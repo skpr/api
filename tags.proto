@@ -1,0 +1,48 @@
+/** Service responsible for coordinating project tags */
+syntax = "proto3";
+
+package workflow;
+
+option go_package = "./pb";
+
+service tag {
+    rpc List (TagListRequest) returns (TagListResponse) {}
+    rpc Add (TagAddRequest) returns (TagAddResponse) {}
+    rpc Delete (TagDeleteRequest) returns (TagDeleteResponse) {}
+}
+
+/**
+ * List a projects tags
+ */
+message TagListRequest {}
+
+/**
+ * Returns a list of tags for a project
+ */
+message TagListResponse {
+    repeated string Tags = 1; // Tags associated with a project
+}
+
+/**
+ * Add a tag to a project
+ */
+message TagAddRequest {
+    string Tag = 1; // Tag that we want to add to the project
+}
+
+/**
+ * Returns the status of a project tag addition
+ */
+message TagAddResponse {}
+
+/**
+ * Delete a projects tag
+ */
+message TagDeleteRequest {
+    string Tag = 1; // Tag that we want to delete from the project
+}
+
+/**
+ * Returns the status of a project tag deletion
+ */
+message TagDeleteResponse {}
