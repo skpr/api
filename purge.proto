@@ -1,0 +1,50 @@
+/** Service responsible for coordinating environment purge requests */
+syntax = "proto3";
+
+package workflow;
+
+option go_package = "./pb";
+
+service purge {
+    rpc Create (PurgeCreateRequest) returns (PurgeCreateResponse) {}
+    rpc List (PurgeListRequest) returns (PurgeListResponse) {}
+}
+
+/**
+ * Create a purge request
+ */
+message PurgeCreateRequest {
+    string Environment = 1;
+    repeated string Paths = 2;
+}
+
+/**
+ * Returns purge request ID if successful
+ */
+message PurgeCreateResponse {
+    string ID = 1; // ID of the purge request
+}
+
+/**
+ * List all purge requests
+ */
+message PurgeListRequest {
+    string Environment = 1; // Name of the environment
+}
+
+/**
+ * Returns a list of all purge requests
+ */
+message PurgeListResponse {
+    repeated RequestSummary Requests = 1; // Lis of requests
+}
+
+/**
+ * Purge request summary
+ */
+message RequestSummary {
+    string ID = 1; // ID of the request
+    string Created = 2; // When the request was created
+    repeated string Paths = 3; // Paths that the request included
+    string Status = 4; // Status of the request
+}

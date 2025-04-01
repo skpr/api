@@ -1,0 +1,31 @@
+/** Service responsible for coordinating projects */
+syntax = "proto3";
+
+package workflow;
+
+option go_package = "./pb";
+
+service project {
+    rpc Get (ProjectGetRequest) returns (ProjectGetResponse) {}
+}
+
+/**
+ * Get project information
+ */
+message ProjectGetRequest {}
+
+/**
+ * Returns project information
+ */
+message ProjectGetResponse {
+    string Namespace = 1;
+    ProjectRegistry Registry = 2;
+}
+
+/**
+ * Project registry information
+ */
+message ProjectRegistry {
+    string Application = 1; // Application registry information
+    string MySQL = 2; // MySQL registry information
+}

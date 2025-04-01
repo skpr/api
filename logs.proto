@@ -1,0 +1,41 @@
+/** Service responsible for querying environment logs */
+syntax = "proto3";
+
+package workflow;
+
+option go_package = "./pb";
+
+service logs {
+    rpc Tail (LogTailRequest) returns (stream LogTailResponse) {}
+    rpc ListStreams (LogListStreamsRequest) returns (LogListStreamsResponse) {}
+}
+
+/**
+ * Start a log tailing stream
+ */
+message LogTailRequest {
+    string Environment = 1; // Name of the environment
+    string Stream = 2; // Stream from an environment
+}
+
+/**
+ * Streamed message response
+ */
+message LogTailResponse {
+    string Message = 1; // Streamed message response
+}
+
+/**
+ * List streams for an environment
+ */
+message LogListStreamsRequest {
+    string Environment = 1; // Name of the environment
+}
+
+/**
+ * Returns a list of streams
+ */
+message LogListStreamsResponse {
+    repeated string Streams = 1; // Streams available for an environment
+    string Default = 2; // Default stream
+}

@@ -1,0 +1,75 @@
+/** Service responsible for coordinating environment restores */
+syntax = "proto3";
+
+package workflow;
+
+option go_package = "./pb";
+
+service restore {
+  rpc Create (RestoreCreateRequest) returns (RestoreCreateResponse) {}
+  rpc Get (RestoreGetRequest) returns (RestoreGetResponse) {}
+  rpc List (RestoreListRequest) returns (RestoreListResponse) {}
+}
+
+/**
+ * Create a restore request
+ */
+message RestoreCreateRequest {
+  string Environment = 1; // Environment name
+  string Backup = 2; // Backup identifier
+}
+
+/**
+ * Returns an ID if the restore creation was successful
+ */
+message RestoreCreateResponse {
+  string ID = 1; // ID of the restore
+}
+
+/**
+ * Get the latest information for a restore
+ */
+message RestoreGetRequest {
+  string ID = 1; // ID of the restore
+}
+
+/**
+ * Returns restore information
+ */
+message RestoreGetResponse {
+  RestoreStatus Restore = 1;
+}
+
+/**
+ * List restores for an environment
+ */
+message RestoreListRequest {
+  string Environment = 1; // Environment name
+}
+
+/**
+ * Returns a list of restores
+ */
+message RestoreListResponse {
+  repeated RestoreStatus List = 1;
+}
+
+/**
+ * Restore status information
+ */
+message RestoreStatus {
+  string Name = 1; // Name of the restore
+  string Backup = 2; // Backup used for the restore
+  enum Phase {
+    InProgress = 0; // Default value
+    Completed = 1; // The backup completed
+    Failed = 2; // The backup failed
+    Unknown = 3; // Backup status is unknown
+  }
+  Phase phase = 3; // Phase of the restore
+  string StartTime = 4; // When the restore was started
+  string CompletionTime = 5; // When the restore was completed
+  string Duration = 6; // How long the restore took to complete
+  repeated string Databases = 7; // Databases associated with the restore
+  repeated string Volumes = 8; // Volumes associated with the restore
+}

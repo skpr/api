@@ -1,0 +1,444 @@
+/** Service responsible for coordinating environments */
+syntax = "proto3";
+
+package workflow;
+
+option go_package = "./pb";
+
+service environment {
+	rpc Delete (EnvironmentDeleteRequest) returns (EnvironmentDeleteResponse) {}
+	rpc Get (EnvironmentGetRequest) returns (EnvironmentGetResponse) {}
+	rpc List (EnvironmentListRequest) returns (EnvironmentListResponse) {}
+	rpc Create (EnvironmentCreateRequest) returns (stream EnvironmentCreateResponse) {}
+	rpc Update (EnvironmentUpdateRequest) returns (stream EnvironmentUpdateResponse) {}
+	rpc Validate (EnvironmentValidateRequest) returns (EnvironmentValidateResponse) {}
+}
+
+/**
+ * Environment cache configuration
+ */
+message Cache {
+	string Policy = 1; // Cache policy assigned to an environment
+}
+
+/**
+ * Environment cron configuration
+ */
+message Cron {
+	string Name = 1; // Cron task name
+	string Command = 2; // Cron task command
+	string Schedule = 3; // How often the cron is executed
+}
+
+/**
+ * Environment daemon configuration
+ */
+message Daemon {
+	string Name = 1; // Name of the daemon
+	string Command = 2; // Command that runs the daemon
+}
+
+/**
+ * Environment configuration
+ */
+message Environment {
+	string Name = 1; // Name of the environment
+	enum Type {
+		None = 0; // Default environment type
+		Drupal = 1; // Environment is Drupal
+	}
+	Type type = 2; // Type of environment
+	bool Production = 3; // If this is a production environment
+	bool Insecure = 4; // DEPRECIATED: If the environment is insecure (no read only filesystem)
+	string Version = 5; // Version associated with an environment
+	string Size = 6; // Size of the environment
+	Ingress Ingress = 7; // Ingress configuration for routing
+	Image Image = 8; // Image respository information
+	repeated Cron Cron = 9; // Cron configuration for an environment
+	repeated MySQL MySQL = 10; // MySQL configuration for an environment
+	SMTP SMTP = 11; // SMTP configuration for an environment
+	ScheduledBackup Backup = 12; // How often the backup is scheduled
+	repeated Solr Solr = 13; // Solr configuration for an environment
+	string Token = 14; // Token assigned to an environment
+	string Phase = 15; // Phase the environment is in eg. Deploying
+	repeated Link Link = 16; // Linked to other environments
+	repeated Volume Volume = 17; // Volumes associated with this environment
+	EnvironmentDashboard Dashboard = 18; // Link to dashboard
+	repeated Daemon Daemon = 19; // Daemon configuration for an environment
+}
+
+/**
+ * Create an environment
+ */
+message EnvironmentCreateRequest {
+	Environment Environment = 1; // Environment configuration
+	bool Wait = 2; // If this request should wait for the environment to be ready
+}
+
+/**
+ * Response if the environment was created
+ */
+message EnvironmentCreateResponse {
+	string Message = 1; // Message provided about the environment
+}
+
+/**
+ * Delete the environment
+ */
+message EnvironmentDeleteRequest {
+	string Name = 1; // Name of the environment
+}
+
+/**
+ * Response if the environment was deleted
+ */
+message EnvironmentDeleteResponse {
+	string Status = 1; // Current status
+}
+
+/**
+ * Request the latest environment status
+ */
+message EnvironmentGetRequest {
+	string Name = 1; // Name of the environment
+}
+
+/**
+ * Latest environment status
+ */
+message EnvironmentGetResponse {
+	Environment Environment = 1; // Environment status
+}
+
+/**
+ * Request a list of environment
+ */
+message EnvironmentListRequest {}
+
+/**
+ * Returns a list of environments
+ */
+message EnvironmentListResponse {
+	repeated Environment Environments = 1; // List of environments
+}
+
+/**
+ * Update the environment
+ */
+message EnvironmentUpdateRequest {
+	Environment Environment = 1; // Environment configuration
+	bool Wait = 2; // If this request should wait
+}
+
+/**
+ * Returns a message if the environment update was successful
+ */
+message EnvironmentUpdateResponse {
+	string Message = 1; // Message if the environment was update was successful
+}
+
+/**
+ * Validate an environment
+ */
+message EnvironmentValidateRequest {
+	Environment Environment = 1; // Environment configuration
+}
+
+/**
+ * Findings when validating an environment
+ */
+message EnvironmentValidateResponse {
+	repeated EnvironmentValidateFinding Findings = 1; // Findings when validating an environment
+}
+
+/**
+ * Finding when validating an environment
+ */
+message EnvironmentValidateFinding {
+	string Group = 1; // Group this finding relates to
+	enum Type {
+		Violation = 0; // If this finding is a violation
+		Warning = 1; // If this finding is a warning
+	}
+	Type type = 2; // Type of finding
+	string Message = 3; // Message associated with finding
+}
+
+/**
+ * Error page configuration for an environment
+ */
+message ErrorPage {
+	string Path = 1; // Path to error page
+	int64 Cache = 2; // How long to cache for
+}
+
+/**
+ * List of error page configuration
+ */
+message ErrorPages {
+	ErrorPage Client = 1; // Client error pages
+	ErrorPage Server = 2; // Server error pages
+}
+
+/**
+ * Image repository details
+ */
+message Image {
+	string Repository = 1; // Repository details eg. Application/MySQL
+}
+
+/**
+ * Ingress configuration associated with an environment
+ */
+message Ingress {
+	string Domain = 1; // Domain environment should respond to
+	repeated string Routes = 2; // Routes associated with an environment
+	repeated string Headers = 3; // Depreciated.
+	repeated string Cookies = 4; // Depreciated.
+	string Certificate = 5; // Certificate associated with an environment
+	ErrorPages ErrorPages = 6; // Error pages configuration
+	repeated Proxy Proxy = 7; // Proxy configuration associated with an environment
+	enum Mode {
+		Default = 0; // Standard routing configuration
+		External = 1; // If the environment has an external CDN
+	}
+	Mode mode = 8; // The mode this CDN is configured for
+	string LoadBalancer = 9; // Load balancer configuration
+	Cache Cache = 10; // Cache configuration
+}
+
+/**
+ * MySQL configuration
+ */
+message MySQL {
+	string Name = 1; // Name of the database
+	MySQLImageSanitize Sanitize = 2; // Sanitization configuration for MySQL
+	MySQLImage Image = 3; // Image configuration for MySQL
+}
+
+/**
+ * MySQL image configuration for an environment
+ */
+message MySQLImage {
+	string Schedule = 1; // How often to build a MySQL image
+	MySQLSanitize Sanitize = 2; // Sanitization rules for image building
+	bool Suspend = 3; // If the MySQL image building is suspended
+}
+
+/**
+ * MySQL image sanitization rules
+ */
+message MySQLSanitize {
+	repeated MySQLSanitizeRewrite Rewrite = 1; // Rewrite table data
+	repeated string NoData = 2; // Export tables with no data
+	repeated string Ignore = 3; // Ingore tables
+	repeated MySQLSanitizeWhere Where = 4; // Update table data
+}
+
+/**
+ * MySQL sanitization rules
+ */
+message MySQLImageSanitize {
+	SanitizationPolicy Backup = 1; // Rules applied to a backup
+	SanitizationPolicy Image = 2; // Rules applied to an image
+}
+
+/**
+ * Sanitization policy configuration
+ */
+message SanitizationPolicy {
+	string Policy = 1; // Policy name
+	SanitizationRules Rules = 2; // Rules to apply
+	repeated string Policies = 3; // Policies to apply
+}
+
+/**
+ * Ingress configuration associated with an environment
+ */
+message SanitizationRules {
+	repeated SanitizationRewrite Rewrite = 1; // Rewrite table data
+	repeated string NoData = 2; // Export tables with no data
+	repeated string Ignore = 3; // Ingore tables
+	repeated SanitizationWhere Where = 4;  // Update table data
+}
+
+/**
+ * Database sanitize rewrite configuration
+ */
+message	SanitizationRewrite {
+	string Name = 1; // Name of the table
+	repeated SanitizationRewriteItem Tables = 2; // How to rewrite
+}
+
+/**
+ * Database sanitize rewrite configuration
+ */
+message MySQLSanitizeRewrite {
+	string Name = 1; // Name of the table
+	repeated MySQLSanitizeRewriteTable Tables = 2; // How to rewrite
+}
+
+/**
+ * Database sanitize rewrite configuration
+ */
+message MySQLSanitizeRewriteTable {
+	string Name = 1; // Name of the table
+	string Value = 2; // Value to rewrite
+}
+
+/**
+ * Database sanitize rewrite configuration
+ */
+message SanitizationRewriteItem {
+	string Name = 1; // Name of the table
+	string Value = 2; // Value to rewrite
+}
+
+/**
+ * Database sanitize rewrite configuration
+ */
+message MySQLSanitizeRewriteTableSanitizationRewrite {
+	string Name = 1; // Name of the table
+	string Value = 2; // Value to rewrite
+}
+
+/**
+ * Database sanitize where configuration
+ */
+message MySQLSanitizeWhere {
+	string Name = 1; // Name of the table
+	string Value = 2; // Value to rewrite
+}
+
+/**
+ * Database sanitize where configuration
+ */
+message SanitizationWhere {
+	string Name = 1; // Name of the table
+	string Value = 2; // Value to rewrite
+}
+
+/**
+ * Proxy configuration
+ */
+message Proxy {
+	string ID = 1; // Identifier of the proxy
+	string Path = 2; // Path to proxy
+	string Origin = 3; // Origin to connect to
+	repeated string Headers = 4; // Depreciated.
+	repeated string Cookies = 5; // Depreciated.
+	Cache Cache = 10; // Cache configuration
+	ProxyTarget Target = 11; // Internal project target
+}
+
+/**
+ * Proxy target configuration
+ */
+message ProxyTarget {
+	ProxyTargetProject Project = 1; // Name of the project
+	ProxyTargetExternal External = 2; // If the target is external
+}
+
+/**
+ * Proxy target project configuration
+ */
+message ProxyTargetProject {
+	string Name = 1; // Name of the project
+	string Environment = 2; // Name of the environment
+}
+
+/**
+ * Proxy target external configuration
+ */
+message ProxyTargetExternal {
+	string Domain = 1; // Domain to connect to
+}
+
+/**
+ * Environment backup schedule
+ */
+message ScheduledBackup {
+	string Schedule = 1; // How often to backup
+	repeated ScheduleBackupVolume Volume = 2; // Volumes to backup
+	bool Suspend = 3; // If backups as suspended
+}
+
+/**
+ * Backup volume configuration
+ */
+message ScheduleBackupVolume {
+	string Name = 1; // Name of the volume
+	bool Exclude = 2; // Exclude rules for backup
+	ScheduleBackupVolumePaths Paths = 3; // Volume path configuration
+}
+
+/**
+ * Backup volume configuration
+ */
+message ScheduleBackupVolumePaths {
+	repeated string Include = 1; // Include these paths
+	repeated string Exclude = 2; // Exclude these paths
+}
+
+/**
+ * SMTP environment configuration
+ */
+message SMTP {
+	// Address to send FROM
+	string Address = 1;
+}
+
+/**
+ * Solr configuration
+ */
+message Solr {
+	string Name = 1; // Name of the Solr instance
+	string Version = 2; // Version of the Solr instance
+}
+
+/**
+ * Link environment to other environment
+ */
+message Link {
+	string Name = 1; // Name of the link
+	string Project = 2; // Name of the project to link to
+	string Environment = 3; // Environment name
+}
+
+/**
+ * Volume configuration
+ */
+message Volume {
+	string Name = 1; // Name of the volume
+	VolumeBackup Backup = 2; // Backup configuration
+}
+
+/**
+ * Volume backup configuration
+ */
+message VolumeBackup {
+	bool Skip = 1; // Skip this volume from backups
+	VolumeBackupSanitize Sanitize = 2; // Sanitize this volume
+}
+
+/**
+ * Volume backup sanitization configuration
+ */
+message VolumeBackupSanitize {
+	repeated string Policies = 1; // Policies associated with backing up this volume
+	VolumeBackupSanitizeRules Rules = 2; // Rules associated with backing up this volume
+}
+
+/**
+ * Volume backup sanitization configuration
+ */
+message VolumeBackupSanitizeRules {
+	repeated string Exclude = 1; // Excluded paths from backup
+}
+
+/**
+ * Environment dashboard configuration
+ */
+message EnvironmentDashboard {
+	string URL = 1; // Link to dashboard
+}

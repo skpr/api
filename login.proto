@@ -1,0 +1,36 @@
+/** Service responsible for logging into the Skpr platform */
+syntax = "proto3";
+
+package authentication;
+
+option go_package = "./pb";
+
+service login {
+  rpc GetProviderInfo (LoginGetProviderInfoRequest) returns (LoginGetProviderInfoResponse) {}
+}
+
+/**
+ * Request login information for a cluster
+ */
+message LoginGetProviderInfoRequest {}
+
+/**
+ * Returns login information
+ */
+message LoginGetProviderInfoResponse {
+  LoginProviderInfoCognito Cognito = 1; // Cognito configuration
+}
+
+/**
+ * Environment cache configuration
+ */
+message LoginProviderInfoCognito {
+  string Region = 1; // Region which Congito resides
+  string ClientID = 2; // Client ID for Congito
+  string IdentityPoolID = 3; // Pool ID for Congito
+  string IdentityProviderID = 4; // Provider ID for Congito
+  string Issuer = 5; // Issuer for Congito
+  string AuthURL = 6; // URL for auth
+  string TokenURL = 7; // URL for token
+  string LogoutURL = 8; // URL for logout
+}

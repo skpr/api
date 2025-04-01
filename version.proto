@@ -1,0 +1,24 @@
+/** Service responsible for version information */
+syntax = "proto3";
+
+package workflow;
+
+option go_package = "./pb";
+
+service version {
+  rpc Get (VersionGetRequest) returns (VersionGetResponse) {}
+}
+
+/**
+ * Get the cluster version
+ */
+message VersionGetRequest {
+}
+
+/**
+ * Returns the cluster version
+ */
+message VersionGetResponse {
+  string Version  = 1; // Version number
+  string BuildDate  = 2; // When this version was built
+}

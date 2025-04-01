@@ -1,0 +1,85 @@
+/** Service responsible for coordinating releases */
+syntax = "proto3";
+
+package workflow;
+
+option go_package = "./pb";
+
+service release {
+  rpc Create (ReleaseCreateRequest) returns (ReleaseCreateResponse) {}
+  rpc Info (ReleaseInfoRequest) returns (ReleaseInfoResponse) {}
+  rpc List (ReleaseListRequest) returns (ReleaseListResponse) {}
+  rpc SignerInfo (ReleaseSignerInfoRequest) returns (ReleaseSignerInfoResponse) {}
+}
+
+/**
+ * Create a release
+ */
+message ReleaseCreateRequest {
+  string Name = 1; // Name of the release
+  repeated ReleaseImage Images = 2; // Images associated with the release
+  string SignedBy = 3; // Release signed by
+}
+
+/**
+ * Image associated with a release
+ */
+message ReleaseImage {
+  string Name = 1; // Name of the release image
+  string URI = 2; // URI of the release image
+}
+
+/**
+ * Returns when a release creation is successful
+ */
+message ReleaseCreateResponse{}
+
+/**
+ * Get release information
+ */
+message ReleaseInfoRequest {
+  string Name = 1; // Name of the release
+}
+
+/**
+ * Returns release information
+ */
+message ReleaseInfoResponse {
+  string Date = 1; // Date the release was created
+  repeated ReleaseImage Images = 2; // Images associated with a release
+  repeated string Environments = 3; // Environments associated with a release
+}
+
+/**
+ * List releases
+ */
+message ReleaseListRequest {}
+
+/**
+ * Returns a list of releases
+ */
+message ReleaseListResponse {
+  repeated ReleaseListItem Items = 1; // List of releases
+}
+
+/**
+ * Release listed item
+ */
+message ReleaseListItem {
+  string Name = 1; // Name of the release
+  string Date = 2; // Creation date of the release
+  repeated ReleaseImage Images = 3; // Images associated with the release
+  repeated string Environments = 4; // Environments associated with the release
+}
+
+/**
+ * Request signer information
+ */
+message ReleaseSignerInfoRequest {}
+
+/**
+ * Returns signer information
+ */
+message ReleaseSignerInfoResponse {
+  string Identifier = 1; // Identifier for the signer
+}

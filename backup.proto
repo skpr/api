@@ -1,0 +1,81 @@
+/** Service responsible for coordinating environment backups */
+syntax = "proto3";
+
+package workflow;
+
+option go_package = "./pb";
+
+service backup {
+  rpc Create (BackupCreateRequest) returns (BackupCreateResponse) {}
+  rpc Get (BackupGetRequest) returns (BackupGetResponse) {}
+  rpc List (BackupListRequest) returns (BackupListResponse) {}
+}
+
+/**
+ * Create a backup for an environment
+ */
+message BackupCreateRequest {
+  string Environment = 1;             // Name of the environment
+  BackupCreateRequestMySQL MySQL = 2; // MySQL configuration
+}
+
+/**
+ * MySQL configuration when creating a backup for an environment
+ */
+message BackupCreateRequestMySQL {
+  repeated string Policies = 1; // Policies to apply
+}
+
+/**
+ * Response containing information to get the status of a backup
+ */
+message BackupCreateResponse {
+  string ID = 1; // Backup identifier
+}
+
+/**
+ * Get the current status of a backup
+ */
+message BackupGetRequest {
+  string ID = 1; // Backup identifier
+}
+
+/**
+ * Response containing the current status of the backup
+ */
+message BackupGetResponse {
+  BackupStatus Backup = 1; // Backup status information
+}
+
+/**
+ * Request a list of backups for an environment
+ */
+message BackupListRequest {
+  string Environment = 1; // Environment name
+}
+
+/**
+ * A list of backups for an environment
+ */
+message BackupListResponse {
+  repeated BackupStatus List = 1; // List of backup information
+}
+
+/**
+ * Response containing the current status of the backup
+ */
+message BackupStatus {
+  string Name = 1; // Name of the backup
+  enum Phase {
+    InProgress = 0; // Default value
+    Completed = 1; // The backup completed
+    Failed = 2; // The backup failed
+    Unknown = 3; // Backup status is unknown
+  }
+  Phase phase = 2; // Current phase the backup is in
+  string StartTime = 3; // When the backup started
+  string CompletionTime = 4; // When the backup completed
+  string Duration = 5; // How long the backup took to execute
+  repeated string Databases = 6; // Databases backed up
+  repeated string Volumes = 7; // Volumes backed up
+}

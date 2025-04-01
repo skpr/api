@@ -1,0 +1,141 @@
+/** Service responsible for coordinating environment volumes */
+syntax = "proto3";
+
+package workflow;
+
+option go_package = "./pb";
+
+service volume {
+  rpc BackupList (VolumeBackupListRequest) returns (VolumeBackupListResponse) {}
+  rpc RestoreList (VolumeRestoreListRequest) returns (VolumeRestoreListResponse) {}
+  rpc BackupCreate (VolumeBackupCreateRequest) returns (VolumeBackupCreateResponse) {}
+  rpc BackupGet (VolumeBackupGetRequest) returns (VolumeBackupGetResponse) {}
+  rpc RestoreCreate (VolumeRestoreCreateRequest) returns (VolumeRestoreCreateResponse) {}
+  rpc RestoreGet (VolumeRestoreGetRequest) returns (VolumeRestoreGetResponse) {}
+}
+
+/**
+ * List volumes backups for an environment
+ */
+message VolumeBackupListRequest {
+  string Environment = 1; // Environment name
+}
+
+/**
+ * Returns list of volume backups
+ */
+message VolumeBackupListResponse {
+  repeated VolumeBackupStatus List = 1; // List of volume backups
+}
+
+/**
+ * Create a volume backup
+ */
+message VolumeBackupCreateRequest {
+  string Environment = 1; // Environment name
+  string VolumeName = 2; // Volume name
+}
+
+/**
+ * Returns a volume backup ID
+ */
+message VolumeBackupCreateResponse {
+  string ID = 1;
+}
+
+/**
+ * Get the latest volume backup information
+ */
+message VolumeBackupGetRequest {
+  string ID = 1; // ID of the backup
+}
+
+/**
+ * Returns the latest backup information
+ */
+message VolumeBackupGetResponse {
+  VolumeBackupStatus VolumeBackup = 1; // Backup status
+}
+
+/**
+ * Backup status information
+ */
+message VolumeBackupStatus {
+  string Name = 1; // Name of the volume backup
+  enum Phase {
+    InProgress = 0; // Default value
+    Completed = 1; // The backup completed
+    Failed = 2; // The backup failed
+    Unknown = 3; // Backup status is unknown
+  }
+  Phase phase = 2; // Phase that the volume backup is in
+  string StartTime = 3; // When the volume backup started
+  string CompletionTime = 4; // When the volume backup completed
+  string Duration = 5; // How long the volume backup took to finish
+  string Volume = 6; // Volumes associated with backup
+  string BackupID =7; // ID of the volume backup
+}
+
+/**
+ * List volume restores for an environment
+ */
+message VolumeRestoreListRequest {
+  string Environment = 1; // Environment name
+}
+
+/**
+ * Returns a list of volume restores
+ */
+message VolumeRestoreListResponse {
+  repeated VolumeRestoreStatus List = 1; // Volume restores
+}
+
+/**
+ * Create a volume restore
+ */
+message VolumeRestoreCreateRequest {
+  string Environment = 1; // Environment name
+  string Backup = 2; // Backup name
+  string VolumeName = 3; // Volume name
+}
+
+/**
+ * Returns the ID of the created restore
+ */
+message VolumeRestoreCreateResponse {
+  string ID = 1;
+}
+
+/**
+ * Get the latest backup information
+ */
+message VolumeRestoreGetRequest {
+  string ID = 1; // ID of the restore
+}
+
+/**
+ * Returns the volume restore status
+ */
+message VolumeRestoreGetResponse {
+  VolumeRestoreStatus VolumeRestore = 1; // Restore status
+}
+
+/**
+ * Volume restore status information
+ */
+message VolumeRestoreStatus {
+  string Name = 1; // Name of the restore
+  string RestoreID = 2; // ID used for volume restore
+  enum Phase {
+    InProgress = 0; // Default value
+    Completed = 1; // The backup completed
+    Failed = 2; // The backup failed
+    Unknown = 3; // Backup status is unknown
+  }
+  Phase phase = 3; // Phase that the volume backup is in
+  string StartTime = 4; // When the volume backup started
+  string CompletionTime = 5; // When the volume backup completed
+  string Duration = 6; // How long the volume backup took to finish
+  string VolumeName = 7; // Name of the volume
+  string BackupID = 8; // ID of the backup used
+}

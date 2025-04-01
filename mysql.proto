@@ -1,0 +1,223 @@
+/** Service responsible for coordinating environment MySQL */
+syntax = "proto3";
+
+package workflow;
+
+option go_package = "./pb";
+
+service mysql {
+  rpc ImageCreate (ImageCreateRequest) returns (ImageCreateResponse) {}
+  rpc ImageGet (ImageGetRequest) returns (ImageGetResponse) {}
+  rpc ImageList (ImageListRequest) returns (ImageListResponse) {}
+  rpc ImageGetRepository (ImageGetRepositoryRequest) returns (ImageGetRepositoryResponse) {}
+  rpc BackupList (MysqlListRequest) returns (MysqlListResponse) {}
+  rpc BackupCreate (MysqlBackupCreateRequest) returns (MysqlBackupCreateResponse) {}
+  rpc BackupGet (MysqlBackupGetRequest) returns (MysqlBackupGetResponse) {}
+  rpc RestoreList (MysqlRestoreListRequest) returns (MysqlRestoreListResponse) {}
+  rpc RestoreCreate (MysqlRestoreCreateRequest) returns (MysqlRestoreCreateResponse) {}
+  rpc RestoreGet (MysqlRestoreGetRequest) returns (MysqlRestoreGetResponse) {}
+}
+
+/**
+ * Create a MySQL database image
+ */
+message ImageCreateRequest {
+  string Environment = 1; // Environment name
+  string Database = 2; // Database to create an image for
+  repeated string Policies = 3; // Policies to apply
+  string Tag = 4; // Tags to apply
+}
+
+/**
+ * Response of image build
+ */
+message ImageCreateResponse {
+  repeated ImageStatus Images = 1; // Images associated with build
+}
+
+/**
+ * Get MySQL image details
+ */
+message ImageGetRequest {
+  string ID = 1; // ID of the image
+}
+
+/**
+ * MySQL database image information
+ */
+message ImageGetResponse {
+  ImageStatus Mysql = 1; // MySQL information
+}
+
+/**
+ * List of images for an environment
+ */
+message ImageListRequest {
+  string Environment = 1; // Name of environment
+}
+
+/**
+ * Images for an environment
+ */
+message ImageListResponse {
+  repeated ImageStatus List = 1; // List of images
+}
+
+/**
+ * Get repository information for environment.
+ */
+message ImageGetRepositoryRequest {
+  string Environment = 1; // Name of environment
+}
+
+/**
+ * Repository information for environment.
+ */
+message ImageGetRepositoryResponse {
+  string Repository = 1;
+}
+
+/**
+ * Image information
+ */
+message ImageStatus {
+  string ID = 1; // ID of the database image
+  enum Phase {
+    InProgress = 0; // Database image build is in progress
+    Completed = 1; // Database image build is complete
+    Failed = 2; // Database image failed
+    Unknown = 3; // Database image is in an unknown state
+  }
+  Phase phase = 2; // Phase the database build is in
+  string StartTime = 3; // When the database image build started
+  string CompletionTime = 4; // When the database image build completed
+  string Duration = 5; // How long the database image build took
+  repeated string Tags = 6; // Tags to applied to the database image
+}
+
+/**
+ * Request a list of MySQL databases
+ */
+message MysqlListRequest {
+  string Environment = 1; // Environment name
+}
+
+/**
+ * Returns a list of databases
+ */
+message MysqlListResponse {
+  repeated MysqlBackupStatus List = 1; // List of databsaes
+}
+
+/**
+ * Create a MySQL backup
+ */
+message MysqlBackupCreateRequest {
+  string Environment = 1; // Environment name
+  string DatabaseName = 2; // Database name
+}
+
+/**
+ * Returns details of MySQL backup
+ */
+message MysqlBackupCreateResponse {
+  string ID = 1; // ID of the backup
+}
+
+/**
+ * Image information
+ */
+message MysqlBackupGetRequest {
+  string ID = 1; // ID of the backup
+  string DatabaseName = 2; // Name of the database
+}
+
+/**
+ * Returns MySQL backup details
+ */
+message MysqlBackupGetResponse {
+  MysqlBackupStatus MysqlBackup = 1; // MySQL backup details
+}
+
+/**
+ * MySQL backup status
+ */
+message MysqlBackupStatus {
+  string Name = 1; // Name of the backup
+  enum Phase {
+    InProgress = 0; // Database image build is in progress
+    Completed = 1; // Database image build is complete
+    Failed = 2; // Database image failed
+    Unknown = 3; // Database image is in an unknown state
+  }
+  Phase phase = 2; // Phase the backup
+  string StartTime = 3; // Start time of the backup
+  string CompletionTime = 4; // Completion time of the backup
+  string Duration = 5; // How long the backup took
+  string Database = 6; // Database that was involved
+  string BackupID = 7; // ID of the backup
+}
+
+/**
+ * Get a list of restores for an environment
+ */
+message MysqlRestoreListRequest {
+  string Environment = 1; // Name of the environment
+}
+
+/**
+ * Returns a list of restores
+ */
+message MysqlRestoreListResponse {
+  repeated MysqlRestoreStatus List = 1; // List of restores
+}
+
+/**
+ * Create a restore
+ */
+message MysqlRestoreCreateRequest {
+  string Environment = 1; // Name of the environment
+  string Backup = 2; // Backup to use for restore
+  string DatabaseName = 3; // Database name
+}
+
+/**
+ * Returns a restore ID if succesful
+ */
+message MysqlRestoreCreateResponse {
+  string ID = 1; // ID of the restore
+}
+
+/**
+ * Request the latest restore information
+ */
+message MysqlRestoreGetRequest {
+  string ID = 1; // ID of the restore
+}
+
+/**
+ * Returns a list of restores
+ */
+message MysqlRestoreGetResponse {
+  MysqlRestoreStatus MysqlRestore = 1; // Restore information
+}
+
+/**
+ * Status of a restore
+ */
+message MysqlRestoreStatus {
+  string Name = 1; // Name of the database
+  string RestoreID = 2; // ID of the restore
+  enum Phase {
+    InProgress = 0; // Database restore is in progress
+    Completed = 1; // Database restore is complete
+    Failed = 2; // Database restore failed
+    Unknown = 3; // Database restore is in an unknown state
+  }
+  Phase phase = 3; // Phase of the database restore
+  string StartTime = 4; // Start time of the restore
+  string CompletionTime = 5; // Completion time of the restore
+  string Duration = 6; // Duration of the restore
+  string Database = 7; // Name of the database
+  string BackupID = 8; // Backup ID used during the restore
+}
