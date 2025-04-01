@@ -23,6 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ProjectClient interface {
 	Get(ctx context.Context, in *ProjectGetRequest, opts ...grpc.CallOption) (*ProjectGetResponse, error)
+	List(ctx context.Context, in *ProjectListRequest, opts ...grpc.CallOption) (*ProjectListResponse, error)
 }
 
 type projectClient struct {
@@ -42,11 +43,21 @@ func (c *projectClient) Get(ctx context.Context, in *ProjectGetRequest, opts ...
 	return out, nil
 }
 
+func (c *projectClient) List(ctx context.Context, in *ProjectListRequest, opts ...grpc.CallOption) (*ProjectListResponse, error) {
+	out := new(ProjectListResponse)
+	err := c.cc.Invoke(ctx, "/workflow.project/List", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ProjectServer is the server API for Project service.
 // All implementations must embed UnimplementedProjectServer
 // for forward compatibility
 type ProjectServer interface {
 	Get(context.Context, *ProjectGetRequest) (*ProjectGetResponse, error)
+	List(context.Context, *ProjectListRequest) (*ProjectListResponse, error)
 	mustEmbedUnimplementedProjectServer()
 }
 
@@ -56,6 +67,9 @@ type UnimplementedProjectServer struct {
 
 func (UnimplementedProjectServer) Get(context.Context, *ProjectGetRequest) (*ProjectGetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
+}
+func (UnimplementedProjectServer) List(context.Context, *ProjectListRequest) (*ProjectListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
 }
 func (UnimplementedProjectServer) mustEmbedUnimplementedProjectServer() {}
 
@@ -88,6 +102,24 @@ func _Project_Get_Handler(srv interface{}, ctx context.Context, dec func(interfa
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Project_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ProjectListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProjectServer).List(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/workflow.project/List",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProjectServer).List(ctx, req.(*ProjectListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Project_ServiceDesc is the grpc.ServiceDesc for Project service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -98,6 +130,10 @@ var Project_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Get",
 			Handler:    _Project_Get_Handler,
+		},
+		{
+			MethodName: "List",
+			Handler:    _Project_List_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

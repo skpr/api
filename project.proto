@@ -7,6 +7,31 @@ option go_package = "./pb";
 
 service project {
     rpc Get (ProjectGetRequest) returns (ProjectGetResponse) {}
+    rpc List (ProjectListRequest) returns (ProjectListResponse) {}
+}
+
+/**
+ * Project status information
+ */
+message Project {
+  string ID = 1; // Machine identifier of the project.
+  string Name = 2; // Human readable name of the project.
+  string Version = 3; // The current version released to production for this project.
+  repeated string Environments = 4; // A list of environments.
+  repeated string Tags = 5; // A list of tags assigned to this environment.
+  string Contact = 6; // Primary contact information for this project.
+  ProjectResourceTotals ResourceTotals = 7; // Total resources being utilised by all environments on this project.
+  string Namespace = 8; // Kubernetes namespace which resources for this project reside.
+  ProjectRegistry Registry = 9; // Container registry information for pushing and pulling images.
+}
+
+/**
+ * Total resource utilisation across all environments for a project.
+ */
+message ProjectResourceTotals {
+  int32 Replicas = 1; // Number of replicas utilising the total resources.
+  int32 CPU = 2; // CPU utilised by all environments on this project.
+  int32 Memory = 3; // Memory utilised by all environments on this project.
 }
 
 /**
@@ -18,8 +43,9 @@ message ProjectGetRequest {}
  * Returns project information
  */
 message ProjectGetResponse {
-    string Namespace = 1;
-    ProjectRegistry Registry = 2;
+    string Namespace = 1; // Will be deprecated in a future release.
+    ProjectRegistry Registry = 2; // Will be deprecated in a future release.
+    Project Project = 3; // Project status information.
 }
 
 /**
@@ -28,4 +54,16 @@ message ProjectGetResponse {
 message ProjectRegistry {
     string Application = 1; // Application registry information
     string MySQL = 2; // MySQL registry information
+}
+
+/**
+ * Request a list of projects from a Skpr platform cluster.
+ */
+message ProjectListRequest {}
+
+/**
+ * A list of all projects on this Skpr platform cluster.
+ */
+message ProjectListResponse {
+    repeated Project Projects = 1;
 }
