@@ -65,6 +65,16 @@ message Environment {
 	repeated Volume Volume = 17; // Volumes associated with this environment
 	EnvironmentDashboard Dashboard = 18; // Link to dashboard
 	repeated Daemon Daemon = 19; // Daemon configuration for an environment
+	EnvironmentResources Resources = 20; // Resources utilised by this environment
+}
+
+/**
+ * Resource utilisation for this environment.
+ */
+message EnvironmentResources {
+	int32 Replicas = 1; // Number of replicas for a given environment.
+	int64 CPU = 2; // CPU utilised by this environment.
+	int64 Memory = 3; // Memory utilised by this environment.
 }
 
 /**

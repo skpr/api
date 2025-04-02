@@ -34,8 +34,8 @@ message Project {
  */
 message ProjectResourceTotals {
   int32 Replicas = 1; // Number of replicas utilising the total resources.
-  int32 CPU = 2; // CPU utilised by all environments on this project.
-  int32 Memory = 3; // Memory utilised by all environments on this project.
+  int64 CPU = 2; // CPU utilised by all environments on this project.
+  int64 Memory = 3; // Memory utilised by all environments on this project.
 }
 
 /**
