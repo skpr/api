@@ -451,6 +451,364 @@ func (x *ProjectListResponse) GetProjects() []*Project {
 	return nil
 }
 
+// *
+// Input for setting tags on a Project.
+type SetTagsRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Tags []string `protobuf:"bytes,1,rep,name=Tags,proto3" json:"Tags,omitempty"` // Tags to set on the Project.
+}
+
+func (x *SetTagsRequest) Reset() {
+	*x = SetTagsRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_project_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SetTagsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetTagsRequest) ProtoMessage() {}
+
+func (x *SetTagsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_project_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetTagsRequest.ProtoReflect.Descriptor instead.
+func (*SetTagsRequest) Descriptor() ([]byte, []int) {
+	return file_project_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *SetTagsRequest) GetTags() []string {
+	if x != nil {
+		return x.Tags
+	}
+	return nil
+}
+
+// *
+// Output when setting tags.
+type SetTagsResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *SetTagsResponse) Reset() {
+	*x = SetTagsResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_project_proto_msgTypes[8]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SetTagsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetTagsResponse) ProtoMessage() {}
+
+func (x *SetTagsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_project_proto_msgTypes[8]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetTagsResponse.ProtoReflect.Descriptor instead.
+func (*SetTagsResponse) Descriptor() ([]byte, []int) {
+	return file_project_proto_rawDescGZIP(), []int{8}
+}
+
+// *
+// Input for getting tags from a Project.
+type GetTagsRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *GetTagsRequest) Reset() {
+	*x = GetTagsRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_project_proto_msgTypes[9]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetTagsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetTagsRequest) ProtoMessage() {}
+
+func (x *GetTagsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_project_proto_msgTypes[9]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetTagsRequest.ProtoReflect.Descriptor instead.
+func (*GetTagsRequest) Descriptor() ([]byte, []int) {
+	return file_project_proto_rawDescGZIP(), []int{9}
+}
+
+// *
+// Output of tags from a Project.
+type GetTagsResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Tags []string `protobuf:"bytes,1,rep,name=Tags,proto3" json:"Tags,omitempty"`
+}
+
+func (x *GetTagsResponse) Reset() {
+	*x = GetTagsResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_project_proto_msgTypes[10]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetTagsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetTagsResponse) ProtoMessage() {}
+
+func (x *GetTagsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_project_proto_msgTypes[10]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetTagsResponse.ProtoReflect.Descriptor instead.
+func (*GetTagsResponse) Descriptor() ([]byte, []int) {
+	return file_project_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *GetTagsResponse) GetTags() []string {
+	if x != nil {
+		return x.Tags
+	}
+	return nil
+}
+
+// *
+// Input for setting contact details on a Project.
+type SetContactRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Deprecated: Do not use.
+	Contact string `protobuf:"bytes,1,opt,name=Contact,proto3" json:"Contact,omitempty"`
+}
+
+func (x *SetContactRequest) Reset() {
+	*x = SetContactRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_project_proto_msgTypes[11]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SetContactRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetContactRequest) ProtoMessage() {}
+
+func (x *SetContactRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_project_proto_msgTypes[11]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetContactRequest.ProtoReflect.Descriptor instead.
+func (*SetContactRequest) Descriptor() ([]byte, []int) {
+	return file_project_proto_rawDescGZIP(), []int{11}
+}
+
+// Deprecated: Do not use.
+func (x *SetContactRequest) GetContact() string {
+	if x != nil {
+		return x.Contact
+	}
+	return ""
+}
+
+// *
+// Output provided when setting contact details.
+type SetContactResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *SetContactResponse) Reset() {
+	*x = SetContactResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_project_proto_msgTypes[12]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SetContactResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetContactResponse) ProtoMessage() {}
+
+func (x *SetContactResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_project_proto_msgTypes[12]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetContactResponse.ProtoReflect.Descriptor instead.
+func (*SetContactResponse) Descriptor() ([]byte, []int) {
+	return file_project_proto_rawDescGZIP(), []int{12}
+}
+
+// *
+// Input provided when getting project contact details.
+type GetContactRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *GetContactRequest) Reset() {
+	*x = GetContactRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_project_proto_msgTypes[13]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetContactRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetContactRequest) ProtoMessage() {}
+
+func (x *GetContactRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_project_proto_msgTypes[13]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetContactRequest.ProtoReflect.Descriptor instead.
+func (*GetContactRequest) Descriptor() ([]byte, []int) {
+	return file_project_proto_rawDescGZIP(), []int{13}
+}
+
+// *
+// Output returned when getting project contact details.
+type GetContactResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Contact string `protobuf:"bytes,1,opt,name=Contact,proto3" json:"Contact,omitempty"`
+}
+
+func (x *GetContactResponse) Reset() {
+	*x = GetContactResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_project_proto_msgTypes[14]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetContactResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetContactResponse) ProtoMessage() {}
+
+func (x *GetContactResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_project_proto_msgTypes[14]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetContactResponse.ProtoReflect.Descriptor instead.
+func (*GetContactResponse) Descriptor() ([]byte, []int) {
+	return file_project_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *GetContactResponse) GetContact() string {
+	if x != nil {
+		return x.Contact
+	}
+	return ""
+}
+
 var File_project_proto protoreflect.FileDescriptor
 
 var file_project_proto_rawDesc = []byte{
@@ -502,7 +860,23 @@ var file_project_proto_rawDesc = []byte{
 	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2d, 0x0a, 0x08, 0x50, 0x72, 0x6f, 0x6a,
 	0x65, 0x63, 0x74, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x77, 0x6f, 0x72,
 	0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x50, 0x72, 0x6f, 0x6a, 0x65, 0x63, 0x74, 0x52, 0x08, 0x50,
-	0x72, 0x6f, 0x6a, 0x65, 0x63, 0x74, 0x73, 0x32, 0x94, 0x01, 0x0a, 0x07, 0x70, 0x72, 0x6f, 0x6a,
+	0x72, 0x6f, 0x6a, 0x65, 0x63, 0x74, 0x73, 0x22, 0x24, 0x0a, 0x0e, 0x53, 0x65, 0x74, 0x54, 0x61,
+	0x67, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x54, 0x61, 0x67,
+	0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52, 0x04, 0x54, 0x61, 0x67, 0x73, 0x22, 0x11, 0x0a,
+	0x0f, 0x53, 0x65, 0x74, 0x54, 0x61, 0x67, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x22, 0x10, 0x0a, 0x0e, 0x47, 0x65, 0x74, 0x54, 0x61, 0x67, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x22, 0x25, 0x0a, 0x0f, 0x47, 0x65, 0x74, 0x54, 0x61, 0x67, 0x73, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x54, 0x61, 0x67, 0x73, 0x18, 0x01, 0x20,
+	0x03, 0x28, 0x09, 0x52, 0x04, 0x54, 0x61, 0x67, 0x73, 0x22, 0x31, 0x0a, 0x11, 0x53, 0x65, 0x74,
+	0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1c,
+	0x0a, 0x07, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42,
+	0x02, 0x18, 0x01, 0x52, 0x07, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x22, 0x14, 0x0a, 0x12,
+	0x53, 0x65, 0x74, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x22, 0x13, 0x0a, 0x11, 0x47, 0x65, 0x74, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x2e, 0x0a, 0x12, 0x47, 0x65, 0x74, 0x43, 0x6f,
+	0x6e, 0x74, 0x61, 0x63, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x18, 0x0a,
+	0x07, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07,
+	0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x32, 0xae, 0x03, 0x0a, 0x07, 0x70, 0x72, 0x6f, 0x6a,
 	0x65, 0x63, 0x74, 0x12, 0x42, 0x0a, 0x03, 0x47, 0x65, 0x74, 0x12, 0x1b, 0x2e, 0x77, 0x6f, 0x72,
 	0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x50, 0x72, 0x6f, 0x6a, 0x65, 0x63, 0x74, 0x47, 0x65, 0x74,
 	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1c, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c,
@@ -511,8 +885,26 @@ var file_project_proto_rawDesc = []byte{
 	0x1c, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x50, 0x72, 0x6f, 0x6a, 0x65,
 	0x63, 0x74, 0x4c, 0x69, 0x73, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1d, 0x2e,
 	0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x50, 0x72, 0x6f, 0x6a, 0x65, 0x63, 0x74,
-	0x4c, 0x69, 0x73, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x06,
-	0x5a, 0x04, 0x2e, 0x2f, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x4c, 0x69, 0x73, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x40,
+	0x0a, 0x07, 0x53, 0x65, 0x74, 0x54, 0x61, 0x67, 0x73, 0x12, 0x18, 0x2e, 0x77, 0x6f, 0x72, 0x6b,
+	0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x53, 0x65, 0x74, 0x54, 0x61, 0x67, 0x73, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x1a, 0x19, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x53,
+	0x65, 0x74, 0x54, 0x61, 0x67, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00,
+	0x12, 0x40, 0x0a, 0x07, 0x47, 0x65, 0x74, 0x54, 0x61, 0x67, 0x73, 0x12, 0x18, 0x2e, 0x77, 0x6f,
+	0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x47, 0x65, 0x74, 0x54, 0x61, 0x67, 0x73, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x19, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77,
+	0x2e, 0x47, 0x65, 0x74, 0x54, 0x61, 0x67, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x22, 0x00, 0x12, 0x49, 0x0a, 0x0a, 0x53, 0x65, 0x74, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74,
+	0x12, 0x1b, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x53, 0x65, 0x74, 0x43,
+	0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1c, 0x2e,
+	0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x53, 0x65, 0x74, 0x43, 0x6f, 0x6e, 0x74,
+	0x61, 0x63, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x49, 0x0a,
+	0x0a, 0x47, 0x65, 0x74, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x12, 0x1b, 0x2e, 0x77, 0x6f,
+	0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x47, 0x65, 0x74, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63,
+	0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1c, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66,
+	0x6c, 0x6f, 0x77, 0x2e, 0x47, 0x65, 0x74, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x06, 0x5a, 0x04, 0x2e, 0x2f, 0x70, 0x62,
+	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -527,7 +919,7 @@ func file_project_proto_rawDescGZIP() []byte {
 	return file_project_proto_rawDescData
 }
 
-var file_project_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_project_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_project_proto_goTypes = []interface{}{
 	(*Project)(nil),               // 0: workflow.Project
 	(*ProjectResourceTotals)(nil), // 1: workflow.ProjectResourceTotals
@@ -536,22 +928,38 @@ var file_project_proto_goTypes = []interface{}{
 	(*ProjectRegistry)(nil),       // 4: workflow.ProjectRegistry
 	(*ProjectListRequest)(nil),    // 5: workflow.ProjectListRequest
 	(*ProjectListResponse)(nil),   // 6: workflow.ProjectListResponse
+	(*SetTagsRequest)(nil),        // 7: workflow.SetTagsRequest
+	(*SetTagsResponse)(nil),       // 8: workflow.SetTagsResponse
+	(*GetTagsRequest)(nil),        // 9: workflow.GetTagsRequest
+	(*GetTagsResponse)(nil),       // 10: workflow.GetTagsResponse
+	(*SetContactRequest)(nil),     // 11: workflow.SetContactRequest
+	(*SetContactResponse)(nil),    // 12: workflow.SetContactResponse
+	(*GetContactRequest)(nil),     // 13: workflow.GetContactRequest
+	(*GetContactResponse)(nil),    // 14: workflow.GetContactResponse
 }
 var file_project_proto_depIdxs = []int32{
-	1, // 0: workflow.Project.ResourceTotals:type_name -> workflow.ProjectResourceTotals
-	4, // 1: workflow.Project.Registry:type_name -> workflow.ProjectRegistry
-	4, // 2: workflow.ProjectGetResponse.Registry:type_name -> workflow.ProjectRegistry
-	0, // 3: workflow.ProjectGetResponse.Project:type_name -> workflow.Project
-	0, // 4: workflow.ProjectListResponse.Projects:type_name -> workflow.Project
-	2, // 5: workflow.project.Get:input_type -> workflow.ProjectGetRequest
-	5, // 6: workflow.project.List:input_type -> workflow.ProjectListRequest
-	3, // 7: workflow.project.Get:output_type -> workflow.ProjectGetResponse
-	6, // 8: workflow.project.List:output_type -> workflow.ProjectListResponse
-	7, // [7:9] is the sub-list for method output_type
-	5, // [5:7] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	1,  // 0: workflow.Project.ResourceTotals:type_name -> workflow.ProjectResourceTotals
+	4,  // 1: workflow.Project.Registry:type_name -> workflow.ProjectRegistry
+	4,  // 2: workflow.ProjectGetResponse.Registry:type_name -> workflow.ProjectRegistry
+	0,  // 3: workflow.ProjectGetResponse.Project:type_name -> workflow.Project
+	0,  // 4: workflow.ProjectListResponse.Projects:type_name -> workflow.Project
+	2,  // 5: workflow.project.Get:input_type -> workflow.ProjectGetRequest
+	5,  // 6: workflow.project.List:input_type -> workflow.ProjectListRequest
+	7,  // 7: workflow.project.SetTags:input_type -> workflow.SetTagsRequest
+	9,  // 8: workflow.project.GetTags:input_type -> workflow.GetTagsRequest
+	11, // 9: workflow.project.SetContact:input_type -> workflow.SetContactRequest
+	13, // 10: workflow.project.GetContact:input_type -> workflow.GetContactRequest
+	3,  // 11: workflow.project.Get:output_type -> workflow.ProjectGetResponse
+	6,  // 12: workflow.project.List:output_type -> workflow.ProjectListResponse
+	8,  // 13: workflow.project.SetTags:output_type -> workflow.SetTagsResponse
+	10, // 14: workflow.project.GetTags:output_type -> workflow.GetTagsResponse
+	12, // 15: workflow.project.SetContact:output_type -> workflow.SetContactResponse
+	14, // 16: workflow.project.GetContact:output_type -> workflow.GetContactResponse
+	11, // [11:17] is the sub-list for method output_type
+	5,  // [5:11] is the sub-list for method input_type
+	5,  // [5:5] is the sub-list for extension type_name
+	5,  // [5:5] is the sub-list for extension extendee
+	0,  // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_project_proto_init() }
@@ -644,6 +1052,102 @@ func file_project_proto_init() {
 				return nil
 			}
 		}
+		file_project_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SetTagsRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_project_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SetTagsResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_project_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetTagsRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_project_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetTagsResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_project_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SetContactRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_project_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SetContactResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_project_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetContactRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_project_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetContactResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -651,7 +1155,7 @@ func file_project_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_project_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

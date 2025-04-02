@@ -6,8 +6,12 @@ package workflow;
 option go_package = "./pb";
 
 service project {
-    rpc Get (ProjectGetRequest) returns (ProjectGetResponse) {}
-    rpc List (ProjectListRequest) returns (ProjectListResponse) {}
+  rpc Get (ProjectGetRequest) returns (ProjectGetResponse) {}
+  rpc List (ProjectListRequest) returns (ProjectListResponse) {}
+  rpc SetTags (SetTagsRequest) returns (SetTagsResponse) {}
+  rpc GetTags (GetTagsRequest) returns (GetTagsResponse) {}
+  rpc SetContact (SetContactRequest) returns (SetContactResponse) {}
+  rpc GetContact (GetContactRequest) returns (GetContactResponse) {}
 }
 
 /**
@@ -66,4 +70,52 @@ message ProjectListRequest {}
  */
 message ProjectListResponse {
     repeated Project Projects = 1;
+}
+
+/**
+ * Input for setting tags on a Project.
+ */
+message SetTagsRequest {
+  repeated string Tags = 1; // Tags to set on the Project.
+}
+
+/**
+ * Output when setting tags.
+ */
+message SetTagsResponse {}
+
+/**
+ * Input for getting tags from a Project.
+ */
+message GetTagsRequest {}
+
+/**
+ * Output of tags from a Project.
+ */
+message GetTagsResponse {
+  repeated string Tags = 1;
+}
+
+/**
+ * Input for setting contact details on a Project.
+ */
+message SetContactRequest {
+  string Contact = 1;
+}
+
+/**
+ * Output provided when setting contact details.
+ */
+message SetContactResponse {}
+
+/**
+ * Input provided when getting project contact details.
+ */
+message GetContactRequest {}
+
+/**
+ * Output returned when getting project contact details.
+ */
+message GetContactResponse {
+  string Contact = 1;
 }
