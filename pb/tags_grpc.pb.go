@@ -23,8 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TagClient interface {
 	List(ctx context.Context, in *TagListRequest, opts ...grpc.CallOption) (*TagListResponse, error)
-	Add(ctx context.Context, in *TagAddRequest, opts ...grpc.CallOption) (*TagAddResponse, error)
-	Delete(ctx context.Context, in *TagDeleteRequest, opts ...grpc.CallOption) (*TagDeleteResponse, error)
+	Set(ctx context.Context, in *TagSetRequest, opts ...grpc.CallOption) (*TagSetResponse, error)
 }
 
 type tagClient struct {
@@ -44,18 +43,9 @@ func (c *tagClient) List(ctx context.Context, in *TagListRequest, opts ...grpc.C
 	return out, nil
 }
 
-func (c *tagClient) Add(ctx context.Context, in *TagAddRequest, opts ...grpc.CallOption) (*TagAddResponse, error) {
-	out := new(TagAddResponse)
-	err := c.cc.Invoke(ctx, "/workflow.tag/Add", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *tagClient) Delete(ctx context.Context, in *TagDeleteRequest, opts ...grpc.CallOption) (*TagDeleteResponse, error) {
-	out := new(TagDeleteResponse)
-	err := c.cc.Invoke(ctx, "/workflow.tag/Delete", in, out, opts...)
+func (c *tagClient) Set(ctx context.Context, in *TagSetRequest, opts ...grpc.CallOption) (*TagSetResponse, error) {
+	out := new(TagSetResponse)
+	err := c.cc.Invoke(ctx, "/workflow.tag/Set", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -67,8 +57,7 @@ func (c *tagClient) Delete(ctx context.Context, in *TagDeleteRequest, opts ...gr
 // for forward compatibility
 type TagServer interface {
 	List(context.Context, *TagListRequest) (*TagListResponse, error)
-	Add(context.Context, *TagAddRequest) (*TagAddResponse, error)
-	Delete(context.Context, *TagDeleteRequest) (*TagDeleteResponse, error)
+	Set(context.Context, *TagSetRequest) (*TagSetResponse, error)
 	mustEmbedUnimplementedTagServer()
 }
 
@@ -79,11 +68,8 @@ type UnimplementedTagServer struct {
 func (UnimplementedTagServer) List(context.Context, *TagListRequest) (*TagListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
 }
-func (UnimplementedTagServer) Add(context.Context, *TagAddRequest) (*TagAddResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Add not implemented")
-}
-func (UnimplementedTagServer) Delete(context.Context, *TagDeleteRequest) (*TagDeleteResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+func (UnimplementedTagServer) Set(context.Context, *TagSetRequest) (*TagSetResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Set not implemented")
 }
 func (UnimplementedTagServer) mustEmbedUnimplementedTagServer() {}
 
@@ -116,38 +102,20 @@ func _Tag_List_Handler(srv interface{}, ctx context.Context, dec func(interface{
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Tag_Add_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(TagAddRequest)
+func _Tag_Set_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TagSetRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TagServer).Add(ctx, in)
+		return srv.(TagServer).Set(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/workflow.tag/Add",
+		FullMethod: "/workflow.tag/Set",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TagServer).Add(ctx, req.(*TagAddRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Tag_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(TagDeleteRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(TagServer).Delete(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/workflow.tag/Delete",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TagServer).Delete(ctx, req.(*TagDeleteRequest))
+		return srv.(TagServer).Set(ctx, req.(*TagSetRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -164,12 +132,8 @@ var Tag_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Tag_List_Handler,
 		},
 		{
-			MethodName: "Add",
-			Handler:    _Tag_Add_Handler,
-		},
-		{
-			MethodName: "Delete",
-			Handler:    _Tag_Delete_Handler,
+			MethodName: "Set",
+			Handler:    _Tag_Set_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
