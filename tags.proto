@@ -26,7 +26,7 @@ message TagListResponse {
  * Set the tags for a project
  */
 message TagSetRequest {
-    repeated string Tag = 1; // Tags we want to set
+    repeated string Tags = 1; // Tags we want to set
 }
 
 /**
