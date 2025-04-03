@@ -21,12 +21,20 @@ message Project {
   string ID = 1; // Machine identifier of the project.
   string Name = 2; // Human readable name of the project.
   string Version = 3; // The current version released to production for this project.
-  repeated string Environments = 4; // A list of environments.
+  ProjectEnvironments Environments = 4; // A list of environments.
   repeated string Tags = 5; // A list of tags assigned to this environment.
   string Contact = 6; // Primary contact information for this project.
   ProjectResourceTotals ResourceTotals = 7; // Total resources being utilised by all environments on this project.
   string Namespace = 8; // Kubernetes namespace which resources for this project reside.
   ProjectRegistry Registry = 9; // Container registry information for pushing and pulling images.
+}
+
+/**
+ * Project environment status information
+ */
+message ProjectEnvironments {
+  string Prod = 1; // The name of the production environment.
+  repeated string NonProd = 2; // Non production environments for this project.
 }
 
 /**

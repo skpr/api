@@ -72,9 +72,34 @@ message Environment {
  * Resource utilisation for this environment.
  */
 message EnvironmentResources {
-	int32 Replicas = 1; // Number of replicas for a given environment.
-	int64 CPU = 2; // CPU utilised by this environment.
-	int64 Memory = 3; // Memory utilised by this environment.
+	EnvironmentResourcesReplicas Replicas = 1; // Number of replicas for a given environment.
+	EnvironmentResourcesCPU CPU = 2; // CPU utilised by this environment.
+	EnvironmentResourcesMemory Memory = 3; // Memory utilised by this environment.
+}
+
+/**
+ * Replica utilisation for this environment.
+ */
+message EnvironmentResourcesReplicas {
+	int32 Current = 1; // Number of replicas for a given environment.
+	int64 Limit = 2; // Limit of how many replicas for a given environment.
+}
+
+/**
+ * CPU utilisation for this environment.
+ */
+message EnvironmentResourcesCPU {
+	int64 Current = 1; // Current CPU utilisation for a given environment.
+	int64 Limit = 2; // Maximum CPU utilisation for a given environment.
+}
+
+/**
+ * Memory utilisation for this environment.
+ */
+message EnvironmentResourcesMemory {
+	int64 Current = 1; // Current number of replicas for a given environment.
+	int64 Min = 2; // Minimum number of replicas for a given environment.
+	int64 Max = 3; // Minimum number of replicas for a given environment.
 }
 
 /**
