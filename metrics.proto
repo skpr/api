@@ -1,0 +1,38 @@
+/** Service responsible for coordinating cluster/environment metrics */
+syntax = "proto3";
+
+package workflow;
+
+option go_package = "./pb";
+
+service metrics {
+  rpc ClusterRequests (ClusterRequestsRequest) returns (ClusterRequestsResponse) {}
+  rpc ClusterResponseCodes (ClusterResponseCodesRequest) returns (ClusterResponseCodesResponse) {}
+}
+
+message ClusterRequestsRequest {}
+
+message ClusterRequestsResponse {
+  repeated MetricClusterRequests Metrics = 1;
+}
+
+message MetricClusterRequests {
+  string Date = 1;
+  int64 Requests = 2;
+}
+
+message ClusterResponseCodesRequest {}
+
+message ClusterResponseCodesResponse {
+  repeated MetricClusterResponseCodes Metrics = 1;
+}
+
+message MetricClusterResponseCodes {
+  string Date = 1;
+  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status
+  int64 Server = 2;
+  int64 Client = 3;
+  int64 Redirection = 4;
+  int64 Successful = 5;
+}
+
