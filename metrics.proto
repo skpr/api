@@ -12,6 +12,7 @@ service metrics {
   rpc ResponseCodes (ResponseCodesRequest) returns (ResponseCodesResponse) {}
   rpc ResponseTimes (ResponseTimesRequest) returns (ResponseTimesResponse) {}
   rpc CacheRatio (CacheRatioRequest) returns (CacheRatioResponse) {}
+  rpc OriginErrors (OriginErrorsRequest) returns (OriginErrorsResponse) {}
 }
 
 message ClusterRequestsRequest {}
@@ -89,4 +90,14 @@ message MetricCacheRatio {
   string Date = 1;
   int64 Hit = 2;
   int64 Miss = 3;
+}
+message OriginErrorsRequest {}
+
+message OriginErrorsResponse {
+  repeated MetricOriginErrors Metrics = 1;
+}
+
+message MetricOriginErrors {
+  string Date = 1;
+  int64 Errors = 2;
 }
