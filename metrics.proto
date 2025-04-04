@@ -8,6 +8,8 @@ option go_package = "./pb";
 service metrics {
   rpc ClusterRequests (ClusterRequestsRequest) returns (ClusterRequestsResponse) {}
   rpc ClusterResponseCodes (ClusterResponseCodesRequest) returns (ClusterResponseCodesResponse) {}
+  rpc Requests (RequestsRequest) returns (RequestsResponse) {}
+  rpc ResponseCodes (ResponseCodesRequest) returns (ResponseCodesResponse) {}
 }
 
 message ClusterRequestsRequest {}
@@ -35,4 +37,31 @@ message MetricClusterResponseCodes {
   int64 Redirection = 4;
   int64 Successful = 5;
 }
+
+message RequestsRequest {}
+
+message RequestsResponse {
+  repeated MetricRequests Metrics = 1;
+}
+
+message MetricRequests {
+  string Date = 1;
+  int64 Requests = 2;
+}
+
+message ResponseCodesRequest {}
+
+message ResponseCodesResponse {
+  repeated MetricResponseCodes Metrics = 1;
+}
+
+message MetricResponseCodes {
+  string Date = 1;
+  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status
+  int64 Server = 2;
+  int64 Client = 3;
+  int64 Redirection = 4;
+  int64 Successful = 5;
+}
+
 
