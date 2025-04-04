@@ -13,6 +13,8 @@ service metrics {
   rpc ResponseTimes (ResponseTimesRequest) returns (ResponseTimesResponse) {}
   rpc CacheRatio (CacheRatioRequest) returns (CacheRatioResponse) {}
   rpc OriginErrors (OriginErrorsRequest) returns (OriginErrorsResponse) {}
+  rpc InvalidationRequests (InvalidationRequestsRequest) returns (InvalidationRequestsResponse) {}
+  rpc InvalidationPaths (InvalidationPathsRequest) returns (InvalidationPathsResponse) {}
 }
 
 message ClusterRequestsRequest {}
@@ -41,7 +43,9 @@ message MetricClusterResponseCodes {
   int64 Successful = 5;
 }
 
-message RequestsRequest {}
+message RequestsRequest {
+  string Environment = 1;
+}
 
 message RequestsResponse {
   repeated MetricRequests Metrics = 1;
@@ -52,7 +56,9 @@ message MetricRequests {
   int64 Requests = 2;
 }
 
-message ResponseCodesRequest {}
+message ResponseCodesRequest {
+  string Environment = 1;
+}
 
 message ResponseCodesResponse {
   repeated MetricResponseCodes Metrics = 1;
@@ -67,7 +73,9 @@ message MetricResponseCodes {
   int64 Successful = 5;
 }
 
-message ResponseTimesRequest {}
+message ResponseTimesRequest {
+  string Environment = 1;
+}
 
 message ResponseTimesResponse {
   repeated MetricResponseTimes Metrics = 1;
@@ -80,7 +88,9 @@ message MetricResponseTimes {
   int64 P99 = 4;
 }
 
-message CacheRatioRequest {}
+message CacheRatioRequest {
+  string Environment = 1;
+}
 
 message CacheRatioResponse {
   repeated MetricCacheRatio Metrics = 1;
@@ -91,7 +101,10 @@ message MetricCacheRatio {
   int64 Hit = 2;
   int64 Miss = 3;
 }
-message OriginErrorsRequest {}
+
+message OriginErrorsRequest {
+  string Environment = 1;
+}
 
 message OriginErrorsResponse {
   repeated MetricOriginErrors Metrics = 1;
@@ -100,4 +113,30 @@ message OriginErrorsResponse {
 message MetricOriginErrors {
   string Date = 1;
   int64 Errors = 2;
+}
+
+message InvalidationRequestsRequest {
+  string Environment = 1;
+}
+
+message InvalidationRequestsResponse {
+  repeated MetricInvalidationRequests Metrics = 1;
+}
+
+message MetricInvalidationRequests {
+  string Date = 1;
+  int64 Requests = 2;
+}
+
+message InvalidationPathsRequest {
+  string Environment = 1;
+}
+
+message InvalidationPathsResponse {
+  repeated MetricInvalidationPaths Metrics = 1;
+}
+
+message MetricInvalidationPaths {
+  string Date = 1;
+  int64 Paths = 2;
 }
