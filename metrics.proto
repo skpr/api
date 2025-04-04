@@ -10,6 +10,7 @@ service metrics {
   rpc ClusterResponseCodes (ClusterResponseCodesRequest) returns (ClusterResponseCodesResponse) {}
   rpc Requests (RequestsRequest) returns (RequestsResponse) {}
   rpc ResponseCodes (ResponseCodesRequest) returns (ResponseCodesResponse) {}
+  rpc ResponseTimes (ResponseTimesRequest) returns (ResponseTimesResponse) {}
 }
 
 message ClusterRequestsRequest {}
@@ -64,4 +65,15 @@ message MetricResponseCodes {
   int64 Successful = 5;
 }
 
+message ResponseTimesRequest {}
 
+message ResponseTimesResponse {
+  repeated MetricResponseTimes Metrics = 1;
+}
+
+message MetricResponseTimes {
+  string Date = 1;
+  int64 Average = 2;
+  int64 P95 = 3;
+  int64 P99 = 4;
+}
