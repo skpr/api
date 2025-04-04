@@ -22,6 +22,8 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// *
+// Input for ClusterRequests.
 type ClusterRequestsRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -60,12 +62,14 @@ func (*ClusterRequestsRequest) Descriptor() ([]byte, []int) {
 	return file_metrics_proto_rawDescGZIP(), []int{0}
 }
 
+// *
+// Output for ClusterRequests.
 type ClusterRequestsResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Metrics []*MetricClusterRequests `protobuf:"bytes,1,rep,name=Metrics,proto3" json:"Metrics,omitempty"`
+	Metrics []*MetricClusterRequests `protobuf:"bytes,1,rep,name=Metrics,proto3" json:"Metrics,omitempty"` // List of metrics.
 }
 
 func (x *ClusterRequestsResponse) Reset() {
@@ -107,13 +111,15 @@ func (x *ClusterRequestsResponse) GetMetrics() []*MetricClusterRequests {
 	return nil
 }
 
+// *
+// Metric which contains total request for a single date for all cluster environments.
 type MetricClusterRequests struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Date     string `protobuf:"bytes,1,opt,name=Date,proto3" json:"Date,omitempty"`
-	Requests int64  `protobuf:"varint,2,opt,name=Requests,proto3" json:"Requests,omitempty"`
+	Date     string `protobuf:"bytes,1,opt,name=Date,proto3" json:"Date,omitempty"`          // Date which the metric dat a is grouped by.
+	Requests int64  `protobuf:"varint,2,opt,name=Requests,proto3" json:"Requests,omitempty"` // Requests across all environments.
 }
 
 func (x *MetricClusterRequests) Reset() {
@@ -162,6 +168,8 @@ func (x *MetricClusterRequests) GetRequests() int64 {
 	return 0
 }
 
+// *
+// Input for ClusterResponseCodes.
 type ClusterResponseCodesRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -200,12 +208,14 @@ func (*ClusterResponseCodesRequest) Descriptor() ([]byte, []int) {
 	return file_metrics_proto_rawDescGZIP(), []int{3}
 }
 
+// *
+// Output for ClusterResponseCodes.
 type ClusterResponseCodesResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Metrics []*MetricClusterResponseCodes `protobuf:"bytes,1,rep,name=Metrics,proto3" json:"Metrics,omitempty"`
+	Metrics []*MetricClusterResponseCodes `protobuf:"bytes,1,rep,name=Metrics,proto3" json:"Metrics,omitempty"` // List of metrics.
 }
 
 func (x *ClusterResponseCodesResponse) Reset() {
@@ -247,17 +257,19 @@ func (x *ClusterResponseCodesResponse) GetMetrics() []*MetricClusterResponseCode
 	return nil
 }
 
+// *
+// Metric which contains total response codes for a single date.
 type MetricClusterResponseCodes struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Date string `protobuf:"bytes,1,opt,name=Date,proto3" json:"Date,omitempty"`
+	Date string `protobuf:"bytes,1,opt,name=Date,proto3" json:"Date,omitempty"` // Date which the metric dat a is grouped by.
 	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status
-	Server      int64 `protobuf:"varint,2,opt,name=Server,proto3" json:"Server,omitempty"`
-	Client      int64 `protobuf:"varint,3,opt,name=Client,proto3" json:"Client,omitempty"`
-	Redirection int64 `protobuf:"varint,4,opt,name=Redirection,proto3" json:"Redirection,omitempty"`
-	Successful  int64 `protobuf:"varint,5,opt,name=Successful,proto3" json:"Successful,omitempty"`
+	Server      int64 `protobuf:"varint,2,opt,name=Server,proto3" json:"Server,omitempty"`           // Error codes were returned from the server.
+	Client      int64 `protobuf:"varint,3,opt,name=Client,proto3" json:"Client,omitempty"`           // Client related codes.
+	Redirection int64 `protobuf:"varint,4,opt,name=Redirection,proto3" json:"Redirection,omitempty"` // Codes which related to redirects.
+	Successful  int64 `protobuf:"varint,5,opt,name=Successful,proto3" json:"Successful,omitempty"`   // Codes which relate to successful responses.
 }
 
 func (x *MetricClusterResponseCodes) Reset() {
@@ -327,12 +339,14 @@ func (x *MetricClusterResponseCodes) GetSuccessful() int64 {
 	return 0
 }
 
+// *
+// Input for Requests.
 type RequestsRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Environment string `protobuf:"bytes,1,opt,name=Environment,proto3" json:"Environment,omitempty"`
+	Environment string `protobuf:"bytes,1,opt,name=Environment,proto3" json:"Environment,omitempty"` // Name of the environment.
 }
 
 func (x *RequestsRequest) Reset() {
@@ -374,12 +388,14 @@ func (x *RequestsRequest) GetEnvironment() string {
 	return ""
 }
 
+// *
+// Output for Requests.
 type RequestsResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Metrics []*MetricRequests `protobuf:"bytes,1,rep,name=Metrics,proto3" json:"Metrics,omitempty"`
+	Metrics []*MetricRequests `protobuf:"bytes,1,rep,name=Metrics,proto3" json:"Metrics,omitempty"` // List of returned metrics.
 }
 
 func (x *RequestsResponse) Reset() {
@@ -421,12 +437,14 @@ func (x *RequestsResponse) GetMetrics() []*MetricRequests {
 	return nil
 }
 
+// *
+// Metric which contains total request for a single date on a single environment.
 type MetricRequests struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Date     string `protobuf:"bytes,1,opt,name=Date,proto3" json:"Date,omitempty"`
+	Date     string `protobuf:"bytes,1,opt,name=Date,proto3" json:"Date,omitempty"` // Date which the metric dat a is grouped by.
 	Requests int64  `protobuf:"varint,2,opt,name=Requests,proto3" json:"Requests,omitempty"`
 }
 
@@ -476,12 +494,14 @@ func (x *MetricRequests) GetRequests() int64 {
 	return 0
 }
 
+// *
+// Input for ResponseCodes.
 type ResponseCodesRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Environment string `protobuf:"bytes,1,opt,name=Environment,proto3" json:"Environment,omitempty"`
+	Environment string `protobuf:"bytes,1,opt,name=Environment,proto3" json:"Environment,omitempty"` // Name of the environment.
 }
 
 func (x *ResponseCodesRequest) Reset() {
@@ -523,12 +543,14 @@ func (x *ResponseCodesRequest) GetEnvironment() string {
 	return ""
 }
 
+// *
+// Output for ResponseCodes.
 type ResponseCodesResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Metrics []*MetricResponseCodes `protobuf:"bytes,1,rep,name=Metrics,proto3" json:"Metrics,omitempty"`
+	Metrics []*MetricResponseCodes `protobuf:"bytes,1,rep,name=Metrics,proto3" json:"Metrics,omitempty"` // List of returned metrics.
 }
 
 func (x *ResponseCodesResponse) Reset() {
@@ -570,17 +592,19 @@ func (x *ResponseCodesResponse) GetMetrics() []*MetricResponseCodes {
 	return nil
 }
 
+// *
+// Metric which contains total response codes for a single date on a single environment.
 type MetricResponseCodes struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Date string `protobuf:"bytes,1,opt,name=Date,proto3" json:"Date,omitempty"`
+	Date string `protobuf:"bytes,1,opt,name=Date,proto3" json:"Date,omitempty"` // Date which the metric dat a is grouped by.
 	// https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status
-	Server      int64 `protobuf:"varint,2,opt,name=Server,proto3" json:"Server,omitempty"`
-	Client      int64 `protobuf:"varint,3,opt,name=Client,proto3" json:"Client,omitempty"`
-	Redirection int64 `protobuf:"varint,4,opt,name=Redirection,proto3" json:"Redirection,omitempty"`
-	Successful  int64 `protobuf:"varint,5,opt,name=Successful,proto3" json:"Successful,omitempty"`
+	Server      int64 `protobuf:"varint,2,opt,name=Server,proto3" json:"Server,omitempty"`           // Error codes were returned from the server.
+	Client      int64 `protobuf:"varint,3,opt,name=Client,proto3" json:"Client,omitempty"`           // Client related codes.
+	Redirection int64 `protobuf:"varint,4,opt,name=Redirection,proto3" json:"Redirection,omitempty"` // Codes which related to redirects.
+	Successful  int64 `protobuf:"varint,5,opt,name=Successful,proto3" json:"Successful,omitempty"`   // Codes which relate to successful responses.
 }
 
 func (x *MetricResponseCodes) Reset() {
@@ -650,12 +674,14 @@ func (x *MetricResponseCodes) GetSuccessful() int64 {
 	return 0
 }
 
+// *
+// Input for ResponseTimes.
 type ResponseTimesRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Environment string `protobuf:"bytes,1,opt,name=Environment,proto3" json:"Environment,omitempty"`
+	Environment string `protobuf:"bytes,1,opt,name=Environment,proto3" json:"Environment,omitempty"` // Name of the environment.
 }
 
 func (x *ResponseTimesRequest) Reset() {
@@ -697,12 +723,14 @@ func (x *ResponseTimesRequest) GetEnvironment() string {
 	return ""
 }
 
+// *
+// Output for ResponseTimes.
 type ResponseTimesResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Metrics []*MetricResponseTimes `protobuf:"bytes,1,rep,name=Metrics,proto3" json:"Metrics,omitempty"`
+	Metrics []*MetricResponseTimes `protobuf:"bytes,1,rep,name=Metrics,proto3" json:"Metrics,omitempty"` // List of returned metrics.
 }
 
 func (x *ResponseTimesResponse) Reset() {
@@ -744,15 +772,17 @@ func (x *ResponseTimesResponse) GetMetrics() []*MetricResponseTimes {
 	return nil
 }
 
+// *
+// Metric which contains total response times for a single date on a single environment.
 type MetricResponseTimes struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Date    string `protobuf:"bytes,1,opt,name=Date,proto3" json:"Date,omitempty"`
-	Average int64  `protobuf:"varint,2,opt,name=Average,proto3" json:"Average,omitempty"`
-	P95     int64  `protobuf:"varint,3,opt,name=P95,proto3" json:"P95,omitempty"`
-	P99     int64  `protobuf:"varint,4,opt,name=P99,proto3" json:"P99,omitempty"`
+	Date    string `protobuf:"bytes,1,opt,name=Date,proto3" json:"Date,omitempty"`        // Date which the metric dat a is grouped by.
+	Average int64  `protobuf:"varint,2,opt,name=Average,proto3" json:"Average,omitempty"` // Average response time.
+	P95     int64  `protobuf:"varint,3,opt,name=P95,proto3" json:"P95,omitempty"`         // 95th percentile.
+	P99     int64  `protobuf:"varint,4,opt,name=P99,proto3" json:"P99,omitempty"`         // 99th percentile
 }
 
 func (x *MetricResponseTimes) Reset() {
@@ -815,12 +845,14 @@ func (x *MetricResponseTimes) GetP99() int64 {
 	return 0
 }
 
+// *
+// Input for CacheRatio.
 type CacheRatioRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Environment string `protobuf:"bytes,1,opt,name=Environment,proto3" json:"Environment,omitempty"`
+	Environment string `protobuf:"bytes,1,opt,name=Environment,proto3" json:"Environment,omitempty"` // Name of the environment.
 }
 
 func (x *CacheRatioRequest) Reset() {
@@ -862,12 +894,14 @@ func (x *CacheRatioRequest) GetEnvironment() string {
 	return ""
 }
 
+// *
+// Output for CacheRatio.
 type CacheRatioResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Metrics []*MetricCacheRatio `protobuf:"bytes,1,rep,name=Metrics,proto3" json:"Metrics,omitempty"`
+	Metrics []*MetricCacheRatio `protobuf:"bytes,1,rep,name=Metrics,proto3" json:"Metrics,omitempty"` // List of returned metrics.
 }
 
 func (x *CacheRatioResponse) Reset() {
@@ -909,14 +943,16 @@ func (x *CacheRatioResponse) GetMetrics() []*MetricCacheRatio {
 	return nil
 }
 
+// *
+// Metric which contains cache ratio for a single date on a single environment.
 type MetricCacheRatio struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Date string `protobuf:"bytes,1,opt,name=Date,proto3" json:"Date,omitempty"`
-	Hit  int64  `protobuf:"varint,2,opt,name=Hit,proto3" json:"Hit,omitempty"`
-	Miss int64  `protobuf:"varint,3,opt,name=Miss,proto3" json:"Miss,omitempty"`
+	Date string `protobuf:"bytes,1,opt,name=Date,proto3" json:"Date,omitempty"`  // Date which the metric dat a is grouped by.
+	Hit  int64  `protobuf:"varint,2,opt,name=Hit,proto3" json:"Hit,omitempty"`   // Percentage of cached responses.
+	Miss int64  `protobuf:"varint,3,opt,name=Miss,proto3" json:"Miss,omitempty"` // Percentage of non cached responses.
 }
 
 func (x *MetricCacheRatio) Reset() {
@@ -972,12 +1008,14 @@ func (x *MetricCacheRatio) GetMiss() int64 {
 	return 0
 }
 
+// *
+// Input for OriginErrors.
 type OriginErrorsRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Environment string `protobuf:"bytes,1,opt,name=Environment,proto3" json:"Environment,omitempty"`
+	Environment string `protobuf:"bytes,1,opt,name=Environment,proto3" json:"Environment,omitempty"` // Name of the environment.
 }
 
 func (x *OriginErrorsRequest) Reset() {
@@ -1019,12 +1057,14 @@ func (x *OriginErrorsRequest) GetEnvironment() string {
 	return ""
 }
 
+// *
+// Output for OriginErrors.
 type OriginErrorsResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Metrics []*MetricOriginErrors `protobuf:"bytes,1,rep,name=Metrics,proto3" json:"Metrics,omitempty"`
+	Metrics []*MetricOriginErrors `protobuf:"bytes,1,rep,name=Metrics,proto3" json:"Metrics,omitempty"` // List of returned metrics.
 }
 
 func (x *OriginErrorsResponse) Reset() {
@@ -1066,13 +1106,15 @@ func (x *OriginErrorsResponse) GetMetrics() []*MetricOriginErrors {
 	return nil
 }
 
+// *
+// Metric which contains origin errors for a single date on a single environment.
 type MetricOriginErrors struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Date   string `protobuf:"bytes,1,opt,name=Date,proto3" json:"Date,omitempty"`
-	Errors int64  `protobuf:"varint,2,opt,name=Errors,proto3" json:"Errors,omitempty"`
+	Date   string `protobuf:"bytes,1,opt,name=Date,proto3" json:"Date,omitempty"`      // Date which the metric dat a is grouped by.
+	Errors int64  `protobuf:"varint,2,opt,name=Errors,proto3" json:"Errors,omitempty"` // Number of origin errors.
 }
 
 func (x *MetricOriginErrors) Reset() {
@@ -1121,12 +1163,14 @@ func (x *MetricOriginErrors) GetErrors() int64 {
 	return 0
 }
 
+// *
+// Input for InvalidationRequests.
 type InvalidationRequestsRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Environment string `protobuf:"bytes,1,opt,name=Environment,proto3" json:"Environment,omitempty"`
+	Environment string `protobuf:"bytes,1,opt,name=Environment,proto3" json:"Environment,omitempty"` // Name of the environment.
 }
 
 func (x *InvalidationRequestsRequest) Reset() {
@@ -1168,12 +1212,14 @@ func (x *InvalidationRequestsRequest) GetEnvironment() string {
 	return ""
 }
 
+// *
+// Output for InvalidationRequests.
 type InvalidationRequestsResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Metrics []*MetricInvalidationRequests `protobuf:"bytes,1,rep,name=Metrics,proto3" json:"Metrics,omitempty"`
+	Metrics []*MetricInvalidationRequests `protobuf:"bytes,1,rep,name=Metrics,proto3" json:"Metrics,omitempty"` // List of returned metrics.
 }
 
 func (x *InvalidationRequestsResponse) Reset() {
@@ -1215,13 +1261,15 @@ func (x *InvalidationRequestsResponse) GetMetrics() []*MetricInvalidationRequest
 	return nil
 }
 
+// *
+// Metric which contains invalidation requests for a single date on a single environment.
 type MetricInvalidationRequests struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Date     string `protobuf:"bytes,1,opt,name=Date,proto3" json:"Date,omitempty"`
-	Requests int64  `protobuf:"varint,2,opt,name=Requests,proto3" json:"Requests,omitempty"`
+	Date     string `protobuf:"bytes,1,opt,name=Date,proto3" json:"Date,omitempty"`          // Date which the metric dat a is grouped by.
+	Requests int64  `protobuf:"varint,2,opt,name=Requests,proto3" json:"Requests,omitempty"` // Number of invalidation requests.
 }
 
 func (x *MetricInvalidationRequests) Reset() {
@@ -1270,12 +1318,14 @@ func (x *MetricInvalidationRequests) GetRequests() int64 {
 	return 0
 }
 
+// *
+// Input for InvalidationPaths.
 type InvalidationPathsRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Environment string `protobuf:"bytes,1,opt,name=Environment,proto3" json:"Environment,omitempty"`
+	Environment string `protobuf:"bytes,1,opt,name=Environment,proto3" json:"Environment,omitempty"` // Name of the environment.
 }
 
 func (x *InvalidationPathsRequest) Reset() {
@@ -1317,12 +1367,14 @@ func (x *InvalidationPathsRequest) GetEnvironment() string {
 	return ""
 }
 
+// *
+// Output for InvalidationPaths.
 type InvalidationPathsResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Metrics []*MetricInvalidationPaths `protobuf:"bytes,1,rep,name=Metrics,proto3" json:"Metrics,omitempty"`
+	Metrics []*MetricInvalidationPaths `protobuf:"bytes,1,rep,name=Metrics,proto3" json:"Metrics,omitempty"` // List of returned metrics.
 }
 
 func (x *InvalidationPathsResponse) Reset() {
@@ -1364,13 +1416,15 @@ func (x *InvalidationPathsResponse) GetMetrics() []*MetricInvalidationPaths {
 	return nil
 }
 
+// *
+// Metric which contains invalidation paths for a single date on a single environment.
 type MetricInvalidationPaths struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Date  string `protobuf:"bytes,1,opt,name=Date,proto3" json:"Date,omitempty"`
-	Paths int64  `protobuf:"varint,2,opt,name=Paths,proto3" json:"Paths,omitempty"`
+	Date  string `protobuf:"bytes,1,opt,name=Date,proto3" json:"Date,omitempty"`    // Date which the metric dat a is grouped by. // Date which the metric dat a is grouped by.
+	Paths int64  `protobuf:"varint,2,opt,name=Paths,proto3" json:"Paths,omitempty"` // Number of paths that were invalidated.
 }
 
 func (x *MetricInvalidationPaths) Reset() {

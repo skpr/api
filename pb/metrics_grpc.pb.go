@@ -22,14 +22,23 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MetricsClient interface {
+	// The total number of HTTP and HTTPS requests for all HTTP methods across all environments.
 	ClusterRequests(ctx context.Context, in *ClusterRequestsRequest, opts ...grpc.CallOption) (*ClusterRequestsResponse, error)
+	// The number of HTTP codes that originate from all load balancers.
 	ClusterResponseCodes(ctx context.Context, in *ClusterResponseCodesRequest, opts ...grpc.CallOption) (*ClusterResponseCodesResponse, error)
+	// The total number of HTTP and HTTPS requests for all HTTP methods for an environment.
 	Requests(ctx context.Context, in *RequestsRequest, opts ...grpc.CallOption) (*RequestsResponse, error)
+	// The number of HTTP codes that originate from an environments load balancer.
 	ResponseCodes(ctx context.Context, in *ResponseCodesRequest, opts ...grpc.CallOption) (*ResponseCodesResponse, error)
+	// The time elapsed after the request leaves the load balancer until a response from the target is received.
 	ResponseTimes(ctx context.Context, in *ResponseTimesRequest, opts ...grpc.CallOption) (*ResponseTimesResponse, error)
+	// The percentage of all cacheable requests for which CDN served the content from its cache.
 	CacheRatio(ctx context.Context, in *CacheRatioRequest, opts ...grpc.CallOption) (*CacheRatioResponse, error)
+	// This error indicates a communication problem between CDN and the origin.
 	OriginErrors(ctx context.Context, in *OriginErrorsRequest, opts ...grpc.CallOption) (*OriginErrorsResponse, error)
+	// The number of requests which were sent to invalidate the CDN.
 	InvalidationRequests(ctx context.Context, in *InvalidationRequestsRequest, opts ...grpc.CallOption) (*InvalidationRequestsResponse, error)
+	// The number of paths which were invalidated by requests.
 	InvalidationPaths(ctx context.Context, in *InvalidationPathsRequest, opts ...grpc.CallOption) (*InvalidationPathsResponse, error)
 }
 
@@ -126,14 +135,23 @@ func (c *metricsClient) InvalidationPaths(ctx context.Context, in *InvalidationP
 // All implementations must embed UnimplementedMetricsServer
 // for forward compatibility
 type MetricsServer interface {
+	// The total number of HTTP and HTTPS requests for all HTTP methods across all environments.
 	ClusterRequests(context.Context, *ClusterRequestsRequest) (*ClusterRequestsResponse, error)
+	// The number of HTTP codes that originate from all load balancers.
 	ClusterResponseCodes(context.Context, *ClusterResponseCodesRequest) (*ClusterResponseCodesResponse, error)
+	// The total number of HTTP and HTTPS requests for all HTTP methods for an environment.
 	Requests(context.Context, *RequestsRequest) (*RequestsResponse, error)
+	// The number of HTTP codes that originate from an environments load balancer.
 	ResponseCodes(context.Context, *ResponseCodesRequest) (*ResponseCodesResponse, error)
+	// The time elapsed after the request leaves the load balancer until a response from the target is received.
 	ResponseTimes(context.Context, *ResponseTimesRequest) (*ResponseTimesResponse, error)
+	// The percentage of all cacheable requests for which CDN served the content from its cache.
 	CacheRatio(context.Context, *CacheRatioRequest) (*CacheRatioResponse, error)
+	// This error indicates a communication problem between CDN and the origin.
 	OriginErrors(context.Context, *OriginErrorsRequest) (*OriginErrorsResponse, error)
+	// The number of requests which were sent to invalidate the CDN.
 	InvalidationRequests(context.Context, *InvalidationRequestsRequest) (*InvalidationRequestsResponse, error)
+	// The number of paths which were invalidated by requests.
 	InvalidationPaths(context.Context, *InvalidationPathsRequest) (*InvalidationPathsResponse, error)
 	mustEmbedUnimplementedMetricsServer()
 }
