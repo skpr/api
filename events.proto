@@ -1,0 +1,35 @@
+/** Service responsible for coordinating environment events */
+syntax = "proto3";
+
+package workflow;
+
+option go_package = "./pb";
+
+service events {
+  rpc List (EventsListRequest) returns (EventsListResponse) {}
+}
+
+/**
+ * Details that are captured as an event.
+ */
+message Event {
+  string ID = 1; // Event identifier
+  string Date = 2; // When the event occurred
+  string Type = 3; // What type of event occurred
+  string Source = 4; // The source of the event
+  string Details = 5; // Details related to the event
+}
+
+/**
+ * Input for EventsList.
+ */
+message EventsListRequest {
+  string Environment = 1; // Name of the environment
+}
+
+/**
+ * Output for EventsList.
+ */
+message EventsListResponse {
+  repeated Event Events = 1; // List of events
+}
