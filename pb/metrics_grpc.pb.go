@@ -40,6 +40,8 @@ type MetricsClient interface {
 	InvalidationRequests(ctx context.Context, in *InvalidationRequestsRequest, opts ...grpc.CallOption) (*InvalidationRequestsResponse, error)
 	// The number of paths which were invalidated by requests.
 	InvalidationPaths(ctx context.Context, in *InvalidationPathsRequest, opts ...grpc.CallOption) (*InvalidationPathsResponse, error)
+	// The amount of resources used by an environment.
+	ResourceUsage(ctx context.Context, in *ResourceUsageRequest, opts ...grpc.CallOption) (*ResourceUsageResponse, error)
 }
 
 type metricsClient struct {
@@ -131,6 +133,15 @@ func (c *metricsClient) InvalidationPaths(ctx context.Context, in *InvalidationP
 	return out, nil
 }
 
+func (c *metricsClient) ResourceUsage(ctx context.Context, in *ResourceUsageRequest, opts ...grpc.CallOption) (*ResourceUsageResponse, error) {
+	out := new(ResourceUsageResponse)
+	err := c.cc.Invoke(ctx, "/workflow.metrics/ResourceUsage", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MetricsServer is the server API for Metrics service.
 // All implementations must embed UnimplementedMetricsServer
 // for forward compatibility
@@ -153,6 +164,8 @@ type MetricsServer interface {
 	InvalidationRequests(context.Context, *InvalidationRequestsRequest) (*InvalidationRequestsResponse, error)
 	// The number of paths which were invalidated by requests.
 	InvalidationPaths(context.Context, *InvalidationPathsRequest) (*InvalidationPathsResponse, error)
+	// The amount of resources used by an environment.
+	ResourceUsage(context.Context, *ResourceUsageRequest) (*ResourceUsageResponse, error)
 	mustEmbedUnimplementedMetricsServer()
 }
 
@@ -186,6 +199,9 @@ func (UnimplementedMetricsServer) InvalidationRequests(context.Context, *Invalid
 }
 func (UnimplementedMetricsServer) InvalidationPaths(context.Context, *InvalidationPathsRequest) (*InvalidationPathsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method InvalidationPaths not implemented")
+}
+func (UnimplementedMetricsServer) ResourceUsage(context.Context, *ResourceUsageRequest) (*ResourceUsageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ResourceUsage not implemented")
 }
 func (UnimplementedMetricsServer) mustEmbedUnimplementedMetricsServer() {}
 
@@ -362,6 +378,24 @@ func _Metrics_InvalidationPaths_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Metrics_ResourceUsage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResourceUsageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MetricsServer).ResourceUsage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/workflow.metrics/ResourceUsage",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MetricsServer).ResourceUsage(ctx, req.(*ResourceUsageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Metrics_ServiceDesc is the grpc.ServiceDesc for Metrics service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -404,6 +438,10 @@ var Metrics_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "InvalidationPaths",
 			Handler:    _Metrics_InvalidationPaths_Handler,
+		},
+		{
+			MethodName: "ResourceUsage",
+			Handler:    _Metrics_ResourceUsage_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

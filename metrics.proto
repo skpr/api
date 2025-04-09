@@ -24,6 +24,8 @@ service metrics {
   rpc InvalidationRequests (InvalidationRequestsRequest) returns (InvalidationRequestsResponse) {}
   // The number of paths which were invalidated by requests.
   rpc InvalidationPaths (InvalidationPathsRequest) returns (InvalidationPathsResponse) {}
+  // The amount of resources used by an environment.
+  rpc ResourceUsage (ResourceUsageRequest) returns (ResourceUsageResponse) {}
 }
 
 /**
@@ -227,6 +229,33 @@ message InvalidationPathsResponse {
  * Metric which contains invalidation paths for a single date on a single environment.
  */
 message MetricInvalidationPaths {
-  string Date = 1; // Date which the metric dat a is grouped by. // Date which the metric dat a is grouped by.
+  string Date = 1; // Date which the metric dat a is grouped by.
   int64 Paths = 2; // Number of paths that were invalidated.
+}
+
+/**
+ * Input for ResourceUsage.
+ */
+message ResourceUsageRequest {
+  string Environment = 1; // Name of the environment.
+}
+
+/**
+ * Output for ResourceUsage.
+ */
+message ResourceUsageResponse {
+  repeated MetricResourceUsage Metrics = 1; // List of returned metrics.
+}
+
+/**
+ * Metric which contains resource usage for a single date on a single environment.
+ */
+message MetricResourceUsage {
+  string Date = 1; // Date which the metric dat a is grouped by.
+  int64 CPU = 2; // Amount of CPU being utilised.
+  int64 Memory = 3; // Amount of memory being utilised.
+  int64 Replicas = 4; // Number of replicas.
+  int64 ActiveProcesses = 5; // Number of active processes.
+  int64 IdleProcesses = 6; // Number of idle processes.
+  int64 ListenQueue = 7; // Number of requests that are queued and cannot be processed.
 }

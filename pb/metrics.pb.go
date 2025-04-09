@@ -1423,7 +1423,7 @@ type MetricInvalidationPaths struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Date  string `protobuf:"bytes,1,opt,name=Date,proto3" json:"Date,omitempty"`    // Date which the metric dat a is grouped by. // Date which the metric dat a is grouped by.
+	Date  string `protobuf:"bytes,1,opt,name=Date,proto3" json:"Date,omitempty"`    // Date which the metric dat a is grouped by.
 	Paths int64  `protobuf:"varint,2,opt,name=Paths,proto3" json:"Paths,omitempty"` // Number of paths that were invalidated.
 }
 
@@ -1469,6 +1469,201 @@ func (x *MetricInvalidationPaths) GetDate() string {
 func (x *MetricInvalidationPaths) GetPaths() int64 {
 	if x != nil {
 		return x.Paths
+	}
+	return 0
+}
+
+// *
+// Input for ResourceUsage.
+type ResourceUsageRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Environment string `protobuf:"bytes,1,opt,name=Environment,proto3" json:"Environment,omitempty"` // Name of the environment.
+}
+
+func (x *ResourceUsageRequest) Reset() {
+	*x = ResourceUsageRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_metrics_proto_msgTypes[27]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ResourceUsageRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ResourceUsageRequest) ProtoMessage() {}
+
+func (x *ResourceUsageRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_metrics_proto_msgTypes[27]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ResourceUsageRequest.ProtoReflect.Descriptor instead.
+func (*ResourceUsageRequest) Descriptor() ([]byte, []int) {
+	return file_metrics_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *ResourceUsageRequest) GetEnvironment() string {
+	if x != nil {
+		return x.Environment
+	}
+	return ""
+}
+
+// *
+// Output for ResourceUsage.
+type ResourceUsageResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Metrics []*MetricResourceUsage `protobuf:"bytes,1,rep,name=Metrics,proto3" json:"Metrics,omitempty"` // List of returned metrics.
+}
+
+func (x *ResourceUsageResponse) Reset() {
+	*x = ResourceUsageResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_metrics_proto_msgTypes[28]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ResourceUsageResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ResourceUsageResponse) ProtoMessage() {}
+
+func (x *ResourceUsageResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_metrics_proto_msgTypes[28]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ResourceUsageResponse.ProtoReflect.Descriptor instead.
+func (*ResourceUsageResponse) Descriptor() ([]byte, []int) {
+	return file_metrics_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *ResourceUsageResponse) GetMetrics() []*MetricResourceUsage {
+	if x != nil {
+		return x.Metrics
+	}
+	return nil
+}
+
+// *
+// Metric which contains resource usage for a single date on a single environment.
+type MetricResourceUsage struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Date            string `protobuf:"bytes,1,opt,name=Date,proto3" json:"Date,omitempty"`                        // Date which the metric dat a is grouped by.
+	CPU             int64  `protobuf:"varint,2,opt,name=CPU,proto3" json:"CPU,omitempty"`                         // Amount of CPU being utilised.
+	Memory          int64  `protobuf:"varint,3,opt,name=Memory,proto3" json:"Memory,omitempty"`                   // Amount of memory being utilised.
+	Replicas        int64  `protobuf:"varint,4,opt,name=Replicas,proto3" json:"Replicas,omitempty"`               // Number of replicas.
+	ActiveProcesses int64  `protobuf:"varint,5,opt,name=ActiveProcesses,proto3" json:"ActiveProcesses,omitempty"` // Number of active processes.
+	IdleProcesses   int64  `protobuf:"varint,6,opt,name=IdleProcesses,proto3" json:"IdleProcesses,omitempty"`     // Number of idle processes.
+	ListenQueue     int64  `protobuf:"varint,7,opt,name=ListenQueue,proto3" json:"ListenQueue,omitempty"`         // Number of requests that are queued and cannot be processed.
+}
+
+func (x *MetricResourceUsage) Reset() {
+	*x = MetricResourceUsage{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_metrics_proto_msgTypes[29]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MetricResourceUsage) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MetricResourceUsage) ProtoMessage() {}
+
+func (x *MetricResourceUsage) ProtoReflect() protoreflect.Message {
+	mi := &file_metrics_proto_msgTypes[29]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MetricResourceUsage.ProtoReflect.Descriptor instead.
+func (*MetricResourceUsage) Descriptor() ([]byte, []int) {
+	return file_metrics_proto_rawDescGZIP(), []int{29}
+}
+
+func (x *MetricResourceUsage) GetDate() string {
+	if x != nil {
+		return x.Date
+	}
+	return ""
+}
+
+func (x *MetricResourceUsage) GetCPU() int64 {
+	if x != nil {
+		return x.CPU
+	}
+	return 0
+}
+
+func (x *MetricResourceUsage) GetMemory() int64 {
+	if x != nil {
+		return x.Memory
+	}
+	return 0
+}
+
+func (x *MetricResourceUsage) GetReplicas() int64 {
+	if x != nil {
+		return x.Replicas
+	}
+	return 0
+}
+
+func (x *MetricResourceUsage) GetActiveProcesses() int64 {
+	if x != nil {
+		return x.ActiveProcesses
+	}
+	return 0
+}
+
+func (x *MetricResourceUsage) GetIdleProcesses() int64 {
+	if x != nil {
+		return x.IdleProcesses
+	}
+	return 0
+}
+
+func (x *MetricResourceUsage) GetListenQueue() int64 {
+	if x != nil {
+		return x.ListenQueue
 	}
 	return 0
 }
@@ -1607,7 +1802,30 @@ var file_metrics_proto_rawDesc = []byte{
 	0x63, 0x49, 0x6e, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x61, 0x74,
 	0x68, 0x73, 0x12, 0x12, 0x0a, 0x04, 0x44, 0x61, 0x74, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
 	0x52, 0x04, 0x44, 0x61, 0x74, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x50, 0x61, 0x74, 0x68, 0x73, 0x18,
-	0x02, 0x20, 0x01, 0x28, 0x03, 0x52, 0x05, 0x50, 0x61, 0x74, 0x68, 0x73, 0x32, 0x9e, 0x06, 0x0a,
+	0x02, 0x20, 0x01, 0x28, 0x03, 0x52, 0x05, 0x50, 0x61, 0x74, 0x68, 0x73, 0x22, 0x38, 0x0a, 0x14,
+	0x52, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x55, 0x73, 0x61, 0x67, 0x65, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x12, 0x20, 0x0a, 0x0b, 0x45, 0x6e, 0x76, 0x69, 0x72, 0x6f, 0x6e, 0x6d,
+	0x65, 0x6e, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x45, 0x6e, 0x76, 0x69, 0x72,
+	0x6f, 0x6e, 0x6d, 0x65, 0x6e, 0x74, 0x22, 0x50, 0x0a, 0x15, 0x52, 0x65, 0x73, 0x6f, 0x75, 0x72,
+	0x63, 0x65, 0x55, 0x73, 0x61, 0x67, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
+	0x37, 0x0a, 0x07, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b,
+	0x32, 0x1d, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x4d, 0x65, 0x74, 0x72,
+	0x69, 0x63, 0x52, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x55, 0x73, 0x61, 0x67, 0x65, 0x52,
+	0x07, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x22, 0xe1, 0x01, 0x0a, 0x13, 0x4d, 0x65, 0x74,
+	0x72, 0x69, 0x63, 0x52, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x55, 0x73, 0x61, 0x67, 0x65,
+	0x12, 0x12, 0x0a, 0x04, 0x44, 0x61, 0x74, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04,
+	0x44, 0x61, 0x74, 0x65, 0x12, 0x10, 0x0a, 0x03, 0x43, 0x50, 0x55, 0x18, 0x02, 0x20, 0x01, 0x28,
+	0x03, 0x52, 0x03, 0x43, 0x50, 0x55, 0x12, 0x16, 0x0a, 0x06, 0x4d, 0x65, 0x6d, 0x6f, 0x72, 0x79,
+	0x18, 0x03, 0x20, 0x01, 0x28, 0x03, 0x52, 0x06, 0x4d, 0x65, 0x6d, 0x6f, 0x72, 0x79, 0x12, 0x1a,
+	0x0a, 0x08, 0x52, 0x65, 0x70, 0x6c, 0x69, 0x63, 0x61, 0x73, 0x18, 0x04, 0x20, 0x01, 0x28, 0x03,
+	0x52, 0x08, 0x52, 0x65, 0x70, 0x6c, 0x69, 0x63, 0x61, 0x73, 0x12, 0x28, 0x0a, 0x0f, 0x41, 0x63,
+	0x74, 0x69, 0x76, 0x65, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x65, 0x73, 0x18, 0x05, 0x20,
+	0x01, 0x28, 0x03, 0x52, 0x0f, 0x41, 0x63, 0x74, 0x69, 0x76, 0x65, 0x50, 0x72, 0x6f, 0x63, 0x65,
+	0x73, 0x73, 0x65, 0x73, 0x12, 0x24, 0x0a, 0x0d, 0x49, 0x64, 0x6c, 0x65, 0x50, 0x72, 0x6f, 0x63,
+	0x65, 0x73, 0x73, 0x65, 0x73, 0x18, 0x06, 0x20, 0x01, 0x28, 0x03, 0x52, 0x0d, 0x49, 0x64, 0x6c,
+	0x65, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x65, 0x73, 0x12, 0x20, 0x0a, 0x0b, 0x4c, 0x69,
+	0x73, 0x74, 0x65, 0x6e, 0x51, 0x75, 0x65, 0x75, 0x65, 0x18, 0x07, 0x20, 0x01, 0x28, 0x03, 0x52,
+	0x0b, 0x4c, 0x69, 0x73, 0x74, 0x65, 0x6e, 0x51, 0x75, 0x65, 0x75, 0x65, 0x32, 0xf2, 0x06, 0x0a,
 	0x07, 0x6d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x12, 0x58, 0x0a, 0x0f, 0x43, 0x6c, 0x75, 0x73,
 	0x74, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x73, 0x12, 0x20, 0x2e, 0x77, 0x6f,
 	0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x43, 0x6c, 0x75, 0x73, 0x74, 0x65, 0x72, 0x52, 0x65,
@@ -1657,8 +1875,14 @@ var file_metrics_proto_rawDesc = []byte{
 	0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x61, 0x74, 0x68, 0x73, 0x52,
 	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x23, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f,
 	0x77, 0x2e, 0x49, 0x6e, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x61,
-	0x74, 0x68, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x06, 0x5a,
-	0x04, 0x2e, 0x2f, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x74, 0x68, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x52, 0x0a,
+	0x0d, 0x52, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x55, 0x73, 0x61, 0x67, 0x65, 0x12, 0x1e,
+	0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x52, 0x65, 0x73, 0x6f, 0x75, 0x72,
+	0x63, 0x65, 0x55, 0x73, 0x61, 0x67, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1f,
+	0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x52, 0x65, 0x73, 0x6f, 0x75, 0x72,
+	0x63, 0x65, 0x55, 0x73, 0x61, 0x67, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22,
+	0x00, 0x42, 0x06, 0x5a, 0x04, 0x2e, 0x2f, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x33,
 }
 
 var (
@@ -1673,7 +1897,7 @@ func file_metrics_proto_rawDescGZIP() []byte {
 	return file_metrics_proto_rawDescData
 }
 
-var file_metrics_proto_msgTypes = make([]protoimpl.MessageInfo, 27)
+var file_metrics_proto_msgTypes = make([]protoimpl.MessageInfo, 30)
 var file_metrics_proto_goTypes = []interface{}{
 	(*ClusterRequestsRequest)(nil),       // 0: workflow.ClusterRequestsRequest
 	(*ClusterRequestsResponse)(nil),      // 1: workflow.ClusterRequestsResponse
@@ -1702,6 +1926,9 @@ var file_metrics_proto_goTypes = []interface{}{
 	(*InvalidationPathsRequest)(nil),     // 24: workflow.InvalidationPathsRequest
 	(*InvalidationPathsResponse)(nil),    // 25: workflow.InvalidationPathsResponse
 	(*MetricInvalidationPaths)(nil),      // 26: workflow.MetricInvalidationPaths
+	(*ResourceUsageRequest)(nil),         // 27: workflow.ResourceUsageRequest
+	(*ResourceUsageResponse)(nil),        // 28: workflow.ResourceUsageResponse
+	(*MetricResourceUsage)(nil),          // 29: workflow.MetricResourceUsage
 }
 var file_metrics_proto_depIdxs = []int32{
 	2,  // 0: workflow.ClusterRequestsResponse.Metrics:type_name -> workflow.MetricClusterRequests
@@ -1713,29 +1940,32 @@ var file_metrics_proto_depIdxs = []int32{
 	20, // 6: workflow.OriginErrorsResponse.Metrics:type_name -> workflow.MetricOriginErrors
 	23, // 7: workflow.InvalidationRequestsResponse.Metrics:type_name -> workflow.MetricInvalidationRequests
 	26, // 8: workflow.InvalidationPathsResponse.Metrics:type_name -> workflow.MetricInvalidationPaths
-	0,  // 9: workflow.metrics.ClusterRequests:input_type -> workflow.ClusterRequestsRequest
-	3,  // 10: workflow.metrics.ClusterResponseCodes:input_type -> workflow.ClusterResponseCodesRequest
-	6,  // 11: workflow.metrics.Requests:input_type -> workflow.RequestsRequest
-	9,  // 12: workflow.metrics.ResponseCodes:input_type -> workflow.ResponseCodesRequest
-	12, // 13: workflow.metrics.ResponseTimes:input_type -> workflow.ResponseTimesRequest
-	15, // 14: workflow.metrics.CacheRatio:input_type -> workflow.CacheRatioRequest
-	18, // 15: workflow.metrics.OriginErrors:input_type -> workflow.OriginErrorsRequest
-	21, // 16: workflow.metrics.InvalidationRequests:input_type -> workflow.InvalidationRequestsRequest
-	24, // 17: workflow.metrics.InvalidationPaths:input_type -> workflow.InvalidationPathsRequest
-	1,  // 18: workflow.metrics.ClusterRequests:output_type -> workflow.ClusterRequestsResponse
-	4,  // 19: workflow.metrics.ClusterResponseCodes:output_type -> workflow.ClusterResponseCodesResponse
-	7,  // 20: workflow.metrics.Requests:output_type -> workflow.RequestsResponse
-	10, // 21: workflow.metrics.ResponseCodes:output_type -> workflow.ResponseCodesResponse
-	13, // 22: workflow.metrics.ResponseTimes:output_type -> workflow.ResponseTimesResponse
-	16, // 23: workflow.metrics.CacheRatio:output_type -> workflow.CacheRatioResponse
-	19, // 24: workflow.metrics.OriginErrors:output_type -> workflow.OriginErrorsResponse
-	22, // 25: workflow.metrics.InvalidationRequests:output_type -> workflow.InvalidationRequestsResponse
-	25, // 26: workflow.metrics.InvalidationPaths:output_type -> workflow.InvalidationPathsResponse
-	18, // [18:27] is the sub-list for method output_type
-	9,  // [9:18] is the sub-list for method input_type
-	9,  // [9:9] is the sub-list for extension type_name
-	9,  // [9:9] is the sub-list for extension extendee
-	0,  // [0:9] is the sub-list for field type_name
+	29, // 9: workflow.ResourceUsageResponse.Metrics:type_name -> workflow.MetricResourceUsage
+	0,  // 10: workflow.metrics.ClusterRequests:input_type -> workflow.ClusterRequestsRequest
+	3,  // 11: workflow.metrics.ClusterResponseCodes:input_type -> workflow.ClusterResponseCodesRequest
+	6,  // 12: workflow.metrics.Requests:input_type -> workflow.RequestsRequest
+	9,  // 13: workflow.metrics.ResponseCodes:input_type -> workflow.ResponseCodesRequest
+	12, // 14: workflow.metrics.ResponseTimes:input_type -> workflow.ResponseTimesRequest
+	15, // 15: workflow.metrics.CacheRatio:input_type -> workflow.CacheRatioRequest
+	18, // 16: workflow.metrics.OriginErrors:input_type -> workflow.OriginErrorsRequest
+	21, // 17: workflow.metrics.InvalidationRequests:input_type -> workflow.InvalidationRequestsRequest
+	24, // 18: workflow.metrics.InvalidationPaths:input_type -> workflow.InvalidationPathsRequest
+	27, // 19: workflow.metrics.ResourceUsage:input_type -> workflow.ResourceUsageRequest
+	1,  // 20: workflow.metrics.ClusterRequests:output_type -> workflow.ClusterRequestsResponse
+	4,  // 21: workflow.metrics.ClusterResponseCodes:output_type -> workflow.ClusterResponseCodesResponse
+	7,  // 22: workflow.metrics.Requests:output_type -> workflow.RequestsResponse
+	10, // 23: workflow.metrics.ResponseCodes:output_type -> workflow.ResponseCodesResponse
+	13, // 24: workflow.metrics.ResponseTimes:output_type -> workflow.ResponseTimesResponse
+	16, // 25: workflow.metrics.CacheRatio:output_type -> workflow.CacheRatioResponse
+	19, // 26: workflow.metrics.OriginErrors:output_type -> workflow.OriginErrorsResponse
+	22, // 27: workflow.metrics.InvalidationRequests:output_type -> workflow.InvalidationRequestsResponse
+	25, // 28: workflow.metrics.InvalidationPaths:output_type -> workflow.InvalidationPathsResponse
+	28, // 29: workflow.metrics.ResourceUsage:output_type -> workflow.ResourceUsageResponse
+	20, // [20:30] is the sub-list for method output_type
+	10, // [10:20] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_metrics_proto_init() }
@@ -2068,6 +2298,42 @@ func file_metrics_proto_init() {
 				return nil
 			}
 		}
+		file_metrics_proto_msgTypes[27].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ResourceUsageRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_metrics_proto_msgTypes[28].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ResourceUsageResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_metrics_proto_msgTypes[29].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*MetricResourceUsage); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -2075,7 +2341,7 @@ func file_metrics_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_metrics_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   27,
+			NumMessages:   30,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
