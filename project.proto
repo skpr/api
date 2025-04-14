@@ -27,6 +27,7 @@ message Project {
   ProjectResourceTotals ResourceTotals = 7; // Total resources being utilised by all environments on this project.
   string Namespace = 8; // Kubernetes namespace which resources for this project reside.
   ProjectRegistry Registry = 9; // Container registry information for pushing and pulling images.
+  string Size = 10;
 }
 
 /**
