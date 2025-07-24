@@ -1,0 +1,54 @@
+/** Service responsible for collecting metrics from Compass */
+syntax = "proto3";
+
+package workflow;
+
+option go_package = "./pb";
+
+service compass {
+  // Stream Compass traces from a specific environment.
+  rpc StreamTraces (StreamTracesRequest) returns (StreamTracesResponse) {}
+}
+
+/**
+ * Input for StreamTraces.
+ */
+message StreamTracesRequest {
+  string environment = 1; // The environment to stream traces from.
+}
+
+/**
+ * Output for StreamTraces.
+ */
+message StreamTracesResponse {
+  repeated CompassTrace Traces = 1; // List of traces.
+}
+
+/**
+ * Trace data provided by Compass.
+ */
+message CompassTrace {
+  CompassTraceMetadata metadata = 1;                    // Metadata about the trace.
+  repeated CompassTraceFunctionCall function_calls = 2; // List of function calls in the trace.
+}
+
+/**
+ * Metadata which contains information about the Compass trace.
+ */
+message CompassTraceMetadata {
+  string request_id = 1; // Request identifier for tracking.
+  string uri = 2;        // URI of the request being traced.
+  string method = 3;     // HTTP method of the request (e.g., GET, POST).
+  int64 start_time = 4;  // Start time of the trace in ISO 8601 format.
+  int64 end_time = 5;    // End time of the trace in ISO 8601 format.
+}
+
+/**
+ * Function call data within a Compass trace.
+ */
+message CompassTraceFunctionCall {
+  string name = 1;        // Name of the function being traced.
+  int64 start_time = 2;   // Start time of the function call in ISO 8601 format.
+  int64 elapsed_time = 3; // Elapsed time for the function call in milliseconds.
+}
+
