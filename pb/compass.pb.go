@@ -187,8 +187,8 @@ type CompassTraceMetadata struct {
 	RequestId string `protobuf:"bytes,1,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`  // Request identifier for tracking.
 	Uri       string `protobuf:"bytes,2,opt,name=uri,proto3" json:"uri,omitempty"`                               // URI of the request being traced.
 	Method    string `protobuf:"bytes,3,opt,name=method,proto3" json:"method,omitempty"`                         // HTTP method of the request (e.g., GET, POST).
-	StartTime int64  `protobuf:"varint,4,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"` // Start time of the trace in ISO 8601 format.
-	EndTime   int64  `protobuf:"varint,5,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`       // End time of the trace in ISO 8601 format.
+	StartTime int64  `protobuf:"varint,4,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"` // Start time of the trace in unix format.
+	EndTime   int64  `protobuf:"varint,5,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`       // End time of the trace in unix format.
 }
 
 func (x *CompassTraceMetadata) Reset() {
@@ -266,7 +266,7 @@ type CompassTraceFunctionCall struct {
 	unknownFields protoimpl.UnknownFields
 
 	Name        string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`                                   // Name of the function being traced.
-	StartTime   int64  `protobuf:"varint,2,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`       // Start time of the function call in ISO 8601 format.
+	StartTime   int64  `protobuf:"varint,2,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`       // Start time of the function call in unix format.
 	ElapsedTime int64  `protobuf:"varint,3,opt,name=elapsed_time,json=elapsedTime,proto3" json:"elapsed_time,omitempty"` // Elapsed time for the function call in milliseconds.
 }
 
