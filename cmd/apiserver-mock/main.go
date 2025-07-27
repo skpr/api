@@ -57,7 +57,7 @@ func main() {
 			pb.RegisterCompassServer(server, &compass.Server{})
 
 			log.Println("Registering service: Version")
-			pb.RegisterVersionServer(server, &version.VersionServer{})
+			pb.RegisterVersionServer(server, &version.Server{})
 
 			reflection.Register(server)
 
