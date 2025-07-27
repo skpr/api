@@ -12,8 +12,10 @@ import (
 	"github.com/jwalton/gchalk"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 
 	"github.com/skpr/api/internal/server/mock/compass"
+	"github.com/skpr/api/internal/server/mock/version"
 	"github.com/skpr/api/pb"
 )
 
@@ -52,8 +54,12 @@ func main() {
 			server := grpc.NewServer()
 
 			log.Println("Registering service: Compass")
-
 			pb.RegisterCompassServer(server, &compass.Server{})
+
+			log.Println("Registering service: Version")
+			pb.RegisterVersionServer(server, &version.Server{})
+
+			reflection.Register(server)
 
 			log.Println("Starting server on port:", o.Port)
 
