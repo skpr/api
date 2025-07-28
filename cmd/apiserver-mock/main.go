@@ -15,6 +15,7 @@ import (
 	"google.golang.org/grpc/reflection"
 
 	"github.com/skpr/api/internal/server/mock/compass"
+	"github.com/skpr/api/internal/server/mock/cron"
 	"github.com/skpr/api/internal/server/mock/version"
 	"github.com/skpr/api/pb"
 )
@@ -55,6 +56,9 @@ func main() {
 
 			log.Println("Registering service: Compass")
 			pb.RegisterCompassServer(server, &compass.Server{})
+
+			log.Println("Registering service: Cron")
+			pb.RegisterCronServer(server, &cron.Server{})
 
 			log.Println("Registering service: Version")
 			pb.RegisterVersionServer(server, &version.Server{})
