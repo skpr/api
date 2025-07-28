@@ -1,4 +1,4 @@
-name: 📋 Quality Checks (GolangCI)
+name: 📋 GolangCI Checks
 
 on:
   pull_request:
@@ -17,7 +17,9 @@ jobs:
         with:
           go-version: stable
 
+      # Action sometimes causes threading. Recommended to run in separate workflow action.
+      # See https://github.com/golangci/golangci-lint-action?tab=readme-ov-file#how-to-use
       - name: 🧪 GolangCI
         uses: golangci/golangci-lint-action@v8
         with:
-          version: v2.1
+          version: v2.3
