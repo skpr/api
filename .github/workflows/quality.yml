@@ -1,0 +1,25 @@
+name: 📋 GolangCI Checks
+
+on:
+  pull_request:
+    types: [ synchronize, opened, reopened, ready_for_review ]
+
+jobs:
+  lint:
+    name: 📋 GolangCI
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⬇️  Git clone the repository
+        uses: actions/checkout@v4
+
+      - name: 📦 Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+
+      # Action sometimes causes threading. Recommended to run in separate workflow action.
+      # See https://github.com/golangci/golangci-lint-action?tab=readme-ov-file#how-to-use
+      - name: 🧪 GolangCI
+        uses: golangci/golangci-lint-action@v8
+        with:
+          version: v2.3
