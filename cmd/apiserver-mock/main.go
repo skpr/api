@@ -53,6 +53,8 @@ func main() {
 		RunE: func(_ *cobra.Command, _ []string) error {
 			server := grpc.NewServer()
 
+			foo, _ := myfunc()
+
 			log.Println("Registering service: Compass")
 			pb.RegisterCompassServer(server, &compass.Server{})
 
