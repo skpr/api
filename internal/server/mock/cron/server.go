@@ -2,6 +2,7 @@ package cron
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/skpr/api/pb"
@@ -32,13 +33,17 @@ var state = map[string]*pb.CronDetail{
 	},
 }
 
-// Server implements the GRPC "version" definition.
+// Server implements the GRPC "cron" definition.
 type Server struct {
 	pb.UnimplementedCronServer
 }
 
 // Suspend all the cron jobs
 func (c *Server) Suspend(ctx context.Context, req *pb.CronSuspendRequest) (*pb.CronSuspendResponse, error) {
+	if req.Environment == "" {
+		return nil, fmt.Errorf("environment not provided")
+	}
+
 	for key := range state {
 		state[key].Suspended = true
 	}
@@ -48,6 +53,10 @@ func (c *Server) Suspend(ctx context.Context, req *pb.CronSuspendRequest) (*pb.C
 
 // Resume all the cron jobs
 func (c *Server) Resume(ctx context.Context, req *pb.CronResumeRequest) (*pb.CronResumeResponse, error) {
+	if req.Environment == "" {
+		return nil, fmt.Errorf("environment not provided")
+	}
+
 	for key := range state {
 		state[key].Suspended = false
 	}
@@ -57,12 +66,14 @@ func (c *Server) Resume(ctx context.Context, req *pb.CronResumeRequest) (*pb.Cro
 
 // List of mocked cron jobs.
 func (c *Server) List(ctx context.Context, req *pb.CronListRequest) (*pb.CronListResponse, error) {
-	var values = []*pb.CronDetail{}
-	for _, value := range state {
-		values = append(values, value)
+	if req.Environment == "" {
+		return nil, fmt.Errorf("environment not provided")
 	}
-	resp := &pb.CronListResponse{
-		List: values,
+
+	resp := &pb.CronListResponse{}
+
+	for _, value := range state {
+		resp.List = append(resp.List, value)
 	}
 
 	return resp, nil
@@ -70,6 +81,10 @@ func (c *Server) List(ctx context.Context, req *pb.CronListRequest) (*pb.CronLis
 
 // JobList about when cron jobs last ran.
 func (c *Server) JobList(ctx context.Context, req *pb.CronJobListRequest) (*pb.CronJobListResponse, error) {
+	if req.Environment == "" {
+		return nil, fmt.Errorf("environment not provided")
+	}
+
 	resp := &pb.CronJobListResponse{
 		List: []*pb.CronJobDetail{
 			{
