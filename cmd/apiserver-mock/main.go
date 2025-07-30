@@ -3,8 +3,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/skpr/api/internal/model"
-	"github.com/skpr/api/internal/server/mock/environment"
 	"log"
 	"net"
 	"regexp"
@@ -16,8 +14,10 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
+	"github.com/skpr/api/internal/model"
 	"github.com/skpr/api/internal/server/mock/compass"
 	"github.com/skpr/api/internal/server/mock/cron"
+	"github.com/skpr/api/internal/server/mock/environment"
 	"github.com/skpr/api/internal/server/mock/events"
 	"github.com/skpr/api/internal/server/mock/version"
 	"github.com/skpr/api/pb"
