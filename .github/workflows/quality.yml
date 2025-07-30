@@ -15,7 +15,7 @@ jobs:
       - name: 📦 Install Go
         uses: actions/setup-go@v5
         with:
-          go-version: stable
+          go-version-file: 'go.mod'
 
       # Action sometimes causes threading. Recommended to run in separate workflow action.
       # See https://github.com/golangci/golangci-lint-action?tab=readme-ov-file#how-to-use
