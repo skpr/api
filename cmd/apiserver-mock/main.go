@@ -3,6 +3,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/skpr/api/internal/model"
+	"github.com/skpr/api/internal/server/mock/environment"
 	"log"
 	"net"
 	"regexp"
@@ -47,6 +49,10 @@ type Options struct {
 func main() {
 	o := Options{}
 
+	model.GlobalState.CreateEnvironment("dev", 1)
+	model.GlobalState.CreateEnvironment("stg", 2)
+	model.GlobalState.CreateEnvironment("prod", 4)
+
 	cmd := &cobra.Command{
 		Use:     "apiserver-mock",
 		Short:   "Mock implementation of the Skpr API.",
@@ -60,6 +66,9 @@ func main() {
 
 			log.Println("Registering service: Cron")
 			pb.RegisterCronServer(server, &cron.Server{})
+
+			log.Println("Registering service: Environments")
+			pb.RegisterEnvironmentServer(server, &environment.Server{})
 
 			log.Println("Registering service: Events")
 			pb.RegisterEventsServer(server, &events.Server{})
