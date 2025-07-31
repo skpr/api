@@ -1,6 +1,6 @@
 module github.com/skpr/api
 
-go 1.24.3
+go 1.24
 
 require (
 	github.com/brianvoe/gofakeit/v7 v7.3.0
@@ -14,10 +14,10 @@ require (
 require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jwalton/go-supportscolor v1.2.0 // indirect
-	github.com/spf13/pflag v1.0.6 // indirect
-	golang.org/x/net v0.40.0 // indirect
+	github.com/spf13/pflag v1.0.7 // indirect
+	golang.org/x/net v0.42.0 // indirect
 	golang.org/x/sys v0.34.0 // indirect
 	golang.org/x/term v0.33.0 // indirect
 	golang.org/x/text v0.27.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250528174236-200df99c418a // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250728155136-f173205681a0 // indirect
 )

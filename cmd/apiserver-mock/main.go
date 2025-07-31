@@ -14,8 +14,10 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
+	"github.com/skpr/api/internal/model"
 	"github.com/skpr/api/internal/server/mock/compass"
 	"github.com/skpr/api/internal/server/mock/cron"
+	"github.com/skpr/api/internal/server/mock/environment"
 	"github.com/skpr/api/internal/server/mock/events"
 	"github.com/skpr/api/internal/server/mock/version"
 	"github.com/skpr/api/pb"
@@ -47,6 +49,11 @@ type Options struct {
 func main() {
 	o := Options{}
 
+	globalModel := model.NewModel()
+	globalModel.CreateEnvironment("dev", 1)
+	globalModel.CreateEnvironment("stg", 2)
+	globalModel.CreateEnvironment("prod", 4)
+
 	cmd := &cobra.Command{
 		Use:     "apiserver-mock",
 		Short:   "Mock implementation of the Skpr API.",
@@ -59,7 +66,14 @@ func main() {
 			pb.RegisterCompassServer(server, &compass.Server{})
 
 			log.Println("Registering service: Cron")
-			pb.RegisterCronServer(server, &cron.Server{})
+			pb.RegisterCronServer(server, &cron.Server{
+				Model: globalModel,
+			})
+
+			log.Println("Registering service: Environments")
+			pb.RegisterEnvironmentServer(server, &environment.Server{
+				Model: globalModel,
+			})
 
 			log.Println("Registering service: Events")
 			pb.RegisterEventsServer(server, &events.Server{})
