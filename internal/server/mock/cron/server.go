@@ -10,12 +10,13 @@ import (
 
 // Server implements the GRPC "cron" definition.
 type Server struct {
+	Model *model.Model
 	pb.UnimplementedCronServer
 }
 
 // Suspend all the cron jobs
 func (c *Server) Suspend(ctx context.Context, req *pb.CronSuspendRequest) (*pb.CronSuspendResponse, error) {
-	environment, err := model.GlobalState.GetEnvironment(req.Environment)
+	environment, err := c.Model.GetEnvironment(req.Environment)
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +31,7 @@ func (c *Server) Suspend(ctx context.Context, req *pb.CronSuspendRequest) (*pb.C
 
 // Resume all the cron jobs
 func (c *Server) Resume(ctx context.Context, req *pb.CronResumeRequest) (*pb.CronResumeResponse, error) {
-	environment, err := model.GlobalState.GetEnvironment(req.Environment)
+	environment, err := c.Model.GetEnvironment(req.Environment)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +46,7 @@ func (c *Server) Resume(ctx context.Context, req *pb.CronResumeRequest) (*pb.Cro
 
 // List of mocked cron jobs.
 func (c *Server) List(ctx context.Context, req *pb.CronListRequest) (*pb.CronListResponse, error) {
-	environment, err := model.GlobalState.GetEnvironment(req.Environment)
+	environment, err := c.Model.GetEnvironment(req.Environment)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +63,7 @@ func (c *Server) List(ctx context.Context, req *pb.CronListRequest) (*pb.CronLis
 
 // JobList about when cron jobs last ran.
 func (c *Server) JobList(ctx context.Context, req *pb.CronJobListRequest) (*pb.CronJobListResponse, error) {
-	_, err := model.GlobalState.GetEnvironment(req.Environment)
+	_, err := c.Model.GetEnvironment(req.Environment)
 	if err != nil {
 		return nil, err
 	}

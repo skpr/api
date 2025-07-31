@@ -9,11 +9,12 @@ import (
 
 // Server implements the GRPC "environments" definition.
 type Server struct {
+	Model *model.Model
 	pb.UnimplementedEnvironmentServer
 }
 
 func (c *Server) Get(ctx context.Context, req *pb.EnvironmentGetRequest) (*pb.EnvironmentGetResponse, error) {
-	environment, err := model.GlobalState.GetEnvironment(req.Name)
+	environment, err := c.Model.GetEnvironment(req.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -27,7 +28,7 @@ func (c *Server) Get(ctx context.Context, req *pb.EnvironmentGetRequest) (*pb.En
 func (c *Server) List(ctx context.Context, req *pb.EnvironmentListRequest) (*pb.EnvironmentListResponse, error) {
 	resp := &pb.EnvironmentListResponse{}
 
-	environments := model.GlobalState.GetEnvironments()
+	environments := c.Model.GetEnvironments()
 	for _, value := range environments {
 		resp.Environments = append(resp.Environments, value.Environment)
 	}
@@ -36,12 +37,12 @@ func (c *Server) List(ctx context.Context, req *pb.EnvironmentListRequest) (*pb.
 }
 
 func (c *Server) Delete(ctx context.Context, req *pb.EnvironmentDeleteRequest) (*pb.EnvironmentDeleteResponse, error) {
-	_, err := model.GlobalState.GetEnvironment(req.Name)
+	_, err := c.Model.GetEnvironment(req.Name)
 	if err != nil {
 		return nil, err
 	}
 
-	model.GlobalState.DeleteEnvironment(req.Name)
+	c.Model.DeleteEnvironment(req.Name)
 
 	resp := &pb.EnvironmentDeleteResponse{}
 	return resp, nil

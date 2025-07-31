@@ -7,10 +7,14 @@ import (
 	"github.com/skpr/api/pb"
 )
 
-var GlobalState Model
-
 type Model struct {
 	storage map[string]*EnvironmentModel
+}
+
+func NewModel() *Model {
+	return &Model{
+		storage: make(map[string]*EnvironmentModel),
+	}
 }
 
 func (s *Model) GetEnvironment(name string) (*EnvironmentModel, error) {
@@ -35,10 +39,6 @@ func (s *Model) GetEnvironments() []*EnvironmentModel {
 }
 
 func (s *Model) CreateEnvironment(name string, size int) {
-	if s.storage == nil {
-		s.storage = make(map[string]*EnvironmentModel)
-	}
-
 	environment := &pb.Environment{
 		Name:       name,
 		Version:    "v0.0.1",

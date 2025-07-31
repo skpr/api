@@ -49,9 +49,10 @@ type Options struct {
 func main() {
 	o := Options{}
 
-	model.GlobalState.CreateEnvironment("dev", 1)
-	model.GlobalState.CreateEnvironment("stg", 2)
-	model.GlobalState.CreateEnvironment("prod", 4)
+	globalModel := model.NewModel()
+	globalModel.CreateEnvironment("dev", 1)
+	globalModel.CreateEnvironment("stg", 2)
+	globalModel.CreateEnvironment("prod", 4)
 
 	cmd := &cobra.Command{
 		Use:     "apiserver-mock",
@@ -65,10 +66,14 @@ func main() {
 			pb.RegisterCompassServer(server, &compass.Server{})
 
 			log.Println("Registering service: Cron")
-			pb.RegisterCronServer(server, &cron.Server{})
+			pb.RegisterCronServer(server, &cron.Server{
+				Model: globalModel,
+			})
 
 			log.Println("Registering service: Environments")
-			pb.RegisterEnvironmentServer(server, &environment.Server{})
+			pb.RegisterEnvironmentServer(server, &environment.Server{
+				Model: globalModel,
+			})
 
 			log.Println("Registering service: Events")
 			pb.RegisterEventsServer(server, &events.Server{})
