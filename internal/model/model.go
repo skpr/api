@@ -2,22 +2,20 @@ package model
 
 import (
 	"fmt"
-	"time"
-
 	"github.com/skpr/api/pb"
 )
 
 type Model struct {
-	storage map[string]*EnvironmentModel
+	storage map[string]*Environment
 }
 
 func NewModel() *Model {
 	return &Model{
-		storage: make(map[string]*EnvironmentModel),
+		storage: make(map[string]*Environment),
 	}
 }
 
-func (s *Model) GetEnvironment(name string) (*EnvironmentModel, error) {
+func (s *Model) GetEnvironment(name string) (*Environment, error) {
 	if name == "" {
 		return nil, fmt.Errorf("environment not provided")
 	}
@@ -30,8 +28,8 @@ func (s *Model) GetEnvironment(name string) (*EnvironmentModel, error) {
 	return value, nil
 }
 
-func (s *Model) GetEnvironments() []*EnvironmentModel {
-	var response []*EnvironmentModel
+func (s *Model) GetEnvironments() []*Environment {
+	var response []*Environment
 	for _, value := range s.storage {
 		response = append(response, value)
 	}
@@ -68,17 +66,17 @@ func (s *Model) CreateEnvironment(name string, size int) {
 			{
 				Name:     "drush",
 				Command:  "drush cron",
-				Schedule: "* * * * *",
+				Schedule: "0 * * * *",
 			},
 			{
 				Name:     "search-api-index",
 				Command:  "drush search-api:index example",
-				Schedule: "*/6 * * * *",
+				Schedule: "*/5 * * * *",
 			},
 			{
 				Name:     "queue-run",
 				Command:  "drush queue:run example",
-				Schedule: "* * * * *",
+				Schedule: "*/15 * * * *",
 			},
 		},
 	}
@@ -86,35 +84,16 @@ func (s *Model) CreateEnvironment(name string, size int) {
 		environment.Ingress.Routes = append(environment.Ingress.Routes, "example.com", "www.example.com")
 	}
 
-	// Duplicated for now but considering a refactor for later.
-	cron := map[string]*pb.CronDetail{
-		"drush": {
-			Name:               "drush",
-			Schedule:           "* * * * *",
-			Command:            "drush cron",
-			LastScheduleTime:   time.Now().Add(-5 * time.Minute).Format(time.RFC3339),
-			LastSuccessfulTime: time.Now().Add(-5 * time.Minute).Format(time.RFC3339),
-		},
-		"search-api-index": {
-			Name:               "search-api-index",
-			Schedule:           "*/6 * * * *",
-			Command:            "drush search-api:index example",
-			LastScheduleTime:   time.Now().Add(-5 * time.Minute).Format(time.RFC3339),
-			LastSuccessfulTime: time.Now().Add(-5 * time.Minute).Format(time.RFC3339),
-		},
-		"queue-run": {
-			Name:               "queue-run",
-			Schedule:           "* * * * *",
-			Command:            "drush queue:run example",
-			LastScheduleTime:   time.Now().Add(-2 * time.Hour).Format(time.RFC3339),
-			LastSuccessfulTime: time.Now().Add(-2 * time.Minute).Format(time.RFC3339),
-			Suspended:          true,
-		},
+	cron := make(map[string]*Cron)
+	for _, value := range environment.Cron {
+		cron[value.Name] = &Cron{
+			Suspended: false,
+		}
 	}
 
-	s.storage[name] = &EnvironmentModel{
+	s.storage[name] = &Environment{
 		Environment: environment,
-		CronDetail:  cron,
+		Cron:        cron,
 	}
 }
 
@@ -122,7 +101,11 @@ func (s *Model) DeleteEnvironment(name string) {
 	delete(s.storage, name)
 }
 
-type EnvironmentModel struct {
+type Environment struct {
 	Environment *pb.Environment
-	CronDetail  map[string]*pb.CronDetail
+	Cron        map[string]*Cron
+}
+
+type Cron struct {
+	Suspended bool
 }
