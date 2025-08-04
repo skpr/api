@@ -19,6 +19,7 @@ import (
 	"github.com/skpr/api/internal/server/mock/cron"
 	"github.com/skpr/api/internal/server/mock/environment"
 	"github.com/skpr/api/internal/server/mock/events"
+	"github.com/skpr/api/internal/server/mock/purge"
 	"github.com/skpr/api/internal/server/mock/version"
 	"github.com/skpr/api/pb"
 )
@@ -77,6 +78,11 @@ func main() {
 
 			log.Println("Registering service: Events")
 			pb.RegisterEventsServer(server, &events.Server{})
+
+			log.Println("Registering service: Purge")
+			pb.RegisterPurgeServer(server, &purge.Server{
+				Model: globalModel,
+			})
 
 			log.Println("Registering service: Version")
 			pb.RegisterVersionServer(server, &version.Server{})
