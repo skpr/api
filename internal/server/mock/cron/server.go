@@ -2,8 +2,9 @@ package cron
 
 import (
 	"context"
-	"github.com/gitploy-io/cronexpr"
 	"time"
+
+	"github.com/gitploy-io/cronexpr"
 
 	"github.com/skpr/api/internal/model"
 	"github.com/skpr/api/pb"
