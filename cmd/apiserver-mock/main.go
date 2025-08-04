@@ -3,6 +3,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/skpr/api/internal/server/mock/purge"
 	"log"
 	"net"
 	"regexp"
@@ -77,6 +78,11 @@ func main() {
 
 			log.Println("Registering service: Events")
 			pb.RegisterEventsServer(server, &events.Server{})
+
+			log.Println("Registering service: Purge")
+			pb.RegisterPurgeServer(server, &purge.Server{
+				Model: globalModel,
+			})
 
 			log.Println("Registering service: Version")
 			pb.RegisterVersionServer(server, &version.Server{})
