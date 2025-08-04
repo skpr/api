@@ -149,7 +149,7 @@ type Purge struct {
 func NewPurge(paths []string) *Purge {
 	return &Purge{
 		Id:      random.StringOfLength(20),
-		Created: time.Now().Round(time.Minute),
+		Created: time.Now().Round(time.Second),
 		Paths:   paths,
 	}
 }

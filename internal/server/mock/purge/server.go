@@ -2,6 +2,7 @@ package purge
 
 import (
 	"context"
+	"sort"
 	"time"
 
 	"github.com/skpr/api/internal/model"
@@ -35,6 +36,10 @@ func (s *Server) List(ctx context.Context, req *pb.PurgeListRequest) (*pb.PurgeL
 		}
 		resp.Requests = append(resp.Requests, summary)
 	}
+
+	sort.Slice(resp.Requests, func(i, j int) bool {
+		return resp.Requests[i].Created > resp.Requests[j].Created
+	})
 
 	return resp, nil
 }
