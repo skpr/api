@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/gitploy-io/cronexpr"
+
 	"github.com/skpr/api/internal/model"
 	"github.com/skpr/api/pb"
 )
@@ -21,7 +23,7 @@ func (c *Server) Suspend(ctx context.Context, req *pb.CronSuspendRequest) (*pb.C
 		return nil, err
 	}
 
-	jobs := environment.CronDetail
+	jobs := environment.Cron
 	for key := range jobs {
 		jobs[key].Suspended = true
 	}
@@ -36,7 +38,7 @@ func (c *Server) Resume(ctx context.Context, req *pb.CronResumeRequest) (*pb.Cro
 		return nil, err
 	}
 
-	jobs := environment.CronDetail
+	jobs := environment.Cron
 	for key := range jobs {
 		jobs[key].Suspended = false
 	}
@@ -53,9 +55,19 @@ func (c *Server) List(ctx context.Context, req *pb.CronListRequest) (*pb.CronLis
 
 	resp := &pb.CronListResponse{}
 
-	jobs := environment.CronDetail
+	jobs := environment.Environment.Cron
+	state := environment.Cron
 	for _, value := range jobs {
-		resp.List = append(resp.List, value)
+		previousTime := cronexpr.MustParse(value.Schedule).Prev(time.Now())
+		detail := &pb.CronDetail{
+			Name:               value.Name,
+			Command:            value.Command,
+			Schedule:           value.Schedule,
+			LastScheduleTime:   previousTime.Format(time.RFC3339),
+			LastSuccessfulTime: previousTime.Format(time.RFC3339),
+			Suspended:          state[value.Name].Suspended,
+		}
+		resp.List = append(resp.List, detail)
 	}
 
 	return resp, nil
@@ -82,28 +94,24 @@ func (c *Server) JobList(ctx context.Context, req *pb.CronJobListRequest) (*pb.C
 				StartTime: time.Now().Add(-2 * time.Hour).Format(time.RFC3339),
 				Duration:  (10 * time.Second).String(),
 			},
-
 			{
 				Name:      "drush",
 				Phase:     pb.CronJobDetail_Succeeded,
 				StartTime: time.Now().Add(-3 * time.Hour).Format(time.RFC3339),
 				Duration:  (10 * time.Second).String(),
 			},
-
 			{
 				Name:      "drush",
 				Phase:     pb.CronJobDetail_Succeeded,
 				StartTime: time.Now().Add(-4 * time.Hour).Format(time.RFC3339),
 				Duration:  (10 * time.Second).String(),
 			},
-
 			{
 				Name:      "drush",
 				Phase:     pb.CronJobDetail_Succeeded,
 				StartTime: time.Now().Add(-5 * time.Hour).Format(time.RFC3339),
 				Duration:  (10 * time.Second).String(),
 			},
-
 			{
 				Name:      "drush",
 				Phase:     pb.CronJobDetail_Succeeded,
