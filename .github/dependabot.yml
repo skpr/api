@@ -1,0 +1,11 @@
+version: 2
+updates:
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "cron"
+      cron: "0 0 * * 5"
+    groups:
+      all-go-deps:
+        patterns:
+          - "*"
