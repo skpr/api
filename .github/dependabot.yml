@@ -3,9 +3,8 @@ updates:
   - package-ecosystem: "gomod"
     directory: "/"
     schedule:
-      interval: "cron"
-      cron: "0 0 * * 5"
+      interval: "weekly"
     groups:
-      all-go-deps:
+      go-dependencies:
         patterns:
           - "*"
