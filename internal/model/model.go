@@ -115,10 +115,49 @@ func (s *Model) CreateEnvironment(name string, size int) {
 		},
 	}
 
+	backups := []*Backup{
+		{
+			Id:        "b84dd996-8113-4cd3-8dfe-018c990f5f1a",
+			StartTime: time.Now().Add(-12 * time.Hour).Round(time.Second),
+			Duration:  115 * time.Second,
+		},
+		{
+			Id:        "aabb7bee-ab04-4ae1-ba3f-1142aae1353f",
+			StartTime: time.Now().Add(-24 * time.Hour).Round(time.Second),
+			Duration:  134 * time.Second,
+		},
+		{
+			Id:        "7d419959-a3b7-483b-8fa7-769a0977e46b",
+			StartTime: time.Now().Add(-36 * time.Hour).Round(time.Second),
+			Duration:  123 * time.Second,
+		},
+	}
+
+	config := map[string]*pb.Config{
+		"mysql.default.database": {
+			Key:   "mysql.default.database",
+			Value: "heuu87bueoa8euua",
+			Type:  pb.ConfigType_System,
+		},
+		"mysql.default.password": {
+			Key:    "mysql.default.password",
+			Value:  "Passw0rd",
+			Secret: true,
+			Type:   pb.ConfigType_System,
+		},
+		"my.personal.key": {
+			Key:   "my.personal.key",
+			Value: "A_value",
+			Type:  pb.ConfigType_User,
+		},
+	}
+
 	s.storage[name] = &Environment{
 		Environment: environment,
+		Config:      config,
 		Cron:        cron,
 		Purge:       purge,
+		Backup:      backups,
 	}
 }
 
@@ -128,14 +167,17 @@ func (s *Model) DeleteEnvironment(name string) {
 
 type Environment struct {
 	Environment *pb.Environment
+	Config      map[string]*pb.Config
 	Cron        map[string]*Cron
 	Purge       []*Purge
+	Backup      []*Backup
 }
 
 type Cron struct {
 	Suspended bool
 }
 
+<<<<<<< HEAD
 func (m *Environment) AppendPurge(purge *Purge) {
 	m.Purge = append(m.Purge, purge)
 }
@@ -152,4 +194,33 @@ func NewPurge(paths []string) *Purge {
 		Created: time.Now().Round(time.Second),
 		Paths:   paths,
 	}
+}
+
+func (m *Environment) AppendBackup(backup *Backup) {
+	m.Backup = append(m.Backup, backup)
+}
+
+func (m *Environment) AddConfig(config *pb.Config) {
+	m.Config[config.Key] = config
+}
+
+func (m *Environment) GetConfig(key string) (*pb.Config, error) {
+	value, exists := m.Config[key]
+	if !exists {
+		return nil, fmt.Errorf("config key does not exist")
+	}
+
+	return value, nil
+}
+
+func (m *Environment) DeleteConfig(key string) error {
+	_, exists := m.Config[key]
+	if !exists {
+		return fmt.Errorf("config key does not exist")
+	}
+
+	if m.Config[key].Type != pb.ConfigType_System {
+		delete(m.Config, key)
+	}
+	return nil
 }
