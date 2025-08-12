@@ -5,14 +5,14 @@ go 1.24
 require (
 	github.com/brianvoe/gofakeit/v7 v7.3.0
 	github.com/christgf/env v0.0.0-20230511114549-ccdc1a7b5961
+	github.com/gitploy-io/cronexpr v0.2.2
 	github.com/jwalton/gchalk v1.3.0
 	github.com/spf13/cobra v1.9.1
 	google.golang.org/grpc v1.74.2
-	google.golang.org/protobuf v1.36.6
+	google.golang.org/protobuf v1.36.7
 )
 
 require (
-	github.com/gitploy-io/cronexpr v0.2.2 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jwalton/go-supportscolor v1.2.0 // indirect
 	github.com/spf13/pflag v1.0.7 // indirect
