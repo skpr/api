@@ -15,7 +15,9 @@ import (
 	"google.golang.org/grpc/reflection"
 
 	"github.com/skpr/api/internal/model"
+	"github.com/skpr/api/internal/server/mock/backup"
 	"github.com/skpr/api/internal/server/mock/compass"
+	"github.com/skpr/api/internal/server/mock/config"
 	"github.com/skpr/api/internal/server/mock/cron"
 	"github.com/skpr/api/internal/server/mock/environment"
 	"github.com/skpr/api/internal/server/mock/events"
@@ -63,8 +65,18 @@ func main() {
 		RunE: func(_ *cobra.Command, _ []string) error {
 			server := grpc.NewServer()
 
+			log.Println("Registering service: Backup")
+			pb.RegisterBackupServer(server, &backup.Server{
+				Model: globalModel,
+			})
+
 			log.Println("Registering service: Compass")
 			pb.RegisterCompassServer(server, &compass.Server{})
+
+			log.Println("Registering service: Config")
+			pb.RegisterConfigServer(server, &config.Server{
+				Model: globalModel,
+			})
 
 			log.Println("Registering service: Cron")
 			pb.RegisterCronServer(server, &cron.Server{
