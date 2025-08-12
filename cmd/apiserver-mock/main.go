@@ -3,7 +3,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/skpr/api/internal/server/mock/config"
 	"log"
 	"net"
 	"regexp"
@@ -18,6 +17,7 @@ import (
 	"github.com/skpr/api/internal/model"
 	"github.com/skpr/api/internal/server/mock/backup"
 	"github.com/skpr/api/internal/server/mock/compass"
+	"github.com/skpr/api/internal/server/mock/config"
 	"github.com/skpr/api/internal/server/mock/cron"
 	"github.com/skpr/api/internal/server/mock/environment"
 	"github.com/skpr/api/internal/server/mock/events"
