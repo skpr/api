@@ -177,7 +177,6 @@ type Cron struct {
 	Suspended bool
 }
 
-<<<<<<< HEAD
 func (m *Environment) AppendPurge(purge *Purge) {
 	m.Purge = append(m.Purge, purge)
 }
