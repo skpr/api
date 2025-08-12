@@ -52,7 +52,6 @@ func (s *Server) Set(ctx context.Context, req *pb.ConfigSetRequest) (*pb.ConfigS
 		return nil, err
 	}
 
-	_, err = environment.GetConfig(req.Config.Key)
 	environment.AddConfig(req.Config)
 
 	return &pb.ConfigSetResponse{}, nil
