@@ -22,8 +22,8 @@ func (s *Server) Create(ctx context.Context, req *pb.BackupCreateRequest) (*pb.B
 		return nil, err
 	}
 
-	backup := model.NewBackup()
-	environment.AppendBackup(backup)
+	backup := model.NewBackup(environment.Environment.Name)
+	environment.AddBackup(backup)
 	resp := &pb.BackupCreateResponse{
 		ID: backup.Id,
 	}
