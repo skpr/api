@@ -51,7 +51,7 @@ func (s *Server) Create(ctx context.Context, req *pb.PurgeCreateRequest) (*pb.Pu
 	}
 
 	purge := model.NewPurge(req.Paths)
-	environment.AppendPurge(purge)
+	environment.AddPurge(purge)
 	resp := &pb.PurgeCreateResponse{
 		ID: purge.Id,
 	}

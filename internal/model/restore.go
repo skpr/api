@@ -8,24 +8,26 @@ import (
 	"github.com/skpr/api/pb"
 )
 
-type Backup struct {
+type Restore struct {
 	Id        string
+	BackupId  string
 	StartTime time.Time
 	Duration  time.Duration
 }
 
-func NewBackup(environment string) *Backup {
-	return &Backup{
+func NewRestore(environment string, backupId string) *Restore {
+	return &Restore{
 		Id:        environment + "-" + gofakeit.UUID(),
+		BackupId:  backupId,
 		StartTime: time.Now().Round(time.Second),
-		Duration:  120 * time.Second,
+		Duration:  150 * time.Second,
 	}
 }
 
-func (b *Backup) Status() pb.BackupStatus_Phase {
-	status := pb.BackupStatus_Completed
+func (b *Restore) Status() pb.RestoreStatus_Phase {
+	status := pb.RestoreStatus_Completed
 	if b.StartTime.Add(b.Duration).After(time.Now()) {
-		status = pb.BackupStatus_InProgress
+		status = pb.RestoreStatus_InProgress
 	}
 	return status
 }

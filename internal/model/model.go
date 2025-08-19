@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/skpr/api/internal/random"
 	"github.com/skpr/api/pb"
 )
 
@@ -115,21 +114,30 @@ func (s *Model) CreateEnvironment(name string, size int) {
 		},
 	}
 
-	backups := []*Backup{
-		{
-			Id:        "b84dd996-8113-4cd3-8dfe-018c990f5f1a",
+	backups := map[string]*Backup{
+		name + "-b84dd996-8113-4cd3-8dfe-018c990f5f1a": {
+			Id:        name + "-b84dd996-8113-4cd3-8dfe-018c990f5f1a",
 			StartTime: time.Now().Add(-12 * time.Hour).Round(time.Second),
 			Duration:  115 * time.Second,
 		},
-		{
-			Id:        "aabb7bee-ab04-4ae1-ba3f-1142aae1353f",
+		name + "-aabb7bee-ab04-4ae1-ba3f-1142aae1353f": {
+			Id:        name + "-aabb7bee-ab04-4ae1-ba3f-1142aae1353f",
 			StartTime: time.Now().Add(-24 * time.Hour).Round(time.Second),
 			Duration:  134 * time.Second,
 		},
-		{
-			Id:        "7d419959-a3b7-483b-8fa7-769a0977e46b",
+		name + "-7d419959-a3b7-483b-8fa7-769a0977e46b": {
+			Id:        name + "-7d419959-a3b7-483b-8fa7-769a0977e46b",
 			StartTime: time.Now().Add(-36 * time.Hour).Round(time.Second),
 			Duration:  123 * time.Second,
+		},
+	}
+
+	restores := map[string]*Restore{
+		name + "-ef394df8-fbf6-4a3d-9b4b-6c1011a8afa5": {
+			Id:        name + "-ef394df8-fbf6-4a3d-9b4b-6c1011a8afa5",
+			BackupId:  name + "-7d419959-a3b7-483b-8fa7-769a0977e46b",
+			StartTime: time.Now().Add(-12 * time.Hour).Round(time.Second),
+			Duration:  145 * time.Second,
 		},
 	}
 
@@ -158,6 +166,7 @@ func (s *Model) CreateEnvironment(name string, size int) {
 		Cron:        cron,
 		Purge:       purge,
 		Backup:      backups,
+		Restore:     restores,
 	}
 }
 
@@ -165,38 +174,45 @@ func (s *Model) DeleteEnvironment(name string) {
 	delete(s.storage, name)
 }
 
+func (m *Model) GetBackup(id string) (*Backup, error) {
+	for _, value := range m.GetEnvironments() {
+		backup, exists := value.Backup[id]
+		if exists {
+			return backup, nil
+		}
+	}
+	return nil, fmt.Errorf("backup with id not found")
+}
+
+func (m *Model) GetRestore(id string) (*Restore, error) {
+	for _, value := range m.GetEnvironments() {
+		restore, exists := value.Restore[id]
+		if exists {
+			return restore, nil
+		}
+	}
+	return nil, fmt.Errorf("restore with id not found")
+}
+
 type Environment struct {
 	Environment *pb.Environment
 	Config      map[string]*pb.Config
 	Cron        map[string]*Cron
 	Purge       []*Purge
-	Backup      []*Backup
+	Backup      map[string]*Backup
+	Restore     map[string]*Restore
 }
 
 type Cron struct {
 	Suspended bool
 }
 
-func (m *Environment) AppendPurge(purge *Purge) {
+func (m *Environment) AddPurge(purge *Purge) {
 	m.Purge = append(m.Purge, purge)
 }
 
-type Purge struct {
-	Id      string
-	Created time.Time
-	Paths   []string
-}
-
-func NewPurge(paths []string) *Purge {
-	return &Purge{
-		Id:      random.StringOfLength(20),
-		Created: time.Now().Round(time.Second),
-		Paths:   paths,
-	}
-}
-
-func (m *Environment) AppendBackup(backup *Backup) {
-	m.Backup = append(m.Backup, backup)
+func (m *Environment) AddBackup(backup *Backup) {
+	m.Backup[backup.Id] = backup
 }
 
 func (m *Environment) AddConfig(config *pb.Config) {
@@ -222,4 +238,8 @@ func (m *Environment) DeleteConfig(key string) error {
 		delete(m.Config, key)
 	}
 	return nil
+}
+
+func (m *Environment) AddRestore(restore *Restore) {
+	m.Restore[restore.Id] = restore
 }
