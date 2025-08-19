@@ -160,6 +160,19 @@ func (s *Model) CreateEnvironment(name string, size int) {
 		},
 	}
 
+	mysql := map[string]*Mysql{
+		name + "-7GH59AB92AJF": {
+			Id:        name + "-7GH59AB92AJF",
+			StartTime: time.Now().Add(-12 * time.Hour).Round(time.Second),
+			Duration:  115 * time.Second,
+		},
+		name + "-GR87QH51ALQ5": {
+			Id:        name + "-GR87QH51ALQ5",
+			StartTime: time.Now().Add(-24 * time.Hour).Round(time.Second),
+			Duration:  134 * time.Second,
+		},
+	}
+
 	s.storage[name] = &Environment{
 		Environment: environment,
 		Config:      config,
@@ -167,6 +180,7 @@ func (s *Model) CreateEnvironment(name string, size int) {
 		Purge:       purge,
 		Backup:      backups,
 		Restore:     restores,
+		Mysql:       mysql,
 	}
 }
 
@@ -201,6 +215,7 @@ type Environment struct {
 	Purge       []*Purge
 	Backup      map[string]*Backup
 	Restore     map[string]*Restore
+	Mysql       map[string]*Mysql
 }
 
 type Cron struct {
