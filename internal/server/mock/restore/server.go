@@ -52,16 +52,21 @@ func (s *Server) Get(ctx context.Context, req *pb.RestoreGetRequest) (*pb.Restor
 		return nil, err
 	}
 
+	restoreResponse := &pb.RestoreStatus{
+		Name:      restore.Id,
+		Backup:    restore.BackupId,
+		Phase:     restore.Status(),
+		StartTime: restore.StartTime.Format(time.RFC3339),
+		Duration:  restore.Duration.String(),
+		Databases: []string{"default"},
+		Volumes:   []string{"public", "private"},
+	}
+	if restore.Status() == pb.RestoreStatus_Completed {
+		restoreResponse.CompletionTime = restore.StartTime.Add(restore.Duration).Format(time.RFC3339)
+	}
+
 	resp := &pb.RestoreGetResponse{
-		Restore: &pb.RestoreStatus{
-			Name:      restore.Id,
-			Backup:    restore.BackupId,
-			Phase:     restore.Status(),
-			StartTime: restore.StartTime.Format(time.RFC3339),
-			Duration:  restore.Duration.String(),
-			Databases: []string{"default"},
-			Volumes:   []string{"public", "private"},
-		},
+		Restore: restoreResponse,
 	}
 	return resp, nil
 }
@@ -83,6 +88,9 @@ func (s *Server) List(ctx context.Context, req *pb.RestoreListRequest) (*pb.Rest
 			Duration:  value.Duration.String(),
 			Databases: []string{"default"},
 			Volumes:   []string{"public", "private"},
+		}
+		if value.Status() == pb.RestoreStatus_Completed {
+			summary.CompletionTime = value.StartTime.Add(value.Duration).Format(time.RFC3339)
 		}
 		resp.List = append(resp.List, summary)
 	}
