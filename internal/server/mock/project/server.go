@@ -2,14 +2,17 @@ package project
 
 import (
 	"context"
+	"fmt"
+	
+	"google.golang.org/grpc/metadata"
 
 	"github.com/skpr/api/pb"
 )
 
 // Projects that we are using for mock data.
 // todo Move to modelling.
-var Projects = []*pb.Project{
-	{
+var Projects = map[string]*pb.Project{
+	"project1": {
 		ID:   "project1",
 		Name: "Project One",
 		Tags: []string{
@@ -32,7 +35,7 @@ var Projects = []*pb.Project{
 			},
 		},
 	},
-	{
+	"project2": {
 		ID:   "project2",
 		Name: "Project Two",
 		Tags: []string{
@@ -54,7 +57,7 @@ var Projects = []*pb.Project{
 			},
 		},
 	},
-	{
+	"project3": {
 		ID:   "project3",
 		Name: "Project Three",
 		Tags: []string{
@@ -85,14 +88,33 @@ type Server struct {
 }
 
 func (s *Server) List(ctx context.Context, req *pb.ProjectListRequest) (*pb.ProjectListResponse, error) {
-	return &pb.ProjectListResponse{
-		Projects: Projects,
-	}, nil
+	resp := &pb.ProjectListResponse{}
+
+	for _, project := range Projects {
+		resp.Projects = append(resp.Projects, project)
+	}
+
+	return resp, nil
 }
 
 func (s *Server) Get(ctx context.Context, req *pb.ProjectGetRequest) (*pb.ProjectGetResponse, error) {
-	resp := &pb.ProjectGetResponse{
-		Project: Projects[0],
+	data, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return nil, fmt.Errorf("gRPC requset contained no metadata")
 	}
-	return resp, nil
+
+	// Access metadata values
+	projectMetadata := data.Get("project")
+	if len(projectMetadata) == 0 {
+		return nil, fmt.Errorf("project metadata not set")
+	}
+
+	project, ok := Projects[projectMetadata[0]]
+	if !ok {
+		return nil, fmt.Errorf("project not found")
+	}
+
+	return &pb.ProjectGetResponse{
+		Project: project,
+	}, nil
 }
