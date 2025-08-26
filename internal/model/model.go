@@ -8,12 +8,14 @@ import (
 )
 
 type Model struct {
-	storage map[string]*Environment
+	Environments map[string]*Environment
+	Projects     map[string]*Project
 }
 
 func NewModel() *Model {
 	return &Model{
-		storage: make(map[string]*Environment),
+		Environments: make(map[string]*Environment),
+		Projects:     make(map[string]*Project),
 	}
 }
 
@@ -22,7 +24,7 @@ func (s *Model) GetEnvironment(name string) (*Environment, error) {
 		return nil, fmt.Errorf("environment not provided")
 	}
 
-	value, exists := s.storage[name]
+	value, exists := s.Environments[name]
 	if !exists {
 		return nil, fmt.Errorf("environment not valid")
 	}
@@ -32,7 +34,7 @@ func (s *Model) GetEnvironment(name string) (*Environment, error) {
 
 func (s *Model) GetEnvironments() []*Environment {
 	var response []*Environment
-	for _, value := range s.storage {
+	for _, value := range s.Environments {
 		response = append(response, value)
 	}
 	return response
@@ -173,7 +175,7 @@ func (s *Model) CreateEnvironment(name string, size int) {
 		},
 	}
 
-	s.storage[name] = &Environment{
+	s.Environments[name] = &Environment{
 		Environment: environment,
 		Config:      config,
 		Cron:        cron,
@@ -185,7 +187,7 @@ func (s *Model) CreateEnvironment(name string, size int) {
 }
 
 func (s *Model) DeleteEnvironment(name string) {
-	delete(s.storage, name)
+	delete(s.Environments, name)
 }
 
 func (m *Model) GetBackup(id string) (*Backup, error) {
@@ -257,4 +259,29 @@ func (m *Environment) DeleteConfig(key string) error {
 
 func (m *Environment) AddRestore(restore *Restore) {
 	m.Restore[restore.Id] = restore
+}
+
+func (m *Model) AddProject(project *Project) {
+	m.Projects[project.Id] = project
+}
+
+func (s *Model) GetProjects() []*Project {
+	var response []*Project
+	for _, value := range s.Projects {
+		response = append(response, value)
+	}
+	return response
+}
+
+func (s *Model) GetProject(name string) (*Project, error) {
+	if name == "" {
+		return nil, fmt.Errorf("project not provided")
+	}
+
+	value, exists := s.Projects[name]
+	if !exists {
+		return nil, fmt.Errorf("project not valid")
+	}
+
+	return value, nil
 }

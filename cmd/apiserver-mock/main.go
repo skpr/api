@@ -58,6 +58,9 @@ func main() {
 	o := Options{}
 
 	globalModel := model.NewModel()
+	globalModel.AddProject(model.NewProject("project1", "Project One", []string{"group1", "group3"}, "small"))
+	globalModel.AddProject(model.NewProject("project2", "Project Two", []string{"group1"}, "medium"))
+	globalModel.AddProject(model.NewProject("project3", "Project Three", []string{"group2", "group4"}, "large"))
 	globalModel.CreateEnvironment("dev", 1)
 	globalModel.CreateEnvironment("stg", 2)
 	globalModel.CreateEnvironment("prod", 4)
@@ -108,7 +111,9 @@ func main() {
 			})
 
 			log.Println("Registering service: Project")
-			pb.RegisterProjectServer(server, &project.Server{})
+			pb.RegisterProjectServer(server, &project.Server{
+				Model: globalModel,
+			})
 
 			log.Println("Registering service: Purge")
 			pb.RegisterPurgeServer(server, &purge.Server{
