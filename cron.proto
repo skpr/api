@@ -6,29 +6,29 @@ package workflow;
 option go_package = "./pb";
 
 service cron {
-    rpc Suspend (CronSuspendRequest) returns (CronSuspendResponse) {}
-    rpc Resume (CronResumeRequest) returns (CronResumeResponse) {}
-    rpc List (CronListRequest) returns (CronListResponse) {}
-    rpc JobList (CronJobListRequest) returns (CronJobListResponse) {}
+  rpc Suspend (CronSuspendRequest) returns (CronSuspendResponse) {}
+  rpc Resume (CronResumeRequest) returns (CronResumeResponse) {}
+  rpc List (CronListRequest) returns (CronListResponse) {}
+  rpc JobList (CronJobListRequest) returns (CronJobListResponse) {}
 }
 
 /**
  * Cron details associated with an environmnt
  */
 message CronDetail {
-    string Name = 1; // Name of the cron task
-    string Schedule = 2; // How often to execute the cron task
-    string Command = 3; // Command to execute
-    bool Suspended = 4; // If the cron task is suspended
-    string LastScheduleTime = 5; // Last time the cron was executed
-    string LastSuccessfulTime = 6; // Last tim the cron was successful
+  string Name = 1; // Name of the cron task
+  string Schedule = 2; // How often to execute the cron task
+  string Command = 3; // Command to execute
+  bool Suspended = 4; // If the cron task is suspended
+  string LastScheduleTime = 5; // Last time the cron was executed
+  string LastSuccessfulTime = 6; // Last tim the cron was successful
 }
 
 /**
  * Request that cron is suspended for an environment
  */
 message CronSuspendRequest {
-    string Environment = 1; // Name of the environment
+  string Environment = 1; // Name of the environment
 }
 
 /**
@@ -40,7 +40,7 @@ message CronSuspendResponse {}
  * Request that cron tasks be resumed
  */
 message CronResumeRequest {
-    string Environment = 1; // Name of the environment
+  string Environment = 1; // Name of the environment
 }
 
 /**
@@ -52,43 +52,43 @@ message CronResumeResponse {}
  * Request a list of config for an environment
  */
 message CronListRequest {
-    string Environment = 1; // Name of the environment
+  string Environment = 1; // Name of the environment
 }
 
 /**
  * Cron detail for an environment
  */
 message CronListResponse {
-    repeated CronDetail List = 1; // List of cron information
+  repeated CronDetail List = 1; // List of cron information
 }
 
 /**
  * Information about a cron task
  */
 message CronJobDetail {
-    string Name = 1; // Name of cron task
-    Phase phase = 2; // Phase that the cron is in
-    string StartTime = 3; // Time the cron job was started
-    string Duration = 4; // How long the cron job took to execute
+  string Name = 1; // Name of cron task
+  Phase phase = 2; // Phase that the cron is in
+  string StartTime = 3; // Time the cron job was started
+  string Duration = 4; // How long the cron job took to execute
 
-    enum Phase {
-        Pending = 0; // Default phase. Waiting to be executed.
-        Running = 1; // Job is running
-        Succeeded = 2; // Job has completed
-        Failed = 3; // Job has failed
-    }
+  enum Phase {
+    Pending = 0; // Default phase. Waiting to be executed.
+    Running = 1; // Job is running
+    Succeeded = 2; // Job has completed
+    Failed = 3; // Job has failed
+  }
 }
 
 /**
  * Request a list of cron jobs for an environment
  */
 message CronJobListRequest {
-    string Environment = 1; // Name of the environment
+  string Environment = 1; // Name of the environment
 }
 
 /**
  * List of cron jobs for an environment
  */
 message CronJobListResponse {
-    repeated CronJobDetail List = 1; // List of cron jobs
+  repeated CronJobDetail List = 1; // List of cron jobs
 }

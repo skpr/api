@@ -6,25 +6,25 @@ package workflow;
 option go_package = "./pb";
 
 service daemon {
-    rpc Suspend (DaemonSuspendRequest) returns (DaemonSuspendResponse) {}
-    rpc Resume (DaemonResumeRequest) returns (DaemonResumeResponse) {}
-    rpc List (DaemonListRequest) returns (DaemonListResponse) {}
+  rpc Suspend (DaemonSuspendRequest) returns (DaemonSuspendResponse) {}
+  rpc Resume (DaemonResumeRequest) returns (DaemonResumeResponse) {}
+  rpc List (DaemonListRequest) returns (DaemonListResponse) {}
 }
 
 /**
  * Details about a daemon
  */
 message DaemonDetail {
-    string Name = 1; // Name of the deamon
-    string Command = 2; // Command executed to start the daemon
-    bool Suspended = 3; // If the daemon is suspended
+  string Name = 1; // Name of the deamon
+  string Command = 2; // Command executed to start the daemon
+  bool Suspended = 3; // If the daemon is suspended
 }
 
 /**
  * Request to suspend daemons for an environment
  */
 message DaemonSuspendRequest {
-    string Environment = 1; // Environment name
+  string Environment = 1; // Environment name
 }
 
 /**
@@ -36,7 +36,7 @@ message DaemonSuspendResponse {}
  * Request daemons are resumed for an environment
  */
 message DaemonResumeRequest {
-    string Environment = 1; // Name of the environment
+  string Environment = 1; // Name of the environment
 }
 
 /**
@@ -48,12 +48,12 @@ message DaemonResumeResponse {}
  * Request a list of daemons for an environment
  */
 message DaemonListRequest {
-    string Environment = 1; // Name of the environment
+  string Environment = 1; // Name of the environment
 }
 
 /**
  * Daemon list of an environment
  */
 message DaemonListResponse {
-    repeated DaemonDetail List = 1; // List of daemon details
+  repeated DaemonDetail List = 1; // List of daemon details
 }
