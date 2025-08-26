@@ -39,4 +39,4 @@ docker_manifests:
   - name_template: "ghcr.io/skpr/api:latest"
     image_templates:
       - "ghcr.io/skpr/api:latest-amd64"
-      - "ghcr.io/skpr/api:latestd-arm64"
+      - "ghcr.io/skpr/api:latest-arm64"
