@@ -52,6 +52,17 @@ func (s *Server) Set(ctx context.Context, req *pb.ConfigSetRequest) (*pb.ConfigS
 		return nil, err
 	}
 
+	if req.Config.Type == pb.ConfigType_None {
+		req.Config.Type = pb.ConfigType_User
+	}
+
+	value, _ := environment.GetConfig(req.Config.Key)
+	if value != nil {
+		if value.Type == pb.ConfigType_System {
+			req.Config.Type = pb.ConfigType_Overridden
+		}
+	}
+
 	environment.AddConfig(req.Config)
 
 	return &pb.ConfigSetResponse{}, nil
