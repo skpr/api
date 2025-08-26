@@ -1,4 +1,4 @@
-project_name: skpr-mock-cluster
+project_name: skpr-apiserver-mock
 version: 2
 
 builds:
