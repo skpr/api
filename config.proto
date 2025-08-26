@@ -6,67 +6,67 @@ package workflow;
 option go_package = "./pb";
 
 service config {
-    rpc List (ConfigListRequest) returns (ConfigListResponse) {}
-    rpc Get (ConfigGetRequest) returns (ConfigGetResponse) {}
-    rpc Set (ConfigSetRequest) returns (ConfigSetResponse) {}
-    rpc Delete (ConfigDeleteRequest) returns (ConfigDeleteResponse) {}
+  rpc List (ConfigListRequest) returns (ConfigListResponse) {}
+  rpc Get (ConfigGetRequest) returns (ConfigGetResponse) {}
+  rpc Set (ConfigSetRequest) returns (ConfigSetResponse) {}
+  rpc Delete (ConfigDeleteRequest) returns (ConfigDeleteResponse) {}
 }
 
 enum ConfigType {
-    None = 0; // Default config type
-    System = 1; // Config provided by the Skpr hosting platform
-    User = 2; // A user provided config
-    Overridden = 3; // A user provided config that overrides a system config
+  None = 0; // Default config type
+  System = 1; // Config provided by the Skpr hosting platform
+  User = 2; // A user provided config
+  Overridden = 3; // A user provided config that overrides a system config
 }
 
 /**
  * Configuration object assigned to an environment
  */
 message Config {
-    string     Key = 1; // Name of the config
-    string     Value = 2; // Value of the config
-    bool       Secret = 3; // If the config is a secret eg. API key
-    ConfigType Type = 4; // Type of config
+  string     Key = 1; // Name of the config
+  string     Value = 2; // Value of the config
+  bool       Secret = 3; // If the config is a secret eg. API key
+  ConfigType Type = 4; // Type of config
 }
 
 /**
  * Request a list of all config for an environment
  */
 message ConfigListRequest {
-    string     Name = 1; // Name of the environment
-    ConfigType FilterType = 2; // Filter by config type
-    bool       ShowSecrets = 3; // If secret values should be shown
+  string     Name = 1; // Name of the environment
+  ConfigType FilterType = 2; // Filter by config type
+  bool       ShowSecrets = 3; // If secret values should be shown
 }
 
 /**
  * List all config for an environment
  */
 message ConfigListResponse {
-    repeated Config List = 1; // List of configs
+  repeated Config List = 1; // List of configs
 }
 
 /**
  * Request a single config for an environment
  */
 message ConfigGetRequest {
-    string Name = 1; // Name of the environment
-    string Key = 2; // Name of the config
-    bool   ShowSecret = 3; // If the secret value should be shown
+  string Name = 1; // Name of the environment
+  string Key = 2; // Name of the config
+  bool   ShowSecret = 3; // If the secret value should be shown
 }
 
 /**
  * Config for an environment
  */
 message ConfigGetResponse {
-    Config Config = 1; // Config returned
+  Config Config = 1; // Config returned
 }
 
 /**
  * Set config for an environment
  */
 message ConfigSetRequest {
-    string Name = 1; // Name of the config
-    Config Config = 2; // Config details to be set
+  string Name = 1; // Name of the config
+  Config Config = 2; // Config details to be set
 }
 
 /**
@@ -78,8 +78,8 @@ message ConfigSetResponse {}
  * Request a config is deleted
  */
 message ConfigDeleteRequest {
-    string Name = 1; // Name of the environment
-    string Key = 2; // Name of the config
+  string Name = 1; // Name of the environment
+  string Key = 2; // Name of the config
 }
 
 /**
