@@ -12,7 +12,7 @@ build:
 	rm -fR $(DIR)
 	mkdir -p $(DIR)
 	# Building image.
-	docker build -t $(IMAGE) .
+	docker build -t $(IMAGE) dockerfiles/grpc-go
 	# Building package.
 	docker run -it -w $(PWD) -v $(PWD):$(PWD) $(IMAGE) /bin/bash -c 'protoc --go_out=./pb --go_opt=paths=source_relative --go-grpc_out=./pb --go-grpc_opt=paths=source_relative  *.proto'
 
