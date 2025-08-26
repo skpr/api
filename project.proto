@@ -9,9 +9,7 @@ service project {
   rpc Get (ProjectGetRequest) returns (ProjectGetResponse) {}
   rpc List (ProjectListRequest) returns (ProjectListResponse) {}
   rpc SetTags (SetTagsRequest) returns (SetTagsResponse) {}
-  rpc GetTags (GetTagsRequest) returns (GetTagsResponse) {}
   rpc SetContact (SetContactRequest) returns (SetContactResponse) {}
-  rpc GetContact (GetContactRequest) returns (GetContactResponse) {}
 }
 
 /**
@@ -56,17 +54,17 @@ message ProjectGetRequest {}
  * Returns project information
  */
 message ProjectGetResponse {
-    string Namespace = 1; // Will be deprecated in a future release.
-    ProjectRegistry Registry = 2; // Will be deprecated in a future release.
-    Project Project = 3; // Project status information.
+  string Namespace = 1; // Will be deprecated in a future release.
+  ProjectRegistry Registry = 2; // Will be deprecated in a future release.
+  Project Project = 3; // Project status information.
 }
 
 /**
  * Project registry information
  */
 message ProjectRegistry {
-    string Application = 1; // Application registry information
-    string MySQL = 2; // MySQL registry information
+  string Application = 1; // Application registry information
+  string MySQL = 2; // MySQL registry information
 }
 
 /**
@@ -78,7 +76,7 @@ message ProjectListRequest {}
  * A list of all projects on this Skpr platform cluster.
  */
 message ProjectListResponse {
-    repeated Project Projects = 1;
+  repeated Project Projects = 1;
 }
 
 /**
@@ -94,18 +92,6 @@ message SetTagsRequest {
 message SetTagsResponse {}
 
 /**
- * Input for getting tags from a Project.
- */
-message GetTagsRequest {}
-
-/**
- * Output of tags from a Project.
- */
-message GetTagsResponse {
-  repeated string Tags = 1;
-}
-
-/**
  * Input for setting contact details on a Project.
  */
 message SetContactRequest {
@@ -116,15 +102,3 @@ message SetContactRequest {
  * Output provided when setting contact details.
  */
 message SetContactResponse {}
-
-/**
- * Input provided when getting project contact details.
- */
-message GetContactRequest {}
-
-/**
- * Output returned when getting project contact details.
- */
-message GetContactResponse {
-  string Contact = 1;
-}
