@@ -3,10 +3,10 @@ package project
 import (
 	"context"
 	"fmt"
-	"github.com/skpr/api/internal/model"
 
 	"google.golang.org/grpc/metadata"
 
+	"github.com/skpr/api/internal/model"
 	"github.com/skpr/api/pb"
 )
 
