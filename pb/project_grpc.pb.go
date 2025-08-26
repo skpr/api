@@ -25,9 +25,7 @@ type ProjectClient interface {
 	Get(ctx context.Context, in *ProjectGetRequest, opts ...grpc.CallOption) (*ProjectGetResponse, error)
 	List(ctx context.Context, in *ProjectListRequest, opts ...grpc.CallOption) (*ProjectListResponse, error)
 	SetTags(ctx context.Context, in *SetTagsRequest, opts ...grpc.CallOption) (*SetTagsResponse, error)
-	GetTags(ctx context.Context, in *GetTagsRequest, opts ...grpc.CallOption) (*GetTagsResponse, error)
 	SetContact(ctx context.Context, in *SetContactRequest, opts ...grpc.CallOption) (*SetContactResponse, error)
-	GetContact(ctx context.Context, in *GetContactRequest, opts ...grpc.CallOption) (*GetContactResponse, error)
 }
 
 type projectClient struct {
@@ -65,27 +63,9 @@ func (c *projectClient) SetTags(ctx context.Context, in *SetTagsRequest, opts ..
 	return out, nil
 }
 
-func (c *projectClient) GetTags(ctx context.Context, in *GetTagsRequest, opts ...grpc.CallOption) (*GetTagsResponse, error) {
-	out := new(GetTagsResponse)
-	err := c.cc.Invoke(ctx, "/workflow.project/GetTags", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *projectClient) SetContact(ctx context.Context, in *SetContactRequest, opts ...grpc.CallOption) (*SetContactResponse, error) {
 	out := new(SetContactResponse)
 	err := c.cc.Invoke(ctx, "/workflow.project/SetContact", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *projectClient) GetContact(ctx context.Context, in *GetContactRequest, opts ...grpc.CallOption) (*GetContactResponse, error) {
-	out := new(GetContactResponse)
-	err := c.cc.Invoke(ctx, "/workflow.project/GetContact", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -99,9 +79,7 @@ type ProjectServer interface {
 	Get(context.Context, *ProjectGetRequest) (*ProjectGetResponse, error)
 	List(context.Context, *ProjectListRequest) (*ProjectListResponse, error)
 	SetTags(context.Context, *SetTagsRequest) (*SetTagsResponse, error)
-	GetTags(context.Context, *GetTagsRequest) (*GetTagsResponse, error)
 	SetContact(context.Context, *SetContactRequest) (*SetContactResponse, error)
-	GetContact(context.Context, *GetContactRequest) (*GetContactResponse, error)
 	mustEmbedUnimplementedProjectServer()
 }
 
@@ -118,14 +96,8 @@ func (UnimplementedProjectServer) List(context.Context, *ProjectListRequest) (*P
 func (UnimplementedProjectServer) SetTags(context.Context, *SetTagsRequest) (*SetTagsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetTags not implemented")
 }
-func (UnimplementedProjectServer) GetTags(context.Context, *GetTagsRequest) (*GetTagsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetTags not implemented")
-}
 func (UnimplementedProjectServer) SetContact(context.Context, *SetContactRequest) (*SetContactResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetContact not implemented")
-}
-func (UnimplementedProjectServer) GetContact(context.Context, *GetContactRequest) (*GetContactResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetContact not implemented")
 }
 func (UnimplementedProjectServer) mustEmbedUnimplementedProjectServer() {}
 
@@ -194,24 +166,6 @@ func _Project_SetTags_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Project_GetTags_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetTagsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ProjectServer).GetTags(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/workflow.project/GetTags",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProjectServer).GetTags(ctx, req.(*GetTagsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _Project_SetContact_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SetContactRequest)
 	if err := dec(in); err != nil {
@@ -226,24 +180,6 @@ func _Project_SetContact_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ProjectServer).SetContact(ctx, req.(*SetContactRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Project_GetContact_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetContactRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ProjectServer).GetContact(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/workflow.project/GetContact",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProjectServer).GetContact(ctx, req.(*GetContactRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -268,16 +204,8 @@ var Project_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Project_SetTags_Handler,
 		},
 		{
-			MethodName: "GetTags",
-			Handler:    _Project_GetTags_Handler,
-		},
-		{
 			MethodName: "SetContact",
 			Handler:    _Project_SetContact_Handler,
-		},
-		{
-			MethodName: "GetContact",
-			Handler:    _Project_GetContact_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
