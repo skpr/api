@@ -18,10 +18,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Go
+      - name: Install Go
         uses: actions/setup-go@v5
         with:
-          go-version: stable
+          go-version-file: 'go.mod'
 
       - name: Login to GHCR
         uses: docker/login-action@v3

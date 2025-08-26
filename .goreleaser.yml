@@ -9,7 +9,7 @@ builds:
       - -extldflags '-static'
     env:
       - CGO_ENABLED=0
-    goos: [ linux, darwin ]
+    goos: [ linux ]
     goarch: [ amd64, arm64 ]
 
 dockers:
@@ -29,9 +29,14 @@ dockers:
       - "--pull"
       - "--platform=linux/arm64"
     use: buildx
+    goarch: arm64
 
 docker_manifests:
   - name_template: "ghcr.io/skpr/api:{{ .Version }}"
     image_templates:
       - "ghcr.io/skpr/api:{{ .Version }}-amd64"
       - "ghcr.io/skpr/api:{{ .Version }}-arm64"
+  - name_template: "ghcr.io/skpr/api:latest"
+    image_templates:
+      - "ghcr.io/skpr/api:latest-amd64"
+      - "ghcr.io/skpr/api:latestd-arm64"
