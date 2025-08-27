@@ -83,6 +83,11 @@ func (s *Model) CreateEnvironment(name string, size int) {
 				Command:  "drush queue:run example",
 				Schedule: "*/15 * * * *",
 			},
+			{
+				Name:     "data-pipeline-refresh",
+				Command:  "drush data-pipelines:reindex my_source_data_from_json_url && drush dn:invalidate-paths /path/to/page/that/uses/data",
+				Schedule: "*/30 * * * *",
+			},
 		},
 	}
 	if name == "prod" {

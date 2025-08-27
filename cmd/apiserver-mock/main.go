@@ -59,8 +59,8 @@ func main() {
 
 	globalModel := model.NewModel()
 	globalModel.AddProject(model.NewProject("project1", "Project One", []string{"group1", "group3"}, "small"))
-	globalModel.AddProject(model.NewProject("project2", "Project Two", []string{"group1"}, "medium"))
-	globalModel.AddProject(model.NewProject("project3", "Project Three", []string{"group2", "group4"}, "large"))
+	globalModel.AddProject(model.NewProject("project2", "Project Two", []string{}, "medium"))
+	globalModel.AddProject(model.NewProject("project3", "Project Three", []string{"group2", "group3"}, "large"))
 	globalModel.CreateEnvironment("dev", 1)
 	globalModel.CreateEnvironment("stg", 2)
 	globalModel.CreateEnvironment("prod", 4)
