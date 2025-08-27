@@ -41,5 +41,5 @@ docker_manifests:
       - "ghcr.io/skpr/api:latest-amd64"
       - "ghcr.io/skpr/api:latest-arm64"
 
-release:
-  draft: true
+changelog:
+  use: github-native
