@@ -257,7 +257,10 @@ func (m *Environment) DeleteConfig(key string) error {
 		return fmt.Errorf("config key does not exist")
 	}
 
-	if m.Config[key].Type != pb.ConfigType_System {
+	if m.Config[key].Type == pb.ConfigType_Overridden {
+		m.Config[key].Type = pb.ConfigType_System
+		m.Config[key].Value = configDefaults[key]
+	} else if m.Config[key].Type != pb.ConfigType_System {
 		delete(m.Config, key)
 	}
 	return nil
