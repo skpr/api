@@ -13,6 +13,7 @@ type Restore struct {
 	BackupId  string
 	StartTime time.Time
 	Duration  time.Duration
+	Failed    bool
 }
 
 func NewRestore(environment string, backupId string) *Restore {
@@ -21,12 +22,15 @@ func NewRestore(environment string, backupId string) *Restore {
 		BackupId:  backupId,
 		StartTime: time.Now().Round(time.Second),
 		Duration:  150 * time.Second,
+		Failed:    false,
 	}
 }
 
 func (b *Restore) Status() pb.RestoreStatus_Phase {
 	status := pb.RestoreStatus_Completed
-	if b.StartTime.Add(b.Duration).After(time.Now()) {
+	if b.Failed {
+		status = pb.RestoreStatus_Failed
+	} else if b.StartTime.Add(b.Duration).After(time.Now()) {
 		status = pb.RestoreStatus_InProgress
 	}
 	return status

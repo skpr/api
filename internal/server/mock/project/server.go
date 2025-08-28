@@ -20,10 +20,8 @@ func (s *Server) List(ctx context.Context, req *pb.ProjectListRequest) (*pb.Proj
 	resp := &pb.ProjectListResponse{}
 
 	for _, project := range s.Model.GetProjects() {
-		respProject, err := buildProject(s.Model, project.Id)
-		if err == nil {
-			resp.Projects = append(resp.Projects, respProject)
-		}
+		respProject, _ := buildProject(s.Model, project.Id)
+		resp.Projects = append(resp.Projects, respProject)
 	}
 
 	return resp, nil
