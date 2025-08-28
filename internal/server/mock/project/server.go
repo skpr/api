@@ -103,9 +103,9 @@ func buildProject(model *model.Model, id string) (*pb.Project, error) {
 		Contact: project.Contact,
 		Size:    project.Size,
 		ResourceTotals: &pb.ProjectResourceTotals{
-			CPU:      10,
-			Memory:   4096,
-			Replicas: 3,
+			CPU:      0,
+			Memory:   0,
+			Replicas: 0,
 		},
 		Environments: &pb.ProjectEnvironments{
 			NonProd: []string{},
@@ -114,6 +114,10 @@ func buildProject(model *model.Model, id string) (*pb.Project, error) {
 
 	environments := model.GetEnvironments()
 	for _, env := range environments {
+		respProject.ResourceTotals.CPU = respProject.ResourceTotals.CPU + env.Environment.Resources.CPU.Limit
+		respProject.ResourceTotals.Memory = respProject.ResourceTotals.Memory + env.Environment.Resources.Memory.Limit
+		respProject.ResourceTotals.Replicas = respProject.ResourceTotals.Replicas + env.Environment.Resources.Replicas.Max
+
 		if env.Environment.Production {
 			respProject.Environments.Prod = env.Environment.Name
 			respProject.Version = env.Environment.Version
