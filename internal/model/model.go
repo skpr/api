@@ -127,16 +127,19 @@ func (s *Model) CreateEnvironment(name string, size int) {
 			Id:        name + "-b84dd996-8113-4cd3-8dfe-018c990f5f1a",
 			StartTime: time.Now().Add(-12 * time.Hour).Round(time.Second),
 			Duration:  115 * time.Second,
+			Failed:    false,
 		},
 		name + "-aabb7bee-ab04-4ae1-ba3f-1142aae1353f": {
 			Id:        name + "-aabb7bee-ab04-4ae1-ba3f-1142aae1353f",
 			StartTime: time.Now().Add(-24 * time.Hour).Round(time.Second),
 			Duration:  134 * time.Second,
+			Failed:    true,
 		},
 		name + "-7d419959-a3b7-483b-8fa7-769a0977e46b": {
 			Id:        name + "-7d419959-a3b7-483b-8fa7-769a0977e46b",
 			StartTime: time.Now().Add(-36 * time.Hour).Round(time.Second),
 			Duration:  123 * time.Second,
+			Failed:    false,
 		},
 	}
 
@@ -146,6 +149,14 @@ func (s *Model) CreateEnvironment(name string, size int) {
 			BackupId:  name + "-7d419959-a3b7-483b-8fa7-769a0977e46b",
 			StartTime: time.Now().Add(-12 * time.Hour).Round(time.Second),
 			Duration:  145 * time.Second,
+			Failed:    false,
+		},
+		name + "-39b11746-eca6-40ac-9aed-094d38c1e444": {
+			Id:        name + "-39b11746-eca6-40ac-9aed-094d38c1e444",
+			BackupId:  name + "-7d419959-a3b7-483b-8fa7-769a0977e46b",
+			StartTime: time.Now().Add(-12 * time.Hour).Round(time.Second),
+			Duration:  145 * time.Second,
+			Failed:    true,
 		},
 	}
 
