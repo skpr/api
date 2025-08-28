@@ -58,8 +58,8 @@ func (s *Model) CreateEnvironment(name string, size int) {
 			},
 			Memory: &pb.EnvironmentResourcesMemory{
 				// In GB.
-				Current: 128 * int64(size) * 1024 * 1024,
-				Limit:   512 * int64(size) * 1024 * 1024,
+				Current: 128 * int64(size) * 1024,
+				Limit:   512 * int64(size) * 1024,
 			},
 			Replicas: &pb.EnvironmentResourcesReplicas{
 				Current: 1 * int32(size),
