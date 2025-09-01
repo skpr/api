@@ -1,5 +1,5 @@
-github.com/brianvoe/gofakeit/v7 v7.4.0 h1:Q7R44v1E9vkath1SxBqxXzhLnyOcGm/Ex3CQwjudJuI=
-github.com/brianvoe/gofakeit/v7 v7.4.0/go.mod h1:QXuPeBw164PJCzCUZVmgpgHJ3Llj49jSLVkKPMtxtxA=
+github.com/brianvoe/gofakeit/v7 v7.5.1 h1:HJvuVtQFe3TKh+pw8eD+2l7r5eyssfL/wGql5hA9r6U=
+github.com/brianvoe/gofakeit/v7 v7.5.1/go.mod h1:QXuPeBw164PJCzCUZVmgpgHJ3Llj49jSLVkKPMtxtxA=
 github.com/christgf/env v0.0.0-20230511114549-ccdc1a7b5961 h1:AzA7Mz5IT3jid4G+f+GXNuvdtsiKQwGmTQr1IojOOnA=
 github.com/christgf/env v0.0.0-20230511114549-ccdc1a7b5961/go.mod h1:61JGvzIxi9y8YMaE49vZawHAuV+CPRcoxRRN4Gu5jPU=
 github.com/cpuguy83/go-md2man/v2 v2.0.6/go.mod h1:oOW0eioCTA6cOiMLiUPZOpcVxMig6NIQQ7OS05n1F4g=

@@ -3,7 +3,7 @@ module github.com/skpr/api
 go 1.24
 
 require (
-	github.com/brianvoe/gofakeit/v7 v7.4.0
+	github.com/brianvoe/gofakeit/v7 v7.5.1
 	github.com/christgf/env v0.0.0-20230511114549-ccdc1a7b5961
 	github.com/gitploy-io/cronexpr v0.2.2
 	github.com/jwalton/gchalk v1.3.0
