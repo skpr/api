@@ -113,14 +113,10 @@ func (s *Server) StreamTraces(_ *pb.StreamTracesRequest, server pb.Compass_Strea
 
 			err := server.Send(resp)
 			if err != nil {
-				fmt.Println("Stopping log stream for:", err.Error())
-				break
+				return fmt.Errorf("stopping log stream for: %w", err)
 			}
 
 			time.Sleep(500 * time.Millisecond)
 		}
-
-		// Simulate sending the response back to the client.
-		return nil
 	}
 }
