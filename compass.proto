@@ -7,7 +7,7 @@ option go_package = "./pb";
 
 service compass {
   // Stream Compass traces from a specific environment.
-  rpc StreamTraces (StreamTracesRequest) returns (StreamTracesResponse) {}
+  rpc StreamTraces (StreamTracesRequest) returns (stream StreamTracesResponse) {}
 }
 
 /**
