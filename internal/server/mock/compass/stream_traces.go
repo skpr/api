@@ -2,6 +2,7 @@ package compass
 
 import (
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/brianvoe/gofakeit/v7"
@@ -21,6 +22,7 @@ func (s *Server) StreamTraces(_ *pb.StreamTracesRequest, server pb.Compass_Strea
 					{
 						Metadata: &pb.CompassTraceMetadata{
 							RequestId: gofakeit.UUID(),
+							Method:    http.MethodGet,
 							Uri:       "/sites/default/files/styles/scale_crop_7_3_wide/public/veggie-pasta-bake-hero-umami.jpg.webp?itok=CYsHBUlX",
 							StartTime: 11479712402527,
 							EndTime:   11480550685871,
@@ -51,6 +53,7 @@ func (s *Server) StreamTraces(_ *pb.StreamTracesRequest, server pb.Compass_Strea
 					{
 						Metadata: &pb.CompassTraceMetadata{
 							RequestId: gofakeit.UUID(),
+							Method:    http.MethodGet,
 							Uri:       "/sites/default/files/styles/scale_crop_7_3_wide/public/veggie-pasta-bake-hero-umami.jpg.webp?itok=CYsHBUlX",
 							StartTime: 11479712402527,
 							EndTime:   11480550685871,
@@ -81,6 +84,7 @@ func (s *Server) StreamTraces(_ *pb.StreamTracesRequest, server pb.Compass_Strea
 					{
 						Metadata: &pb.CompassTraceMetadata{
 							RequestId: gofakeit.UUID(),
+							Method:    http.MethodGet,
 							Uri:       "/sites/default/files/styles/scale_crop_7_3_wide/public/veggie-pasta-bake-hero-umami.jpg.webp?itok=CYsHBUlX",
 							StartTime: 11479712402527,
 							EndTime:   11480550685871,
