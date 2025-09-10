@@ -23,7 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CompassClient interface {
 	// Stream Compass traces from a specific environment.
-	StreamTraces(ctx context.Context, in *StreamTracesRequest, opts ...grpc.CallOption) (*StreamTracesResponse, error)
+	StreamTraces(ctx context.Context, in *StreamTracesRequest, opts ...grpc.CallOption) (Compass_StreamTracesClient, error)
 }
 
 type compassClient struct {
@@ -34,13 +34,36 @@ func NewCompassClient(cc grpc.ClientConnInterface) CompassClient {
 	return &compassClient{cc}
 }
 
-func (c *compassClient) StreamTraces(ctx context.Context, in *StreamTracesRequest, opts ...grpc.CallOption) (*StreamTracesResponse, error) {
-	out := new(StreamTracesResponse)
-	err := c.cc.Invoke(ctx, "/workflow.compass/StreamTraces", in, out, opts...)
+func (c *compassClient) StreamTraces(ctx context.Context, in *StreamTracesRequest, opts ...grpc.CallOption) (Compass_StreamTracesClient, error) {
+	stream, err := c.cc.NewStream(ctx, &Compass_ServiceDesc.Streams[0], "/workflow.compass/StreamTraces", opts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &compassStreamTracesClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type Compass_StreamTracesClient interface {
+	Recv() (*StreamTracesResponse, error)
+	grpc.ClientStream
+}
+
+type compassStreamTracesClient struct {
+	grpc.ClientStream
+}
+
+func (x *compassStreamTracesClient) Recv() (*StreamTracesResponse, error) {
+	m := new(StreamTracesResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 // CompassServer is the server API for Compass service.
@@ -48,7 +71,7 @@ func (c *compassClient) StreamTraces(ctx context.Context, in *StreamTracesReques
 // for forward compatibility
 type CompassServer interface {
 	// Stream Compass traces from a specific environment.
-	StreamTraces(context.Context, *StreamTracesRequest) (*StreamTracesResponse, error)
+	StreamTraces(*StreamTracesRequest, Compass_StreamTracesServer) error
 	mustEmbedUnimplementedCompassServer()
 }
 
@@ -56,8 +79,8 @@ type CompassServer interface {
 type UnimplementedCompassServer struct {
 }
 
-func (UnimplementedCompassServer) StreamTraces(context.Context, *StreamTracesRequest) (*StreamTracesResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method StreamTraces not implemented")
+func (UnimplementedCompassServer) StreamTraces(*StreamTracesRequest, Compass_StreamTracesServer) error {
+	return status.Errorf(codes.Unimplemented, "method StreamTraces not implemented")
 }
 func (UnimplementedCompassServer) mustEmbedUnimplementedCompassServer() {}
 
@@ -72,22 +95,25 @@ func RegisterCompassServer(s grpc.ServiceRegistrar, srv CompassServer) {
 	s.RegisterService(&Compass_ServiceDesc, srv)
 }
 
-func _Compass_StreamTraces_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(StreamTracesRequest)
-	if err := dec(in); err != nil {
-		return nil, err
+func _Compass_StreamTraces_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(StreamTracesRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
 	}
-	if interceptor == nil {
-		return srv.(CompassServer).StreamTraces(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/workflow.compass/StreamTraces",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CompassServer).StreamTraces(ctx, req.(*StreamTracesRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	return srv.(CompassServer).StreamTraces(m, &compassStreamTracesServer{stream})
+}
+
+type Compass_StreamTracesServer interface {
+	Send(*StreamTracesResponse) error
+	grpc.ServerStream
+}
+
+type compassStreamTracesServer struct {
+	grpc.ServerStream
+}
+
+func (x *compassStreamTracesServer) Send(m *StreamTracesResponse) error {
+	return x.ServerStream.SendMsg(m)
 }
 
 // Compass_ServiceDesc is the grpc.ServiceDesc for Compass service.
@@ -96,12 +122,13 @@ func _Compass_StreamTraces_Handler(srv interface{}, ctx context.Context, dec fun
 var Compass_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "workflow.compass",
 	HandlerType: (*CompassServer)(nil),
-	Methods: []grpc.MethodDesc{
+	Methods:     []grpc.MethodDesc{},
+	Streams: []grpc.StreamDesc{
 		{
-			MethodName: "StreamTraces",
-			Handler:    _Compass_StreamTraces_Handler,
+			StreamName:    "StreamTraces",
+			Handler:       _Compass_StreamTraces_Handler,
+			ServerStreams: true,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
 	Metadata: "compass.proto",
 }
