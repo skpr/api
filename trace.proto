@@ -5,7 +5,7 @@ package workflow;
 
 option go_package = "./pb";
 
-service compass {
+service trace {
   // Stream Compass traces from a specific environment.
   rpc StreamTraces (StreamTracesRequest) returns (stream StreamTracesResponse) {}
 }
@@ -21,21 +21,21 @@ message StreamTracesRequest {
  * Output for StreamTraces.
  */
 message StreamTracesResponse {
-  repeated CompassTrace Traces = 1; // List of traces.
+  repeated Trace Traces = 1; // List of traces.
 }
 
 /**
  * Trace data provided by Compass.
  */
-message CompassTrace {
-  CompassTraceMetadata metadata = 1;                    // Metadata about the trace.
-  repeated CompassTraceFunctionCall function_calls = 2; // List of function calls in the trace.
+message Trace {
+  TraceMetadata metadata = 1;                    // Metadata about the trace.
+  repeated TraceFunctionCall function_calls = 2; // List of function calls in the trace.
 }
 
 /**
- * Metadata which contains information about the Compass trace.
+ * Metadata which contains information about the trace.
  */
-message CompassTraceMetadata {
+message TraceMetadata {
   string request_id = 1; // Request identifier for tracking.
   string uri = 2;        // URI of the request being traced.
   string method = 3;     // HTTP method of the request (e.g., GET, POST).
@@ -44,9 +44,9 @@ message CompassTraceMetadata {
 }
 
 /**
- * Function call data within a Compass trace.
+ * Function call data within a trace.
  */
-message CompassTraceFunctionCall {
+message TraceFunctionCall {
   string name = 1;        // Name of the function being traced.
   int64 start_time = 2;   // Start time of the function call in unix format.
   int64 elapsed_time = 3; // Elapsed time for the function call in milliseconds.

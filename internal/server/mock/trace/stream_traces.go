@@ -1,4 +1,4 @@
-package compass
+package trace
 
 import (
 	"fmt"
@@ -10,24 +10,24 @@ import (
 	"github.com/skpr/api/pb"
 )
 
-// StreamTraces streams Compass traces from a specific environment.
-func (s *Server) StreamTraces(_ *pb.StreamTracesRequest, server pb.Compass_StreamTracesServer) error {
+// StreamTraces streams traces from a specific environment.
+func (s *Server) StreamTraces(_ *pb.StreamTracesRequest, server pb.Trace_StreamTracesServer) error {
 	for {
 		// Simulate some processing delay.
 		time.Sleep(time.Second)
 
 		for {
 			resp := &pb.StreamTracesResponse{
-				Traces: []*pb.CompassTrace{
+				Traces: []*pb.Trace{
 					{
-						Metadata: &pb.CompassTraceMetadata{
+						Metadata: &pb.TraceMetadata{
 							RequestId: gofakeit.UUID(),
 							Method:    http.MethodGet,
 							Uri:       "/sites/default/files/styles/scale_crop_7_3_wide/public/veggie-pasta-bake-hero-umami.jpg.webp?itok=CYsHBUlX",
 							StartTime: 11479712402527,
 							EndTime:   11480550685871,
 						},
-						FunctionCalls: []*pb.CompassTraceFunctionCall{
+						FunctionCalls: []*pb.TraceFunctionCall{
 							{
 								Name:        "PDOStatement::execute",
 								StartTime:   11479719656578,
@@ -51,14 +51,14 @@ func (s *Server) StreamTraces(_ *pb.StreamTracesRequest, server pb.Compass_Strea
 						},
 					},
 					{
-						Metadata: &pb.CompassTraceMetadata{
+						Metadata: &pb.TraceMetadata{
 							RequestId: gofakeit.UUID(),
 							Method:    http.MethodGet,
 							Uri:       "/sites/default/files/styles/scale_crop_7_3_wide/public/veggie-pasta-bake-hero-umami.jpg.webp?itok=CYsHBUlX",
 							StartTime: 11479712402527,
 							EndTime:   11480550685871,
 						},
-						FunctionCalls: []*pb.CompassTraceFunctionCall{
+						FunctionCalls: []*pb.TraceFunctionCall{
 							{
 								Name:        "PDOStatement::execute",
 								StartTime:   11479719656578,
@@ -82,14 +82,13 @@ func (s *Server) StreamTraces(_ *pb.StreamTracesRequest, server pb.Compass_Strea
 						},
 					},
 					{
-						Metadata: &pb.CompassTraceMetadata{
+						Metadata: &pb.TraceMetadata{
 							RequestId: gofakeit.UUID(),
-							Method:    http.MethodGet,
 							Uri:       "/sites/default/files/styles/scale_crop_7_3_wide/public/veggie-pasta-bake-hero-umami.jpg.webp?itok=CYsHBUlX",
 							StartTime: 11479712402527,
 							EndTime:   11480550685871,
 						},
-						FunctionCalls: []*pb.CompassTraceFunctionCall{
+						FunctionCalls: []*pb.TraceFunctionCall{
 							{
 								Name:        "PDOStatement::execute",
 								StartTime:   11479719656578,
