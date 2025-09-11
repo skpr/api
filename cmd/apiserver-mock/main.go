@@ -16,7 +16,6 @@ import (
 
 	"github.com/skpr/api/internal/model"
 	"github.com/skpr/api/internal/server/mock/backup"
-	"github.com/skpr/api/internal/server/mock/compass"
 	"github.com/skpr/api/internal/server/mock/config"
 	"github.com/skpr/api/internal/server/mock/cron"
 	"github.com/skpr/api/internal/server/mock/environment"
@@ -27,6 +26,7 @@ import (
 	"github.com/skpr/api/internal/server/mock/project"
 	"github.com/skpr/api/internal/server/mock/purge"
 	"github.com/skpr/api/internal/server/mock/restore"
+	"github.com/skpr/api/internal/server/mock/trace"
 	"github.com/skpr/api/internal/server/mock/version"
 	"github.com/skpr/api/pb"
 )
@@ -78,8 +78,8 @@ func main() {
 				Model: globalModel,
 			})
 
-			log.Println("Registering service: Compass")
-			pb.RegisterCompassServer(server, &compass.Server{})
+			log.Println("Registering service: Trace")
+			pb.RegisterTraceServer(server, &trace.Server{})
 
 			log.Println("Registering service: Config")
 			pb.RegisterConfigServer(server, &config.Server{
