@@ -1,15 +1,15 @@
 module github.com/skpr/api
 
-go 1.24
+go 1.24.0
 
 require (
-	github.com/brianvoe/gofakeit/v7 v7.6.0
+	github.com/brianvoe/gofakeit/v7 v7.8.2
 	github.com/christgf/env v0.0.0-20230511114549-ccdc1a7b5961
 	github.com/gitploy-io/cronexpr v0.2.2
 	github.com/jwalton/gchalk v1.3.0
 	github.com/spf13/cobra v1.10.1
-	google.golang.org/grpc v1.75.1
-	google.golang.org/protobuf v1.36.9
+	google.golang.org/grpc v1.76.0
+	google.golang.org/protobuf v1.36.10
 )
 
 require (
@@ -20,5 +20,5 @@ require (
 	golang.org/x/sys v0.34.0 // indirect
 	golang.org/x/term v0.33.0 // indirect
 	golang.org/x/text v0.27.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250728155136-f173205681a0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250804133106-a7a43d27e69b // indirect
 )
