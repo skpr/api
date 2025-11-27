@@ -3,6 +3,9 @@ syntax = "proto3";
 
 package workflow;
 
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+
 option go_package = "./pb";
 
 service trace {
@@ -36,19 +39,19 @@ message Trace {
  * Metadata which contains information about the trace.
  */
 message TraceMetadata {
-  string request_id = 1; // Request identifier for tracking.
-  string uri = 2;        // URI of the request being traced.
-  string method = 3;     // HTTP method of the request (e.g., GET, POST).
-  int64 start_time = 4;  // Start time of the trace in unix format.
-  int64 end_time = 5;    // End time of the trace in unix format.
+  string request_id = 1;                     // Request identifier for tracking.
+  string uri = 2;                            // URI of the request being traced.
+  string method = 3;                         // HTTP method of the request (e.g., GET, POST).
+  google.protobuf.Timestamp start_time = 4;  // Start time of the trace in unix format.
+  google.protobuf.Timestamp end_time = 5;    // End time of the trace in unix format.
 }
 
 /**
  * Function call data within a trace.
  */
 message TraceFunctionCall {
-  string name = 1;        // Name of the function being traced.
-  int64 start_time = 2;   // Start time of the function call in unix format.
-  int64 elapsed_time = 3; // Elapsed time for the function call in milliseconds.
+  string name = 1;                           // Name of the function being traced.
+  google.protobuf.Timestamp start_time = 2;  // Start time of the function call in unix format.
+  google.protobuf.Duration elapsed = 3;      // Elapsed time for the function call in milliseconds.
 }
 
