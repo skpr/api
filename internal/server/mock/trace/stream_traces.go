@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/brianvoe/gofakeit/v7"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/skpr/api/pb"
 )
@@ -13,113 +15,62 @@ import (
 // StreamTraces streams traces from a specific environment.
 func (s *Server) StreamTraces(_ *pb.StreamTracesRequest, server pb.Trace_StreamTracesServer) error {
 	for {
-		// Simulate some processing delay.
-		time.Sleep(time.Second)
+		now := time.Now()
 
-		for {
-			resp := &pb.StreamTracesResponse{
-				Traces: []*pb.Trace{
-					{
-						Metadata: &pb.TraceMetadata{
-							RequestId: gofakeit.UUID(),
-							Method:    http.MethodGet,
-							Uri:       "/sites/default/files/styles/scale_crop_7_3_wide/public/veggie-pasta-bake-hero-umami.jpg.webp?itok=CYsHBUlX",
-							StartTime: 11479712402527,
-							EndTime:   11480550685871,
-						},
-						FunctionCalls: []*pb.TraceFunctionCall{
-							{
-								Name:        "PDOStatement::execute",
-								StartTime:   11479719656578,
-								ElapsedTime: 5999966,
-							},
-							{
-								Name:        "Drupal\\Core\\Database\\StatementPrefetchIterator::execute",
-								StartTime:   11479719664878,
-								ElapsedTime: 5999966,
-							},
-							{
-								Name:        "Drupal\\sqlite\\Driver\\Database\\sqlite\\Statement::execute",
-								StartTime:   11479719666498,
-								ElapsedTime: 5999966,
-							},
-							{
-								Name:        "Drupal\\Core\\Database\\Query\\Upsert::execute",
-								StartTime:   11479719668488,
-								ElapsedTime: 5999966,
-							},
-						},
-					},
-					{
-						Metadata: &pb.TraceMetadata{
-							RequestId: gofakeit.UUID(),
-							Method:    http.MethodGet,
-							Uri:       "/sites/default/files/styles/scale_crop_7_3_wide/public/veggie-pasta-bake-hero-umami.jpg.webp?itok=CYsHBUlX",
-							StartTime: 11479712402527,
-							EndTime:   11480550685871,
-						},
-						FunctionCalls: []*pb.TraceFunctionCall{
-							{
-								Name:        "PDOStatement::execute",
-								StartTime:   11479719656578,
-								ElapsedTime: 5999966,
-							},
-							{
-								Name:        "Drupal\\Core\\Database\\StatementPrefetchIterator::execute",
-								StartTime:   11479719664878,
-								ElapsedTime: 5999966,
-							},
-							{
-								Name:        "Drupal\\sqlite\\Driver\\Database\\sqlite\\Statement::execute",
-								StartTime:   11479719666498,
-								ElapsedTime: 5999966,
-							},
-							{
-								Name:        "Drupal\\Core\\Database\\Query\\Upsert::execute",
-								StartTime:   11479719668488,
-								ElapsedTime: 5999966,
-							},
-						},
-					},
-					{
-						Metadata: &pb.TraceMetadata{
-							RequestId: gofakeit.UUID(),
-							Uri:       "/sites/default/files/styles/scale_crop_7_3_wide/public/veggie-pasta-bake-hero-umami.jpg.webp?itok=CYsHBUlX",
-							StartTime: 11479712402527,
-							EndTime:   11480550685871,
-						},
-						FunctionCalls: []*pb.TraceFunctionCall{
-							{
-								Name:        "PDOStatement::execute",
-								StartTime:   11479719656578,
-								ElapsedTime: 5999966,
-							},
-							{
-								Name:        "Drupal\\Core\\Database\\StatementPrefetchIterator::execute",
-								StartTime:   11479719664878,
-								ElapsedTime: 5999966,
-							},
-							{
-								Name:        "Drupal\\sqlite\\Driver\\Database\\sqlite\\Statement::execute",
-								StartTime:   11479719666498,
-								ElapsedTime: 5999966,
-							},
-							{
-								Name:        "Drupal\\Core\\Database\\Query\\Upsert::execute",
-								StartTime:   11479719668488,
-								ElapsedTime: 5999966,
-							},
-						},
-					},
+		// ~6ms realistic function execution time
+		latency := 6 * time.Millisecond
+
+		// Function calls generator with Duration + timestamp
+		makeFunctionCalls := func(base time.Time) []*pb.TraceFunctionCall {
+			return []*pb.TraceFunctionCall{
+				{
+					Name:      "PDOStatement::execute",
+					StartTime: timestamppb.New(base),
+					Elapsed:   durationpb.New(latency),
+				},
+				{
+					Name:      "Drupal\\Core\\Database\\StatementPrefetchIterator::execute",
+					StartTime: timestamppb.New(base.Add(500 * time.Microsecond)),
+					Elapsed:   durationpb.New(latency),
+				},
+				{
+					Name:      "Drupal\\sqlite\\Driver\\Database\\sqlite\\Statement::execute",
+					StartTime: timestamppb.New(base.Add(1 * time.Millisecond)),
+					Elapsed:   durationpb.New(latency),
+				},
+				{
+					Name:      "Drupal\\Core\\Database\\Query\\Upsert::execute",
+					StartTime: timestamppb.New(base.Add(1500 * time.Microsecond)),
+					Elapsed:   durationpb.New(latency),
 				},
 			}
-
-			err := server.Send(resp)
-			if err != nil {
-				return fmt.Errorf("stopping log stream for: %w", err)
-			}
-
-			time.Sleep(500 * time.Millisecond)
 		}
+
+		// Create 3 traces with increasing offsets
+		traces := make([]*pb.Trace, 0, 3)
+
+		for i := 0; i < 3; i++ {
+			start := now.Add(time.Duration(i*250) * time.Millisecond)
+			end := start.Add(50 * time.Millisecond)
+
+			traces = append(traces, &pb.Trace{
+				Metadata: &pb.TraceMetadata{
+					RequestId: gofakeit.UUID(),
+					Method:    http.MethodGet,
+					Uri:       "/sites/default/files/styles/scale_crop_7_3_wide/public/veggie-pasta-bake-hero-umami.jpg.webp?itok=CYsHBUlX",
+					StartTime: timestamppb.New(start),
+					EndTime:   timestamppb.New(end),
+				},
+				FunctionCalls: makeFunctionCalls(start),
+			})
+		}
+
+		resp := &pb.StreamTracesResponse{Traces: traces}
+
+		if err := server.Send(resp); err != nil {
+			return fmt.Errorf("stopping log stream for: %w", err)
+		}
+
+		time.Sleep(time.Second)
 	}
 }
