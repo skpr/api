@@ -3,6 +3,8 @@ syntax = "proto3";
 
 package workflow;
 
+import "google/protobuf/timestamp.proto";
+
 option go_package = "./pb";
 
 service events {
@@ -13,11 +15,11 @@ service events {
  * Details that are captured as an event.
  */
 message Event {
-  string ID = 1; // Event identifier
-  string Date = 2; // When the event occurred
-  string Type = 3; // What type of event occurred
-  string Source = 4; // The source of the event
-  string Details = 5; // Details related to the event
+  string ID = 1;                           // Event identifier
+  google.protobuf.Timestamp Timestamp = 2; // When the event occurred
+  string Type = 3;                         // What type of event it is (e.g., Warning, Normal)
+  string Reason = 4;                       // The reason for the event (e.g., BackupSucceeded, ShellProvisioned)
+  string Message = 5;                      // Message contains the specific information about the event
 }
 
 /**
