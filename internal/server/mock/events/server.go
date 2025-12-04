@@ -19,22 +19,22 @@ var mockEvents = []*pb.Event{
 	{
 		Timestamp: timestamppb.New(time.Date(2025, 3, 1, 0, 0, 0, 0, time.UTC).Round(time.Minute)),
 		ID:        "ABCDXXXX",
-		Type:      pb.Event_Normal,
-		Reason:    "ConfigSet",
+		Severity:  pb.Event_Normal,
+		Type:      "ConfigSet",
 		Message:   "A config was set: api.key",
 	},
 	{
 		Timestamp: timestamppb.New(time.Date(2025, 2, 1, 0, 0, 0, 0, time.UTC).Round(time.Minute)),
 		ID:        "ABCDYYYY",
-		Type:      pb.Event_Warning,
-		Reason:    "ErrorRate",
+		Severity:  pb.Event_Warning,
+		Type:      "ErrorRate",
 		Message:   "Elevated error rate has been detected",
 	},
 	{
 		Timestamp: timestamppb.New(time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC).Round(time.Minute)),
 		ID:        "ABCDZZZZ",
-		Type:      pb.Event_Error,
-		Reason:    "BackupFailed",
+		Severity:  pb.Event_Error,
+		Type:      "BackupFailed",
 		Message:   "The following backup failed with the ID: xxxxxxxxxxxxxxxxx",
 	},
 }

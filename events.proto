@@ -17,14 +17,14 @@ service events {
 message Event {
   string ID = 1;                           // Event identifier
   google.protobuf.Timestamp Timestamp = 2; // When the event occurred
-  enum EventType {
+  enum EventSeverity {
     Normal = 0;  // Default type is normal
     Warning = 1; // The event was a warning
     Error = 2;   // The event was an error
   }
-  EventType Type = 3;    // What type of event it is (e.g., Warning, Normal)
-  string Reason = 4;  // The reason for the event (e.g., BackupSucceeded, ShellProvisioned)
-  string Message = 5; // Message contains the specific information about the event
+  EventSeverity Severity = 3; // What type of event it is (e.g., Warning, Normal)
+  string Type = 4;      // The reason for the event (e.g., BackupSucceeded, ShellProvisioned)
+  string Message = 5;     // Message contains the specific information about the event
 }
 
 /**
