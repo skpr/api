@@ -19,7 +19,7 @@ var mockEvents = []*pb.Event{
 	{
 		Timestamp: timestamppb.New(time.Date(2025, 3, 1, 0, 0, 0, 0, time.UTC).Round(time.Minute)),
 		ID:        "ABCDXXXX",
-		Severity:  pb.Event_Normal,
+		Severity:  pb.Event_Info,
 		Type:      "ConfigSet",
 		Message:   "A config was set: api.key",
 	},
@@ -36,6 +36,13 @@ var mockEvents = []*pb.Event{
 		Severity:  pb.Event_Error,
 		Type:      "BackupFailed",
 		Message:   "The following backup failed with the ID: xxxxxxxxxxxxxxxxx",
+	},
+	{
+		Timestamp: timestamppb.New(time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC).Round(time.Minute)),
+		ID:        "ABCDWWWW",
+		Severity:  pb.Event_Critical,
+		Type:      "EnvironmentDown",
+		Message:   "The environment is down due to a critical failure",
 	},
 }
 
