@@ -18,9 +18,10 @@ message Event {
   string ID = 1;                           // Event identifier
   google.protobuf.Timestamp Timestamp = 2; // When the event occurred
   enum EventSeverity {
-    Normal = 0;  // Default type is normal
-    Warning = 1; // The event was a warning
-    Error = 2;   // The event was an error
+    Info = 0;     // Default type is normal informational events occur.
+    Warning = 1;  // Used when something unusual happened eg. A config was deleted
+    Error = 2;    // A failure has occured eg. Elevated error rates detected
+    Critical = 3; // Used when a critical failure has occured eg. Environment is down or a security breach detected
   }
   EventSeverity Severity = 3; // What type of event it is (e.g., Warning, Normal)
   string Type = 4;      // The reason for the event (e.g., BackupSucceeded, ShellProvisioned)
