@@ -1,0 +1,50 @@
+[tools]
+go = "1.25"
+"go:github.com/daixiang0/gci" = "latest"
+"ubi:golangci/golangci-lint" = "2.5"
+"ubi:goreleaser/goreleaser" = "2.12"
+
+[env]
+CGO_ENABLED=0
+LGFLAGS="-extldflags '-static'"
+IMAGE="skpr/grpc-go:latest"
+PB_DIR="./pb"
+
+[tasks.vendor]
+description = "Vendor resets the main module's vendor directory to include all packages needed to build the application"
+run = "go mod vendor"
+depends = ["generate"]
+
+[tasks.tidy]
+description = "Tidy makes sure go.mod matches the source code in the module"
+run = "go mod tidy"
+
+[tasks.generate]
+description = "Build the grpc protocol"
+run = '''
+rm -rf $PB_DIR
+mkdir -p $PB_DIR
+# Sadly can't get protoc on mac through mise.
+docker build -t $IMAGE dockerfiles/grpc-go
+docker run -it -w /data -v .:/data $IMAGE /bin/bash -c 'protoc --go_out=./pb --go_opt=paths=source_relative --go-grpc_out=./pb --go-grpc_opt=paths=source_relative  *.proto'
+'''
+
+[tasks."build"]
+description = "Build the application"
+run = "go build -o bin/apiserver-mock -ldflags=${CLI_LDFLAGS} github.com/skpr/api/cmd/apiserver-mock"
+depends = ["vendor"]
+
+[tasks."lint"]
+description = "Linting automatically checks code for errors and style issues"
+run = "golangci-lint run"
+depends = ["tidy"]
+
+[tasks.test]
+description = "Checks to verify code correctness"
+run = "go test -cover ./..."
+depends = ["vendor"]
+
+[tasks.release]
+description = "Release the command line interface"
+run = "goreleaser"
+depends = ["build"]
