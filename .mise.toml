@@ -34,6 +34,11 @@ description = "Build the application"
 run = "go build -o bin/apiserver-mock -ldflags=${CLI_LDFLAGS} github.com/skpr/api/cmd/apiserver-mock"
 depends = ["vendor"]
 
+[tasks.run]
+description = "Run the application"
+run = "bin/apiserver-mock"
+depends = ["build"]
+
 [tasks."lint"]
 description = "Linting automatically checks code for errors and style issues"
 run = "golangci-lint run"
