@@ -34,7 +34,7 @@ description = "Build the application"
 run = "go build -o bin/apiserver-mock -ldflags=${CLI_LDFLAGS} github.com/skpr/api/cmd/apiserver-mock"
 depends = ["vendor"]
 
-[tasks.run]
+[tasks.mock]
 description = "Run the application"
 run = "bin/apiserver-mock"
 depends = ["build"]
