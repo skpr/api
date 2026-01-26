@@ -3,6 +3,9 @@ syntax = "proto3";
 
 package workflow;
 
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+
 option go_package = "./pb";
 
 service metrics {
@@ -26,6 +29,49 @@ service metrics {
   rpc InvalidationPaths (InvalidationPathsRequest) returns (InvalidationPathsResponse) {}
   // The amount of resources used by an environment.
   rpc ResourceUsage (ResourceUsageRequest) returns (ResourceUsageResponse) {}
+  // A list of all available metrics.
+  rpc AvailableMetrics (AvailableMetricsRequest) returns (AvailableMetricsResponse) {}
+  // Metric values for a given absolute range.
+  rpc AbsoluteRange (AbsoluteRangeRequest) returns (AbsoluteRangeResponse) {}
+}
+
+/**
+ * Input for AvailableMetricsRequest.
+ */
+message AvailableMetricsRequest {
+  optional string environment = 1; // Name of the environment.
+}
+
+/**
+ * Output for AvailableMetricsRequest.
+ */
+message AvailableMetricsResponse {
+  repeated string metrics = 1; // A list of all available metrics for the environment.
+}
+
+/**
+ * Input for AbsoluteRangeRequest.
+ */
+message AbsoluteRangeRequest {
+  optional string environment = 1; // Name of the environment.
+  string metric = 2; // The metric that's being requested.
+  google.protobuf.Timestamp start_time = 3; // The start time for metrics gathering.
+  google.protobuf.Timestamp end_time = 4; // The end time for metrics gathering.
+}
+
+/**
+ * Output for AbsoluteRangeRequest.
+ */
+message AbsoluteRangeResponse {
+  repeated MetricValueResponse metrics = 1; // List of metrics.
+}
+
+/**
+ * Output for a single metric response.
+ */
+message MetricValueResponse {
+  google.protobuf.Timestamp timestamp = 1; // The timestamp of the metric..
+  int64 value = 2; // The value of the metric at the given timestamp.
 }
 
 /**
