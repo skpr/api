@@ -42,6 +42,10 @@ type MetricsClient interface {
 	InvalidationPaths(ctx context.Context, in *InvalidationPathsRequest, opts ...grpc.CallOption) (*InvalidationPathsResponse, error)
 	// The amount of resources used by an environment.
 	ResourceUsage(ctx context.Context, in *ResourceUsageRequest, opts ...grpc.CallOption) (*ResourceUsageResponse, error)
+	// A list of all available metrics.
+	AvailableMetrics(ctx context.Context, in *AvailableMetricsRequest, opts ...grpc.CallOption) (*AvailableMetricsResponse, error)
+	// Metric values for a given absolute range.
+	AbsoluteRange(ctx context.Context, in *AbsoluteRangeRequest, opts ...grpc.CallOption) (*AbsoluteRangeResponse, error)
 }
 
 type metricsClient struct {
@@ -142,6 +146,24 @@ func (c *metricsClient) ResourceUsage(ctx context.Context, in *ResourceUsageRequ
 	return out, nil
 }
 
+func (c *metricsClient) AvailableMetrics(ctx context.Context, in *AvailableMetricsRequest, opts ...grpc.CallOption) (*AvailableMetricsResponse, error) {
+	out := new(AvailableMetricsResponse)
+	err := c.cc.Invoke(ctx, "/workflow.metrics/AvailableMetrics", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *metricsClient) AbsoluteRange(ctx context.Context, in *AbsoluteRangeRequest, opts ...grpc.CallOption) (*AbsoluteRangeResponse, error) {
+	out := new(AbsoluteRangeResponse)
+	err := c.cc.Invoke(ctx, "/workflow.metrics/AbsoluteRange", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MetricsServer is the server API for Metrics service.
 // All implementations must embed UnimplementedMetricsServer
 // for forward compatibility
@@ -166,6 +188,10 @@ type MetricsServer interface {
 	InvalidationPaths(context.Context, *InvalidationPathsRequest) (*InvalidationPathsResponse, error)
 	// The amount of resources used by an environment.
 	ResourceUsage(context.Context, *ResourceUsageRequest) (*ResourceUsageResponse, error)
+	// A list of all available metrics.
+	AvailableMetrics(context.Context, *AvailableMetricsRequest) (*AvailableMetricsResponse, error)
+	// Metric values for a given absolute range.
+	AbsoluteRange(context.Context, *AbsoluteRangeRequest) (*AbsoluteRangeResponse, error)
 	mustEmbedUnimplementedMetricsServer()
 }
 
@@ -202,6 +228,12 @@ func (UnimplementedMetricsServer) InvalidationPaths(context.Context, *Invalidati
 }
 func (UnimplementedMetricsServer) ResourceUsage(context.Context, *ResourceUsageRequest) (*ResourceUsageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ResourceUsage not implemented")
+}
+func (UnimplementedMetricsServer) AvailableMetrics(context.Context, *AvailableMetricsRequest) (*AvailableMetricsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AvailableMetrics not implemented")
+}
+func (UnimplementedMetricsServer) AbsoluteRange(context.Context, *AbsoluteRangeRequest) (*AbsoluteRangeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AbsoluteRange not implemented")
 }
 func (UnimplementedMetricsServer) mustEmbedUnimplementedMetricsServer() {}
 
@@ -396,6 +428,42 @@ func _Metrics_ResourceUsage_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Metrics_AvailableMetrics_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AvailableMetricsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MetricsServer).AvailableMetrics(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/workflow.metrics/AvailableMetrics",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MetricsServer).AvailableMetrics(ctx, req.(*AvailableMetricsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Metrics_AbsoluteRange_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AbsoluteRangeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MetricsServer).AbsoluteRange(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/workflow.metrics/AbsoluteRange",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MetricsServer).AbsoluteRange(ctx, req.(*AbsoluteRangeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Metrics_ServiceDesc is the grpc.ServiceDesc for Metrics service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -442,6 +510,14 @@ var Metrics_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ResourceUsage",
 			Handler:    _Metrics_ResourceUsage_Handler,
+		},
+		{
+			MethodName: "AvailableMetrics",
+			Handler:    _Metrics_AvailableMetrics_Handler,
+		},
+		{
+			MethodName: "AbsoluteRange",
+			Handler:    _Metrics_AbsoluteRange_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
