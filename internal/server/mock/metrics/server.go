@@ -2,13 +2,88 @@ package metrics
 
 import (
 	"context"
+	"fmt"
+	"hash/fnv"
+	"maps"
+	"slices"
+	"time"
 
 	"github.com/skpr/api/pb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // Server implements the GRPC "events" definition.
 type Server struct {
 	pb.UnimplementedMetricsServer
+}
+
+func deterministicRange(t time.Time, minVal, maxVal, seconds int64, key string) int64 {
+	h := fnv.New32a()
+
+	bucketKey := fmt.Sprintf("%d-%s", t.Unix()/seconds, key)
+	_, _ = h.Write([]byte(bucketKey))
+	hashVal := int64(h.Sum32())
+
+	rangeSize := maxVal - minVal + 1
+	return minVal + (hashVal % rangeSize)
+}
+
+func metricMappings() map[string][]int64 {
+	return map[string][]int64{
+		"cluster_requests":                  {250_000, 4_000_000},
+		"cluster_httpcode_target_200":       {500, 1_000},
+		"cluster_httpcode_target_300":       {25, 50},
+		"cluster_httpcode_target_400":       {10, 25},
+		"cluster_httpcode_target_500":       {0, 10},
+		"environment_requests":              {25_000, 200_000},
+		"environment_cpu":                   {25, 100},
+		"environment_memory":                {512, 4096},
+		"environment_replicas":              {2, 8},
+		"environment_php_active":            {4, 48},
+		"environment_php_idle":              {2, 12},
+		"environment_php_queued":            {0, 8},
+		"environment_cache_hit_rate":        {60, 99},
+		"environment_invalidation_paths":    {10, 50},
+		"environment_invalidation_requests": {5, 20},
+		"environment_origin_errors":         {0, 10},
+		"environment_httpcode_target_200":   {200, 500},
+		"environment_httpcode_target_300":   {25, 50},
+		"environment_httpcode_target_400":   {10, 25},
+		"environment_httpcode_target_500":   {0, 10},
+		"environment_response_times_avg":    {100, 250},
+		"environment_response_times_p95":    {2_000, 5_000},
+		"environment_response_times_p99":    {10_000, 20_000},
+	}
+}
+
+// AvailableMetrics lists all available metrics.
+func (s *Server) AvailableMetrics(ctx context.Context, req *pb.AvailableMetricsRequest) (*pb.AvailableMetricsResponse, error) {
+	mappings := metricMappings()
+	keys := slices.Collect(maps.Keys(mappings))
+	return &pb.AvailableMetricsResponse{
+		Metrics: keys,
+	}, nil
+}
+
+// AbsoluteRange gets a metric for a given timestamp range.
+func (s *Server) AbsoluteRange(ctx context.Context, req *pb.AbsoluteRangeRequest) (*pb.AbsoluteRangeResponse, error) {
+	mappings := metricMappings()
+	metricMin, metricMax := mappings[req.Metric][0], mappings[req.Metric][1]
+
+	output := []*pb.MetricValueResponse{}
+	metricTime := req.StartTime.AsTime()
+	for metricTime.Before(req.EndTime.AsTime()) {
+		metric := pb.MetricValueResponse{
+			Timestamp: timestamppb.New(metricTime),
+			Value:     deterministicRange(metricTime, metricMin, metricMax, 60, req.Metric),
+		}
+		output = append(output, &metric)
+		metricTime = metricTime.Add(time.Minute)
+	}
+
+	return &pb.AbsoluteRangeResponse{
+		Metrics: output,
+	}, nil
 }
 
 func (s *Server) ClusterRequests(ctx context.Context, req *pb.ClusterRequestsRequest) (*pb.ClusterRequestsResponse, error) {
