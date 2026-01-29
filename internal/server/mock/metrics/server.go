@@ -66,9 +66,9 @@ func (s *Server) AvailableMetrics(ctx context.Context, req *pb.AvailableMetricsR
 	mappings := metricMappings(req.Type)
 	keys := slices.Collect(maps.Keys(mappings))
 
-	metrics := make([]*pb.AvailableMetric, len(keys))
+	metrics := make([]*pb.MetricDefinition, len(keys))
 	for i, key := range keys {
-		metrics[i] = &pb.AvailableMetric{
+		metrics[i] = &pb.MetricDefinition{
 			Name: key,
 			Type: req.Type,
 		}
@@ -84,11 +84,11 @@ func (s *Server) AbsoluteRange(ctx context.Context, req *pb.AbsoluteRangeRequest
 	mappings := metricMappings(req.Type)
 	metricMin, metricMax := mappings[req.Metric][0], mappings[req.Metric][1]
 
-	output := []*pb.MetricValueResponse{}
+	output := []*pb.MetricValue{}
 	metricTime := req.StartTime.AsTime()
 	for metricTime.Before(req.EndTime.AsTime()) {
 		cacheKey := fmt.Sprintf("%s_%s", req.Type, req.Metric)
-		metric := pb.MetricValueResponse{
+		metric := pb.MetricValue{
 			Timestamp: timestamppb.New(metricTime),
 			Value:     deterministicRange(metricTime, metricMin, metricMax, 60, cacheKey),
 		}

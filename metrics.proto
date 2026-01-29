@@ -55,13 +55,13 @@ message AvailableMetricsRequest {
  * Output for AvailableMetricsRequest.
  */
 message AvailableMetricsResponse {
-  repeated AvailableMetric metrics = 1; // A list of all available metrics for the type.
+  repeated MetricDefinition metrics = 1; // A list of all available metrics for the type.
 }
 
 /**
  * Record for an individual metric that's available.
  */
-message AvailableMetric {
+message MetricDefinition {
   string name = 1; // The name of the metric.
   MetricType type = 2; // The type of the metric.
 }
@@ -81,13 +81,13 @@ message AbsoluteRangeRequest {
  * Output for AbsoluteRangeRequest.
  */
 message AbsoluteRangeResponse {
-  repeated MetricValueResponse metrics = 1; // List of metrics.
+  repeated MetricValue metrics = 1; // List of metrics.
 }
 
 /**
  * Output for a single metric response.
  */
-message MetricValueResponse {
+message MetricValue {
   google.protobuf.Timestamp timestamp = 1; // The timestamp of the metric..
   int64 value = 2; // The value of the metric at the given timestamp.
 }
