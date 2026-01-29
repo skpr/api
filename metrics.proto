@@ -35,28 +35,46 @@ service metrics {
   rpc AbsoluteRange (AbsoluteRangeRequest) returns (AbsoluteRangeResponse) {}
 }
 
+// Top-level enum definition
+enum MetricType {
+  METRIC_TYPE_UNSPECIFIED = 0;
+  CLUSTER = 1;
+  PROJECT = 2;
+  ENVIRONMENT = 3;
+}
+
 /**
  * Input for AvailableMetricsRequest.
  */
 message AvailableMetricsRequest {
-  optional string environment = 1; // Name of the environment.
+  MetricType type = 1; // The type of the metric.
+  optional string environment = 2; // Name of the environment. Required when using ENVIRONMENT type.
 }
 
 /**
  * Output for AvailableMetricsRequest.
  */
 message AvailableMetricsResponse {
-  repeated string metrics = 1; // A list of all available metrics for the environment.
+  repeated AvailableMetric metrics = 1; // A list of all available metrics for the type.
+}
+
+/**
+ * Record for an individual metric that's available.
+ */
+message AvailableMetric {
+  string name = 1; // The name of the metric.
+  MetricType type = 2; // The type of the metric.
 }
 
 /**
  * Input for AbsoluteRangeRequest.
  */
 message AbsoluteRangeRequest {
-  optional string environment = 1; // Name of the environment.
-  string metric = 2; // The metric that's being requested.
-  google.protobuf.Timestamp start_time = 3; // The start time for metrics gathering.
-  google.protobuf.Timestamp end_time = 4; // The end time for metrics gathering.
+  MetricType type = 1; // The type of the metric.
+  optional string environment = 2; // Name of the environment. Required when using ENVIRONMENT type.
+  string metric = 3; // The metric that's being requested.
+  google.protobuf.Timestamp start_time = 4; // The start time for metrics gathering.
+  google.protobuf.Timestamp end_time = 5; // The end time for metrics gathering.
 }
 
 /**

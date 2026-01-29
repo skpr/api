@@ -24,6 +24,59 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// Top-level enum definition
+type MetricType int32
+
+const (
+	MetricType_METRIC_TYPE_UNSPECIFIED MetricType = 0
+	MetricType_CLUSTER                 MetricType = 1
+	MetricType_PROJECT                 MetricType = 2
+	MetricType_ENVIRONMENT             MetricType = 3
+)
+
+// Enum value maps for MetricType.
+var (
+	MetricType_name = map[int32]string{
+		0: "METRIC_TYPE_UNSPECIFIED",
+		1: "CLUSTER",
+		2: "PROJECT",
+		3: "ENVIRONMENT",
+	}
+	MetricType_value = map[string]int32{
+		"METRIC_TYPE_UNSPECIFIED": 0,
+		"CLUSTER":                 1,
+		"PROJECT":                 2,
+		"ENVIRONMENT":             3,
+	}
+)
+
+func (x MetricType) Enum() *MetricType {
+	p := new(MetricType)
+	*p = x
+	return p
+}
+
+func (x MetricType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (MetricType) Descriptor() protoreflect.EnumDescriptor {
+	return file_metrics_proto_enumTypes[0].Descriptor()
+}
+
+func (MetricType) Type() protoreflect.EnumType {
+	return &file_metrics_proto_enumTypes[0]
+}
+
+func (x MetricType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use MetricType.Descriptor instead.
+func (MetricType) EnumDescriptor() ([]byte, []int) {
+	return file_metrics_proto_rawDescGZIP(), []int{0}
+}
+
 // *
 // Input for AvailableMetricsRequest.
 type AvailableMetricsRequest struct {
@@ -31,7 +84,8 @@ type AvailableMetricsRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Environment *string `protobuf:"bytes,1,opt,name=environment,proto3,oneof" json:"environment,omitempty"` // Name of the environment.
+	Type        MetricType `protobuf:"varint,1,opt,name=type,proto3,enum=workflow.MetricType" json:"type,omitempty"` // The type of the metric.
+	Environment *string    `protobuf:"bytes,2,opt,name=environment,proto3,oneof" json:"environment,omitempty"`       // Name of the environment. Required when using ENVIRONMENT type.
 }
 
 func (x *AvailableMetricsRequest) Reset() {
@@ -66,6 +120,13 @@ func (*AvailableMetricsRequest) Descriptor() ([]byte, []int) {
 	return file_metrics_proto_rawDescGZIP(), []int{0}
 }
 
+func (x *AvailableMetricsRequest) GetType() MetricType {
+	if x != nil {
+		return x.Type
+	}
+	return MetricType_METRIC_TYPE_UNSPECIFIED
+}
+
 func (x *AvailableMetricsRequest) GetEnvironment() string {
 	if x != nil && x.Environment != nil {
 		return *x.Environment
@@ -80,7 +141,7 @@ type AvailableMetricsResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Metrics []string `protobuf:"bytes,1,rep,name=metrics,proto3" json:"metrics,omitempty"` // A list of all available metrics for the environment.
+	Metrics []*AvailableMetric `protobuf:"bytes,1,rep,name=metrics,proto3" json:"metrics,omitempty"` // A list of all available metrics for the type.
 }
 
 func (x *AvailableMetricsResponse) Reset() {
@@ -115,11 +176,68 @@ func (*AvailableMetricsResponse) Descriptor() ([]byte, []int) {
 	return file_metrics_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *AvailableMetricsResponse) GetMetrics() []string {
+func (x *AvailableMetricsResponse) GetMetrics() []*AvailableMetric {
 	if x != nil {
 		return x.Metrics
 	}
 	return nil
+}
+
+// *
+// Record for an individual metric that's available.
+type AvailableMetric struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Name string     `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`                           // The name of the metric.
+	Type MetricType `protobuf:"varint,2,opt,name=type,proto3,enum=workflow.MetricType" json:"type,omitempty"` // The type of the metric.
+}
+
+func (x *AvailableMetric) Reset() {
+	*x = AvailableMetric{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_metrics_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *AvailableMetric) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AvailableMetric) ProtoMessage() {}
+
+func (x *AvailableMetric) ProtoReflect() protoreflect.Message {
+	mi := &file_metrics_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AvailableMetric.ProtoReflect.Descriptor instead.
+func (*AvailableMetric) Descriptor() ([]byte, []int) {
+	return file_metrics_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *AvailableMetric) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *AvailableMetric) GetType() MetricType {
+	if x != nil {
+		return x.Type
+	}
+	return MetricType_METRIC_TYPE_UNSPECIFIED
 }
 
 // *
@@ -129,16 +247,17 @@ type AbsoluteRangeRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Environment *string                `protobuf:"bytes,1,opt,name=environment,proto3,oneof" json:"environment,omitempty"`        // Name of the environment.
-	Metric      string                 `protobuf:"bytes,2,opt,name=metric,proto3" json:"metric,omitempty"`                        // The metric that's being requested.
-	StartTime   *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"` // The start time for metrics gathering.
-	EndTime     *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`       // The end time for metrics gathering.
+	Type        MetricType             `protobuf:"varint,1,opt,name=type,proto3,enum=workflow.MetricType" json:"type,omitempty"`  // The type of the metric.
+	Environment *string                `protobuf:"bytes,2,opt,name=environment,proto3,oneof" json:"environment,omitempty"`        // Name of the environment. Required when using ENVIRONMENT type.
+	Metric      string                 `protobuf:"bytes,3,opt,name=metric,proto3" json:"metric,omitempty"`                        // The metric that's being requested.
+	StartTime   *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"` // The start time for metrics gathering.
+	EndTime     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`       // The end time for metrics gathering.
 }
 
 func (x *AbsoluteRangeRequest) Reset() {
 	*x = AbsoluteRangeRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[2]
+		mi := &file_metrics_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -151,7 +270,7 @@ func (x *AbsoluteRangeRequest) String() string {
 func (*AbsoluteRangeRequest) ProtoMessage() {}
 
 func (x *AbsoluteRangeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[2]
+	mi := &file_metrics_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -164,7 +283,14 @@ func (x *AbsoluteRangeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AbsoluteRangeRequest.ProtoReflect.Descriptor instead.
 func (*AbsoluteRangeRequest) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{2}
+	return file_metrics_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *AbsoluteRangeRequest) GetType() MetricType {
+	if x != nil {
+		return x.Type
+	}
+	return MetricType_METRIC_TYPE_UNSPECIFIED
 }
 
 func (x *AbsoluteRangeRequest) GetEnvironment() string {
@@ -208,7 +334,7 @@ type AbsoluteRangeResponse struct {
 func (x *AbsoluteRangeResponse) Reset() {
 	*x = AbsoluteRangeResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[3]
+		mi := &file_metrics_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -221,7 +347,7 @@ func (x *AbsoluteRangeResponse) String() string {
 func (*AbsoluteRangeResponse) ProtoMessage() {}
 
 func (x *AbsoluteRangeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[3]
+	mi := &file_metrics_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -234,7 +360,7 @@ func (x *AbsoluteRangeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AbsoluteRangeResponse.ProtoReflect.Descriptor instead.
 func (*AbsoluteRangeResponse) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{3}
+	return file_metrics_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *AbsoluteRangeResponse) GetMetrics() []*MetricValueResponse {
@@ -258,7 +384,7 @@ type MetricValueResponse struct {
 func (x *MetricValueResponse) Reset() {
 	*x = MetricValueResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[4]
+		mi := &file_metrics_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -271,7 +397,7 @@ func (x *MetricValueResponse) String() string {
 func (*MetricValueResponse) ProtoMessage() {}
 
 func (x *MetricValueResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[4]
+	mi := &file_metrics_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -284,7 +410,7 @@ func (x *MetricValueResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MetricValueResponse.ProtoReflect.Descriptor instead.
 func (*MetricValueResponse) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{4}
+	return file_metrics_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *MetricValueResponse) GetTimestamp() *timestamppb.Timestamp {
@@ -312,7 +438,7 @@ type ClusterRequestsRequest struct {
 func (x *ClusterRequestsRequest) Reset() {
 	*x = ClusterRequestsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[5]
+		mi := &file_metrics_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -325,7 +451,7 @@ func (x *ClusterRequestsRequest) String() string {
 func (*ClusterRequestsRequest) ProtoMessage() {}
 
 func (x *ClusterRequestsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[5]
+	mi := &file_metrics_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -338,7 +464,7 @@ func (x *ClusterRequestsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClusterRequestsRequest.ProtoReflect.Descriptor instead.
 func (*ClusterRequestsRequest) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{5}
+	return file_metrics_proto_rawDescGZIP(), []int{6}
 }
 
 // *
@@ -354,7 +480,7 @@ type ClusterRequestsResponse struct {
 func (x *ClusterRequestsResponse) Reset() {
 	*x = ClusterRequestsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[6]
+		mi := &file_metrics_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -367,7 +493,7 @@ func (x *ClusterRequestsResponse) String() string {
 func (*ClusterRequestsResponse) ProtoMessage() {}
 
 func (x *ClusterRequestsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[6]
+	mi := &file_metrics_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -380,7 +506,7 @@ func (x *ClusterRequestsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClusterRequestsResponse.ProtoReflect.Descriptor instead.
 func (*ClusterRequestsResponse) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{6}
+	return file_metrics_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *ClusterRequestsResponse) GetMetrics() []*MetricClusterRequests {
@@ -404,7 +530,7 @@ type MetricClusterRequests struct {
 func (x *MetricClusterRequests) Reset() {
 	*x = MetricClusterRequests{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[7]
+		mi := &file_metrics_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -417,7 +543,7 @@ func (x *MetricClusterRequests) String() string {
 func (*MetricClusterRequests) ProtoMessage() {}
 
 func (x *MetricClusterRequests) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[7]
+	mi := &file_metrics_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -430,7 +556,7 @@ func (x *MetricClusterRequests) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MetricClusterRequests.ProtoReflect.Descriptor instead.
 func (*MetricClusterRequests) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{7}
+	return file_metrics_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *MetricClusterRequests) GetDate() string {
@@ -458,7 +584,7 @@ type ClusterResponseCodesRequest struct {
 func (x *ClusterResponseCodesRequest) Reset() {
 	*x = ClusterResponseCodesRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[8]
+		mi := &file_metrics_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -471,7 +597,7 @@ func (x *ClusterResponseCodesRequest) String() string {
 func (*ClusterResponseCodesRequest) ProtoMessage() {}
 
 func (x *ClusterResponseCodesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[8]
+	mi := &file_metrics_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -484,7 +610,7 @@ func (x *ClusterResponseCodesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClusterResponseCodesRequest.ProtoReflect.Descriptor instead.
 func (*ClusterResponseCodesRequest) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{8}
+	return file_metrics_proto_rawDescGZIP(), []int{9}
 }
 
 // *
@@ -500,7 +626,7 @@ type ClusterResponseCodesResponse struct {
 func (x *ClusterResponseCodesResponse) Reset() {
 	*x = ClusterResponseCodesResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[9]
+		mi := &file_metrics_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -513,7 +639,7 @@ func (x *ClusterResponseCodesResponse) String() string {
 func (*ClusterResponseCodesResponse) ProtoMessage() {}
 
 func (x *ClusterResponseCodesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[9]
+	mi := &file_metrics_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -526,7 +652,7 @@ func (x *ClusterResponseCodesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClusterResponseCodesResponse.ProtoReflect.Descriptor instead.
 func (*ClusterResponseCodesResponse) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{9}
+	return file_metrics_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *ClusterResponseCodesResponse) GetMetrics() []*MetricClusterResponseCodes {
@@ -554,7 +680,7 @@ type MetricClusterResponseCodes struct {
 func (x *MetricClusterResponseCodes) Reset() {
 	*x = MetricClusterResponseCodes{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[10]
+		mi := &file_metrics_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -567,7 +693,7 @@ func (x *MetricClusterResponseCodes) String() string {
 func (*MetricClusterResponseCodes) ProtoMessage() {}
 
 func (x *MetricClusterResponseCodes) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[10]
+	mi := &file_metrics_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -580,7 +706,7 @@ func (x *MetricClusterResponseCodes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MetricClusterResponseCodes.ProtoReflect.Descriptor instead.
 func (*MetricClusterResponseCodes) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{10}
+	return file_metrics_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *MetricClusterResponseCodes) GetDate() string {
@@ -631,7 +757,7 @@ type RequestsRequest struct {
 func (x *RequestsRequest) Reset() {
 	*x = RequestsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[11]
+		mi := &file_metrics_proto_msgTypes[12]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -644,7 +770,7 @@ func (x *RequestsRequest) String() string {
 func (*RequestsRequest) ProtoMessage() {}
 
 func (x *RequestsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[11]
+	mi := &file_metrics_proto_msgTypes[12]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -657,7 +783,7 @@ func (x *RequestsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RequestsRequest.ProtoReflect.Descriptor instead.
 func (*RequestsRequest) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{11}
+	return file_metrics_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *RequestsRequest) GetEnvironment() string {
@@ -680,7 +806,7 @@ type RequestsResponse struct {
 func (x *RequestsResponse) Reset() {
 	*x = RequestsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[12]
+		mi := &file_metrics_proto_msgTypes[13]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -693,7 +819,7 @@ func (x *RequestsResponse) String() string {
 func (*RequestsResponse) ProtoMessage() {}
 
 func (x *RequestsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[12]
+	mi := &file_metrics_proto_msgTypes[13]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -706,7 +832,7 @@ func (x *RequestsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RequestsResponse.ProtoReflect.Descriptor instead.
 func (*RequestsResponse) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{12}
+	return file_metrics_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *RequestsResponse) GetMetrics() []*MetricRequests {
@@ -730,7 +856,7 @@ type MetricRequests struct {
 func (x *MetricRequests) Reset() {
 	*x = MetricRequests{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[13]
+		mi := &file_metrics_proto_msgTypes[14]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -743,7 +869,7 @@ func (x *MetricRequests) String() string {
 func (*MetricRequests) ProtoMessage() {}
 
 func (x *MetricRequests) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[13]
+	mi := &file_metrics_proto_msgTypes[14]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -756,7 +882,7 @@ func (x *MetricRequests) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MetricRequests.ProtoReflect.Descriptor instead.
 func (*MetricRequests) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{13}
+	return file_metrics_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *MetricRequests) GetDate() string {
@@ -786,7 +912,7 @@ type ResponseCodesRequest struct {
 func (x *ResponseCodesRequest) Reset() {
 	*x = ResponseCodesRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[14]
+		mi := &file_metrics_proto_msgTypes[15]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -799,7 +925,7 @@ func (x *ResponseCodesRequest) String() string {
 func (*ResponseCodesRequest) ProtoMessage() {}
 
 func (x *ResponseCodesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[14]
+	mi := &file_metrics_proto_msgTypes[15]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -812,7 +938,7 @@ func (x *ResponseCodesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResponseCodesRequest.ProtoReflect.Descriptor instead.
 func (*ResponseCodesRequest) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{14}
+	return file_metrics_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *ResponseCodesRequest) GetEnvironment() string {
@@ -835,7 +961,7 @@ type ResponseCodesResponse struct {
 func (x *ResponseCodesResponse) Reset() {
 	*x = ResponseCodesResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[15]
+		mi := &file_metrics_proto_msgTypes[16]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -848,7 +974,7 @@ func (x *ResponseCodesResponse) String() string {
 func (*ResponseCodesResponse) ProtoMessage() {}
 
 func (x *ResponseCodesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[15]
+	mi := &file_metrics_proto_msgTypes[16]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -861,7 +987,7 @@ func (x *ResponseCodesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResponseCodesResponse.ProtoReflect.Descriptor instead.
 func (*ResponseCodesResponse) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{15}
+	return file_metrics_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *ResponseCodesResponse) GetMetrics() []*MetricResponseCodes {
@@ -889,7 +1015,7 @@ type MetricResponseCodes struct {
 func (x *MetricResponseCodes) Reset() {
 	*x = MetricResponseCodes{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[16]
+		mi := &file_metrics_proto_msgTypes[17]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -902,7 +1028,7 @@ func (x *MetricResponseCodes) String() string {
 func (*MetricResponseCodes) ProtoMessage() {}
 
 func (x *MetricResponseCodes) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[16]
+	mi := &file_metrics_proto_msgTypes[17]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -915,7 +1041,7 @@ func (x *MetricResponseCodes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MetricResponseCodes.ProtoReflect.Descriptor instead.
 func (*MetricResponseCodes) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{16}
+	return file_metrics_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *MetricResponseCodes) GetDate() string {
@@ -966,7 +1092,7 @@ type ResponseTimesRequest struct {
 func (x *ResponseTimesRequest) Reset() {
 	*x = ResponseTimesRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[17]
+		mi := &file_metrics_proto_msgTypes[18]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -979,7 +1105,7 @@ func (x *ResponseTimesRequest) String() string {
 func (*ResponseTimesRequest) ProtoMessage() {}
 
 func (x *ResponseTimesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[17]
+	mi := &file_metrics_proto_msgTypes[18]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -992,7 +1118,7 @@ func (x *ResponseTimesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResponseTimesRequest.ProtoReflect.Descriptor instead.
 func (*ResponseTimesRequest) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{17}
+	return file_metrics_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *ResponseTimesRequest) GetEnvironment() string {
@@ -1015,7 +1141,7 @@ type ResponseTimesResponse struct {
 func (x *ResponseTimesResponse) Reset() {
 	*x = ResponseTimesResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[18]
+		mi := &file_metrics_proto_msgTypes[19]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1028,7 +1154,7 @@ func (x *ResponseTimesResponse) String() string {
 func (*ResponseTimesResponse) ProtoMessage() {}
 
 func (x *ResponseTimesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[18]
+	mi := &file_metrics_proto_msgTypes[19]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1041,7 +1167,7 @@ func (x *ResponseTimesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResponseTimesResponse.ProtoReflect.Descriptor instead.
 func (*ResponseTimesResponse) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{18}
+	return file_metrics_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *ResponseTimesResponse) GetMetrics() []*MetricResponseTimes {
@@ -1067,7 +1193,7 @@ type MetricResponseTimes struct {
 func (x *MetricResponseTimes) Reset() {
 	*x = MetricResponseTimes{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[19]
+		mi := &file_metrics_proto_msgTypes[20]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1080,7 +1206,7 @@ func (x *MetricResponseTimes) String() string {
 func (*MetricResponseTimes) ProtoMessage() {}
 
 func (x *MetricResponseTimes) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[19]
+	mi := &file_metrics_proto_msgTypes[20]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1093,7 +1219,7 @@ func (x *MetricResponseTimes) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MetricResponseTimes.ProtoReflect.Descriptor instead.
 func (*MetricResponseTimes) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{19}
+	return file_metrics_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *MetricResponseTimes) GetDate() string {
@@ -1137,7 +1263,7 @@ type CacheRatioRequest struct {
 func (x *CacheRatioRequest) Reset() {
 	*x = CacheRatioRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[20]
+		mi := &file_metrics_proto_msgTypes[21]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1150,7 +1276,7 @@ func (x *CacheRatioRequest) String() string {
 func (*CacheRatioRequest) ProtoMessage() {}
 
 func (x *CacheRatioRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[20]
+	mi := &file_metrics_proto_msgTypes[21]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1163,7 +1289,7 @@ func (x *CacheRatioRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CacheRatioRequest.ProtoReflect.Descriptor instead.
 func (*CacheRatioRequest) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{20}
+	return file_metrics_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *CacheRatioRequest) GetEnvironment() string {
@@ -1186,7 +1312,7 @@ type CacheRatioResponse struct {
 func (x *CacheRatioResponse) Reset() {
 	*x = CacheRatioResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[21]
+		mi := &file_metrics_proto_msgTypes[22]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1199,7 +1325,7 @@ func (x *CacheRatioResponse) String() string {
 func (*CacheRatioResponse) ProtoMessage() {}
 
 func (x *CacheRatioResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[21]
+	mi := &file_metrics_proto_msgTypes[22]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1212,7 +1338,7 @@ func (x *CacheRatioResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CacheRatioResponse.ProtoReflect.Descriptor instead.
 func (*CacheRatioResponse) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{21}
+	return file_metrics_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *CacheRatioResponse) GetMetrics() []*MetricCacheRatio {
@@ -1237,7 +1363,7 @@ type MetricCacheRatio struct {
 func (x *MetricCacheRatio) Reset() {
 	*x = MetricCacheRatio{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[22]
+		mi := &file_metrics_proto_msgTypes[23]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1250,7 +1376,7 @@ func (x *MetricCacheRatio) String() string {
 func (*MetricCacheRatio) ProtoMessage() {}
 
 func (x *MetricCacheRatio) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[22]
+	mi := &file_metrics_proto_msgTypes[23]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1263,7 +1389,7 @@ func (x *MetricCacheRatio) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MetricCacheRatio.ProtoReflect.Descriptor instead.
 func (*MetricCacheRatio) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{22}
+	return file_metrics_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *MetricCacheRatio) GetDate() string {
@@ -1300,7 +1426,7 @@ type OriginErrorsRequest struct {
 func (x *OriginErrorsRequest) Reset() {
 	*x = OriginErrorsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[23]
+		mi := &file_metrics_proto_msgTypes[24]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1313,7 +1439,7 @@ func (x *OriginErrorsRequest) String() string {
 func (*OriginErrorsRequest) ProtoMessage() {}
 
 func (x *OriginErrorsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[23]
+	mi := &file_metrics_proto_msgTypes[24]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1326,7 +1452,7 @@ func (x *OriginErrorsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use OriginErrorsRequest.ProtoReflect.Descriptor instead.
 func (*OriginErrorsRequest) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{23}
+	return file_metrics_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *OriginErrorsRequest) GetEnvironment() string {
@@ -1349,7 +1475,7 @@ type OriginErrorsResponse struct {
 func (x *OriginErrorsResponse) Reset() {
 	*x = OriginErrorsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[24]
+		mi := &file_metrics_proto_msgTypes[25]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1362,7 +1488,7 @@ func (x *OriginErrorsResponse) String() string {
 func (*OriginErrorsResponse) ProtoMessage() {}
 
 func (x *OriginErrorsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[24]
+	mi := &file_metrics_proto_msgTypes[25]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1375,7 +1501,7 @@ func (x *OriginErrorsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use OriginErrorsResponse.ProtoReflect.Descriptor instead.
 func (*OriginErrorsResponse) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{24}
+	return file_metrics_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *OriginErrorsResponse) GetMetrics() []*MetricOriginErrors {
@@ -1399,7 +1525,7 @@ type MetricOriginErrors struct {
 func (x *MetricOriginErrors) Reset() {
 	*x = MetricOriginErrors{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[25]
+		mi := &file_metrics_proto_msgTypes[26]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1412,7 +1538,7 @@ func (x *MetricOriginErrors) String() string {
 func (*MetricOriginErrors) ProtoMessage() {}
 
 func (x *MetricOriginErrors) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[25]
+	mi := &file_metrics_proto_msgTypes[26]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1425,7 +1551,7 @@ func (x *MetricOriginErrors) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MetricOriginErrors.ProtoReflect.Descriptor instead.
 func (*MetricOriginErrors) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{25}
+	return file_metrics_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *MetricOriginErrors) GetDate() string {
@@ -1455,7 +1581,7 @@ type InvalidationRequestsRequest struct {
 func (x *InvalidationRequestsRequest) Reset() {
 	*x = InvalidationRequestsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[26]
+		mi := &file_metrics_proto_msgTypes[27]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1468,7 +1594,7 @@ func (x *InvalidationRequestsRequest) String() string {
 func (*InvalidationRequestsRequest) ProtoMessage() {}
 
 func (x *InvalidationRequestsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[26]
+	mi := &file_metrics_proto_msgTypes[27]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1481,7 +1607,7 @@ func (x *InvalidationRequestsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InvalidationRequestsRequest.ProtoReflect.Descriptor instead.
 func (*InvalidationRequestsRequest) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{26}
+	return file_metrics_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *InvalidationRequestsRequest) GetEnvironment() string {
@@ -1504,7 +1630,7 @@ type InvalidationRequestsResponse struct {
 func (x *InvalidationRequestsResponse) Reset() {
 	*x = InvalidationRequestsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[27]
+		mi := &file_metrics_proto_msgTypes[28]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1517,7 +1643,7 @@ func (x *InvalidationRequestsResponse) String() string {
 func (*InvalidationRequestsResponse) ProtoMessage() {}
 
 func (x *InvalidationRequestsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[27]
+	mi := &file_metrics_proto_msgTypes[28]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1530,7 +1656,7 @@ func (x *InvalidationRequestsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InvalidationRequestsResponse.ProtoReflect.Descriptor instead.
 func (*InvalidationRequestsResponse) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{27}
+	return file_metrics_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *InvalidationRequestsResponse) GetMetrics() []*MetricInvalidationRequests {
@@ -1554,7 +1680,7 @@ type MetricInvalidationRequests struct {
 func (x *MetricInvalidationRequests) Reset() {
 	*x = MetricInvalidationRequests{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[28]
+		mi := &file_metrics_proto_msgTypes[29]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1567,7 +1693,7 @@ func (x *MetricInvalidationRequests) String() string {
 func (*MetricInvalidationRequests) ProtoMessage() {}
 
 func (x *MetricInvalidationRequests) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[28]
+	mi := &file_metrics_proto_msgTypes[29]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1580,7 +1706,7 @@ func (x *MetricInvalidationRequests) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MetricInvalidationRequests.ProtoReflect.Descriptor instead.
 func (*MetricInvalidationRequests) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{28}
+	return file_metrics_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *MetricInvalidationRequests) GetDate() string {
@@ -1610,7 +1736,7 @@ type InvalidationPathsRequest struct {
 func (x *InvalidationPathsRequest) Reset() {
 	*x = InvalidationPathsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[29]
+		mi := &file_metrics_proto_msgTypes[30]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1623,7 +1749,7 @@ func (x *InvalidationPathsRequest) String() string {
 func (*InvalidationPathsRequest) ProtoMessage() {}
 
 func (x *InvalidationPathsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[29]
+	mi := &file_metrics_proto_msgTypes[30]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1636,7 +1762,7 @@ func (x *InvalidationPathsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InvalidationPathsRequest.ProtoReflect.Descriptor instead.
 func (*InvalidationPathsRequest) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{29}
+	return file_metrics_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *InvalidationPathsRequest) GetEnvironment() string {
@@ -1659,7 +1785,7 @@ type InvalidationPathsResponse struct {
 func (x *InvalidationPathsResponse) Reset() {
 	*x = InvalidationPathsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[30]
+		mi := &file_metrics_proto_msgTypes[31]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1672,7 +1798,7 @@ func (x *InvalidationPathsResponse) String() string {
 func (*InvalidationPathsResponse) ProtoMessage() {}
 
 func (x *InvalidationPathsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[30]
+	mi := &file_metrics_proto_msgTypes[31]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1685,7 +1811,7 @@ func (x *InvalidationPathsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InvalidationPathsResponse.ProtoReflect.Descriptor instead.
 func (*InvalidationPathsResponse) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{30}
+	return file_metrics_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *InvalidationPathsResponse) GetMetrics() []*MetricInvalidationPaths {
@@ -1709,7 +1835,7 @@ type MetricInvalidationPaths struct {
 func (x *MetricInvalidationPaths) Reset() {
 	*x = MetricInvalidationPaths{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[31]
+		mi := &file_metrics_proto_msgTypes[32]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1722,7 +1848,7 @@ func (x *MetricInvalidationPaths) String() string {
 func (*MetricInvalidationPaths) ProtoMessage() {}
 
 func (x *MetricInvalidationPaths) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[31]
+	mi := &file_metrics_proto_msgTypes[32]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1735,7 +1861,7 @@ func (x *MetricInvalidationPaths) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MetricInvalidationPaths.ProtoReflect.Descriptor instead.
 func (*MetricInvalidationPaths) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{31}
+	return file_metrics_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *MetricInvalidationPaths) GetDate() string {
@@ -1765,7 +1891,7 @@ type ResourceUsageRequest struct {
 func (x *ResourceUsageRequest) Reset() {
 	*x = ResourceUsageRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[32]
+		mi := &file_metrics_proto_msgTypes[33]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1778,7 +1904,7 @@ func (x *ResourceUsageRequest) String() string {
 func (*ResourceUsageRequest) ProtoMessage() {}
 
 func (x *ResourceUsageRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[32]
+	mi := &file_metrics_proto_msgTypes[33]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1791,7 +1917,7 @@ func (x *ResourceUsageRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResourceUsageRequest.ProtoReflect.Descriptor instead.
 func (*ResourceUsageRequest) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{32}
+	return file_metrics_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *ResourceUsageRequest) GetEnvironment() string {
@@ -1814,7 +1940,7 @@ type ResourceUsageResponse struct {
 func (x *ResourceUsageResponse) Reset() {
 	*x = ResourceUsageResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[33]
+		mi := &file_metrics_proto_msgTypes[34]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1827,7 +1953,7 @@ func (x *ResourceUsageResponse) String() string {
 func (*ResourceUsageResponse) ProtoMessage() {}
 
 func (x *ResourceUsageResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[33]
+	mi := &file_metrics_proto_msgTypes[34]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1840,7 +1966,7 @@ func (x *ResourceUsageResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResourceUsageResponse.ProtoReflect.Descriptor instead.
 func (*ResourceUsageResponse) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{33}
+	return file_metrics_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *ResourceUsageResponse) GetMetrics() []*MetricResourceUsage {
@@ -1869,7 +1995,7 @@ type MetricResourceUsage struct {
 func (x *MetricResourceUsage) Reset() {
 	*x = MetricResourceUsage{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_metrics_proto_msgTypes[34]
+		mi := &file_metrics_proto_msgTypes[35]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1882,7 +2008,7 @@ func (x *MetricResourceUsage) String() string {
 func (*MetricResourceUsage) ProtoMessage() {}
 
 func (x *MetricResourceUsage) ProtoReflect() protoreflect.Message {
-	mi := &file_metrics_proto_msgTypes[34]
+	mi := &file_metrics_proto_msgTypes[35]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1895,7 +2021,7 @@ func (x *MetricResourceUsage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MetricResourceUsage.ProtoReflect.Descriptor instead.
 func (*MetricResourceUsage) Descriptor() ([]byte, []int) {
-	return file_metrics_proto_rawDescGZIP(), []int{34}
+	return file_metrics_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *MetricResourceUsage) GetDate() string {
@@ -1955,26 +2081,38 @@ var file_metrics_proto_rawDesc = []byte{
 	0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x74, 0x69, 0x6d, 0x65, 0x73,
 	0x74, 0x61, 0x6d, 0x70, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x1e, 0x67, 0x6f, 0x6f, 0x67,
 	0x6c, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x64, 0x75, 0x72, 0x61,
-	0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x50, 0x0a, 0x17, 0x41, 0x76,
+	0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x7a, 0x0a, 0x17, 0x41, 0x76,
 	0x61, 0x69, 0x6c, 0x61, 0x62, 0x6c, 0x65, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x52, 0x65,
-	0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x25, 0x0a, 0x0b, 0x65, 0x6e, 0x76, 0x69, 0x72, 0x6f, 0x6e,
-	0x6d, 0x65, 0x6e, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52, 0x0b, 0x65, 0x6e,
-	0x76, 0x69, 0x72, 0x6f, 0x6e, 0x6d, 0x65, 0x6e, 0x74, 0x88, 0x01, 0x01, 0x42, 0x0e, 0x0a, 0x0c,
-	0x5f, 0x65, 0x6e, 0x76, 0x69, 0x72, 0x6f, 0x6e, 0x6d, 0x65, 0x6e, 0x74, 0x22, 0x34, 0x0a, 0x18,
-	0x41, 0x76, 0x61, 0x69, 0x6c, 0x61, 0x62, 0x6c, 0x65, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73,
-	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x6d, 0x65, 0x74, 0x72,
-	0x69, 0x63, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52, 0x07, 0x6d, 0x65, 0x74, 0x72, 0x69,
-	0x63, 0x73, 0x22, 0xd7, 0x01, 0x0a, 0x14, 0x41, 0x62, 0x73, 0x6f, 0x6c, 0x75, 0x74, 0x65, 0x52,
-	0x61, 0x6e, 0x67, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x25, 0x0a, 0x0b, 0x65,
-	0x6e, 0x76, 0x69, 0x72, 0x6f, 0x6e, 0x6d, 0x65, 0x6e, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x28, 0x0a, 0x04, 0x74, 0x79, 0x70, 0x65, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x0e, 0x32, 0x14, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x4d,
+	0x65, 0x74, 0x72, 0x69, 0x63, 0x54, 0x79, 0x70, 0x65, 0x52, 0x04, 0x74, 0x79, 0x70, 0x65, 0x12,
+	0x25, 0x0a, 0x0b, 0x65, 0x6e, 0x76, 0x69, 0x72, 0x6f, 0x6e, 0x6d, 0x65, 0x6e, 0x74, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52, 0x0b, 0x65, 0x6e, 0x76, 0x69, 0x72, 0x6f, 0x6e, 0x6d,
+	0x65, 0x6e, 0x74, 0x88, 0x01, 0x01, 0x42, 0x0e, 0x0a, 0x0c, 0x5f, 0x65, 0x6e, 0x76, 0x69, 0x72,
+	0x6f, 0x6e, 0x6d, 0x65, 0x6e, 0x74, 0x22, 0x4f, 0x0a, 0x18, 0x41, 0x76, 0x61, 0x69, 0x6c, 0x61,
+	0x62, 0x6c, 0x65, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x12, 0x33, 0x0a, 0x07, 0x6d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x18, 0x01, 0x20,
+	0x03, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x41,
+	0x76, 0x61, 0x69, 0x6c, 0x61, 0x62, 0x6c, 0x65, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x52, 0x07,
+	0x6d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x22, 0x4f, 0x0a, 0x0f, 0x41, 0x76, 0x61, 0x69, 0x6c,
+	0x61, 0x62, 0x6c, 0x65, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61,
+	0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x28,
+	0x0a, 0x04, 0x74, 0x79, 0x70, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x14, 0x2e, 0x77,
+	0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x54, 0x79,
+	0x70, 0x65, 0x52, 0x04, 0x74, 0x79, 0x70, 0x65, 0x22, 0x81, 0x02, 0x0a, 0x14, 0x41, 0x62, 0x73,
+	0x6f, 0x6c, 0x75, 0x74, 0x65, 0x52, 0x61, 0x6e, 0x67, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x12, 0x28, 0x0a, 0x04, 0x74, 0x79, 0x70, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0e, 0x32,
+	0x14, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x4d, 0x65, 0x74, 0x72, 0x69,
+	0x63, 0x54, 0x79, 0x70, 0x65, 0x52, 0x04, 0x74, 0x79, 0x70, 0x65, 0x12, 0x25, 0x0a, 0x0b, 0x65,
+	0x6e, 0x76, 0x69, 0x72, 0x6f, 0x6e, 0x6d, 0x65, 0x6e, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
 	0x48, 0x00, 0x52, 0x0b, 0x65, 0x6e, 0x76, 0x69, 0x72, 0x6f, 0x6e, 0x6d, 0x65, 0x6e, 0x74, 0x88,
-	0x01, 0x01, 0x12, 0x16, 0x0a, 0x06, 0x6d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x18, 0x02, 0x20, 0x01,
+	0x01, 0x01, 0x12, 0x16, 0x0a, 0x06, 0x6d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x18, 0x03, 0x20, 0x01,
 	0x28, 0x09, 0x52, 0x06, 0x6d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x12, 0x39, 0x0a, 0x0a, 0x73, 0x74,
-	0x61, 0x72, 0x74, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a,
+	0x61, 0x72, 0x74, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a,
 	0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66,
 	0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x09, 0x73, 0x74, 0x61, 0x72,
 	0x74, 0x54, 0x69, 0x6d, 0x65, 0x12, 0x35, 0x0a, 0x08, 0x65, 0x6e, 0x64, 0x5f, 0x74, 0x69, 0x6d,
-	0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65,
+	0x65, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65,
 	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74,
 	0x61, 0x6d, 0x70, 0x52, 0x07, 0x65, 0x6e, 0x64, 0x54, 0x69, 0x6d, 0x65, 0x42, 0x0e, 0x0a, 0x0c,
 	0x5f, 0x65, 0x6e, 0x76, 0x69, 0x72, 0x6f, 0x6e, 0x6d, 0x65, 0x6e, 0x74, 0x22, 0x50, 0x0a, 0x15,
@@ -2142,74 +2280,80 @@ var file_metrics_proto_rawDesc = []byte{
 	0x73, 0x18, 0x06, 0x20, 0x01, 0x28, 0x03, 0x52, 0x0d, 0x49, 0x64, 0x6c, 0x65, 0x50, 0x72, 0x6f,
 	0x63, 0x65, 0x73, 0x73, 0x65, 0x73, 0x12, 0x20, 0x0a, 0x0b, 0x4c, 0x69, 0x73, 0x74, 0x65, 0x6e,
 	0x51, 0x75, 0x65, 0x75, 0x65, 0x18, 0x07, 0x20, 0x01, 0x28, 0x03, 0x52, 0x0b, 0x4c, 0x69, 0x73,
-	0x74, 0x65, 0x6e, 0x51, 0x75, 0x65, 0x75, 0x65, 0x32, 0xa3, 0x08, 0x0a, 0x07, 0x6d, 0x65, 0x74,
-	0x72, 0x69, 0x63, 0x73, 0x12, 0x58, 0x0a, 0x0f, 0x43, 0x6c, 0x75, 0x73, 0x74, 0x65, 0x72, 0x52,
-	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x73, 0x12, 0x20, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c,
-	0x6f, 0x77, 0x2e, 0x43, 0x6c, 0x75, 0x73, 0x74, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
-	0x74, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x21, 0x2e, 0x77, 0x6f, 0x72, 0x6b,
-	0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x43, 0x6c, 0x75, 0x73, 0x74, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75,
-	0x65, 0x73, 0x74, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x67,
-	0x0a, 0x14, 0x43, 0x6c, 0x75, 0x73, 0x74, 0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x43, 0x6f, 0x64, 0x65, 0x73, 0x12, 0x25, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f,
-	0x77, 0x2e, 0x43, 0x6c, 0x75, 0x73, 0x74, 0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x43, 0x6f, 0x64, 0x65, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x26, 0x2e,
+	0x74, 0x65, 0x6e, 0x51, 0x75, 0x65, 0x75, 0x65, 0x2a, 0x54, 0x0a, 0x0a, 0x4d, 0x65, 0x74, 0x72,
+	0x69, 0x63, 0x54, 0x79, 0x70, 0x65, 0x12, 0x1b, 0x0a, 0x17, 0x4d, 0x45, 0x54, 0x52, 0x49, 0x43,
+	0x5f, 0x54, 0x59, 0x50, 0x45, 0x5f, 0x55, 0x4e, 0x53, 0x50, 0x45, 0x43, 0x49, 0x46, 0x49, 0x45,
+	0x44, 0x10, 0x00, 0x12, 0x0b, 0x0a, 0x07, 0x43, 0x4c, 0x55, 0x53, 0x54, 0x45, 0x52, 0x10, 0x01,
+	0x12, 0x0b, 0x0a, 0x07, 0x50, 0x52, 0x4f, 0x4a, 0x45, 0x43, 0x54, 0x10, 0x02, 0x12, 0x0f, 0x0a,
+	0x0b, 0x45, 0x4e, 0x56, 0x49, 0x52, 0x4f, 0x4e, 0x4d, 0x45, 0x4e, 0x54, 0x10, 0x03, 0x32, 0xa3,
+	0x08, 0x0a, 0x07, 0x6d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x12, 0x58, 0x0a, 0x0f, 0x43, 0x6c,
+	0x75, 0x73, 0x74, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x73, 0x12, 0x20, 0x2e,
 	0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x43, 0x6c, 0x75, 0x73, 0x74, 0x65, 0x72,
-	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x43, 0x6f, 0x64, 0x65, 0x73, 0x52, 0x65, 0x73,
-	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x43, 0x0a, 0x08, 0x52, 0x65, 0x71, 0x75, 0x65,
-	0x73, 0x74, 0x73, 0x12, 0x19, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x52,
-	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1a,
-	0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
-	0x74, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x52, 0x0a, 0x0d,
-	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x43, 0x6f, 0x64, 0x65, 0x73, 0x12, 0x1e, 0x2e,
-	0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x43, 0x6f, 0x64, 0x65, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1f, 0x2e,
-	0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x43, 0x6f, 0x64, 0x65, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00,
-	0x12, 0x52, 0x0a, 0x0d, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x54, 0x69, 0x6d, 0x65,
-	0x73, 0x12, 0x1e, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x52, 0x65, 0x73,
-	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
-	0x74, 0x1a, 0x1f, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x52, 0x65, 0x73,
-	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
-	0x73, 0x65, 0x22, 0x00, 0x12, 0x49, 0x0a, 0x0a, 0x43, 0x61, 0x63, 0x68, 0x65, 0x52, 0x61, 0x74,
-	0x69, 0x6f, 0x12, 0x1b, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x43, 0x61,
-	0x63, 0x68, 0x65, 0x52, 0x61, 0x74, 0x69, 0x6f, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
-	0x1c, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x43, 0x61, 0x63, 0x68, 0x65,
-	0x52, 0x61, 0x74, 0x69, 0x6f, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12,
-	0x4f, 0x0a, 0x0c, 0x4f, 0x72, 0x69, 0x67, 0x69, 0x6e, 0x45, 0x72, 0x72, 0x6f, 0x72, 0x73, 0x12,
-	0x1d, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x4f, 0x72, 0x69, 0x67, 0x69,
-	0x6e, 0x45, 0x72, 0x72, 0x6f, 0x72, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1e,
-	0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x4f, 0x72, 0x69, 0x67, 0x69, 0x6e,
-	0x45, 0x72, 0x72, 0x6f, 0x72, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00,
-	0x12, 0x67, 0x0a, 0x14, 0x49, 0x6e, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x69, 0x6f, 0x6e,
-	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x73, 0x12, 0x25, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66,
-	0x6c, 0x6f, 0x77, 0x2e, 0x49, 0x6e, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x69, 0x6f, 0x6e,
 	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
-	0x26, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x49, 0x6e, 0x76, 0x61, 0x6c,
-	0x69, 0x64, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x73, 0x52,
-	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x5e, 0x0a, 0x11, 0x49, 0x6e, 0x76,
-	0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x61, 0x74, 0x68, 0x73, 0x12, 0x22,
+	0x21, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x43, 0x6c, 0x75, 0x73, 0x74,
+	0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x22, 0x00, 0x12, 0x67, 0x0a, 0x14, 0x43, 0x6c, 0x75, 0x73, 0x74, 0x65, 0x72, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x43, 0x6f, 0x64, 0x65, 0x73, 0x12, 0x25, 0x2e, 0x77,
+	0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x43, 0x6c, 0x75, 0x73, 0x74, 0x65, 0x72, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x43, 0x6f, 0x64, 0x65, 0x73, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x1a, 0x26, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x43,
+	0x6c, 0x75, 0x73, 0x74, 0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x43, 0x6f,
+	0x64, 0x65, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x43, 0x0a,
+	0x08, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x73, 0x12, 0x19, 0x2e, 0x77, 0x6f, 0x72, 0x6b,
+	0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x73, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x1a, 0x1a, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x22, 0x00, 0x12, 0x52, 0x0a, 0x0d, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x43, 0x6f,
+	0x64, 0x65, 0x73, 0x12, 0x1e, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x43, 0x6f, 0x64, 0x65, 0x73, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x1a, 0x1f, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x43, 0x6f, 0x64, 0x65, 0x73, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x52, 0x0a, 0x0d, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x12, 0x1e, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c,
+	0x6f, 0x77, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x54, 0x69, 0x6d, 0x65, 0x73,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1f, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c,
+	0x6f, 0x77, 0x2e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x54, 0x69, 0x6d, 0x65, 0x73,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x49, 0x0a, 0x0a, 0x43, 0x61,
+	0x63, 0x68, 0x65, 0x52, 0x61, 0x74, 0x69, 0x6f, 0x12, 0x1b, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66,
+	0x6c, 0x6f, 0x77, 0x2e, 0x43, 0x61, 0x63, 0x68, 0x65, 0x52, 0x61, 0x74, 0x69, 0x6f, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1c, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77,
+	0x2e, 0x43, 0x61, 0x63, 0x68, 0x65, 0x52, 0x61, 0x74, 0x69, 0x6f, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x4f, 0x0a, 0x0c, 0x4f, 0x72, 0x69, 0x67, 0x69, 0x6e, 0x45,
+	0x72, 0x72, 0x6f, 0x72, 0x73, 0x12, 0x1d, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77,
+	0x2e, 0x4f, 0x72, 0x69, 0x67, 0x69, 0x6e, 0x45, 0x72, 0x72, 0x6f, 0x72, 0x73, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x1a, 0x1e, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e,
+	0x4f, 0x72, 0x69, 0x67, 0x69, 0x6e, 0x45, 0x72, 0x72, 0x6f, 0x72, 0x73, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x67, 0x0a, 0x14, 0x49, 0x6e, 0x76, 0x61, 0x6c, 0x69,
+	0x64, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x73, 0x12, 0x25,
 	0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x49, 0x6e, 0x76, 0x61, 0x6c, 0x69,
-	0x64, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x61, 0x74, 0x68, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65,
-	0x73, 0x74, 0x1a, 0x23, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x49, 0x6e,
-	0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x61, 0x74, 0x68, 0x73, 0x52,
-	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x52, 0x0a, 0x0d, 0x52, 0x65, 0x73,
-	0x6f, 0x75, 0x72, 0x63, 0x65, 0x55, 0x73, 0x61, 0x67, 0x65, 0x12, 0x1e, 0x2e, 0x77, 0x6f, 0x72,
-	0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x52, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x55, 0x73,
-	0x61, 0x67, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1f, 0x2e, 0x77, 0x6f, 0x72,
-	0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x52, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x55, 0x73,
-	0x61, 0x67, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x5b, 0x0a,
-	0x10, 0x41, 0x76, 0x61, 0x69, 0x6c, 0x61, 0x62, 0x6c, 0x65, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63,
-	0x73, 0x12, 0x21, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x41, 0x76, 0x61,
-	0x69, 0x6c, 0x61, 0x62, 0x6c, 0x65, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x52, 0x65, 0x71,
-	0x75, 0x65, 0x73, 0x74, 0x1a, 0x22, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e,
-	0x41, 0x76, 0x61, 0x69, 0x6c, 0x61, 0x62, 0x6c, 0x65, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73,
-	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x52, 0x0a, 0x0d, 0x41, 0x62,
-	0x73, 0x6f, 0x6c, 0x75, 0x74, 0x65, 0x52, 0x61, 0x6e, 0x67, 0x65, 0x12, 0x1e, 0x2e, 0x77, 0x6f,
-	0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x41, 0x62, 0x73, 0x6f, 0x6c, 0x75, 0x74, 0x65, 0x52,
-	0x61, 0x6e, 0x67, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1f, 0x2e, 0x77, 0x6f,
-	0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x41, 0x62, 0x73, 0x6f, 0x6c, 0x75, 0x74, 0x65, 0x52,
-	0x61, 0x6e, 0x67, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x06,
-	0x5a, 0x04, 0x2e, 0x2f, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x64, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x73, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x26, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77,
+	0x2e, 0x49, 0x6e, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12,
+	0x5e, 0x0a, 0x11, 0x49, 0x6e, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x50,
+	0x61, 0x74, 0x68, 0x73, 0x12, 0x22, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e,
+	0x49, 0x6e, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x61, 0x74, 0x68,
+	0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x23, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66,
+	0x6c, 0x6f, 0x77, 0x2e, 0x49, 0x6e, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x69, 0x6f, 0x6e,
+	0x50, 0x61, 0x74, 0x68, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12,
+	0x52, 0x0a, 0x0d, 0x52, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x55, 0x73, 0x61, 0x67, 0x65,
+	0x12, 0x1e, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x52, 0x65, 0x73, 0x6f,
+	0x75, 0x72, 0x63, 0x65, 0x55, 0x73, 0x61, 0x67, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x1a, 0x1f, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x52, 0x65, 0x73, 0x6f,
+	0x75, 0x72, 0x63, 0x65, 0x55, 0x73, 0x61, 0x67, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x22, 0x00, 0x12, 0x5b, 0x0a, 0x10, 0x41, 0x76, 0x61, 0x69, 0x6c, 0x61, 0x62, 0x6c, 0x65,
+	0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x12, 0x21, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c,
+	0x6f, 0x77, 0x2e, 0x41, 0x76, 0x61, 0x69, 0x6c, 0x61, 0x62, 0x6c, 0x65, 0x4d, 0x65, 0x74, 0x72,
+	0x69, 0x63, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x22, 0x2e, 0x77, 0x6f, 0x72,
+	0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x41, 0x76, 0x61, 0x69, 0x6c, 0x61, 0x62, 0x6c, 0x65, 0x4d,
+	0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00,
+	0x12, 0x52, 0x0a, 0x0d, 0x41, 0x62, 0x73, 0x6f, 0x6c, 0x75, 0x74, 0x65, 0x52, 0x61, 0x6e, 0x67,
+	0x65, 0x12, 0x1e, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x41, 0x62, 0x73,
+	0x6f, 0x6c, 0x75, 0x74, 0x65, 0x52, 0x61, 0x6e, 0x67, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x1a, 0x1f, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x41, 0x62, 0x73,
+	0x6f, 0x6c, 0x75, 0x74, 0x65, 0x52, 0x61, 0x6e, 0x67, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x22, 0x00, 0x42, 0x06, 0x5a, 0x04, 0x2e, 0x2f, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -2224,89 +2368,96 @@ func file_metrics_proto_rawDescGZIP() []byte {
 	return file_metrics_proto_rawDescData
 }
 
-var file_metrics_proto_msgTypes = make([]protoimpl.MessageInfo, 35)
+var file_metrics_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_metrics_proto_msgTypes = make([]protoimpl.MessageInfo, 36)
 var file_metrics_proto_goTypes = []interface{}{
-	(*AvailableMetricsRequest)(nil),      // 0: workflow.AvailableMetricsRequest
-	(*AvailableMetricsResponse)(nil),     // 1: workflow.AvailableMetricsResponse
-	(*AbsoluteRangeRequest)(nil),         // 2: workflow.AbsoluteRangeRequest
-	(*AbsoluteRangeResponse)(nil),        // 3: workflow.AbsoluteRangeResponse
-	(*MetricValueResponse)(nil),          // 4: workflow.MetricValueResponse
-	(*ClusterRequestsRequest)(nil),       // 5: workflow.ClusterRequestsRequest
-	(*ClusterRequestsResponse)(nil),      // 6: workflow.ClusterRequestsResponse
-	(*MetricClusterRequests)(nil),        // 7: workflow.MetricClusterRequests
-	(*ClusterResponseCodesRequest)(nil),  // 8: workflow.ClusterResponseCodesRequest
-	(*ClusterResponseCodesResponse)(nil), // 9: workflow.ClusterResponseCodesResponse
-	(*MetricClusterResponseCodes)(nil),   // 10: workflow.MetricClusterResponseCodes
-	(*RequestsRequest)(nil),              // 11: workflow.RequestsRequest
-	(*RequestsResponse)(nil),             // 12: workflow.RequestsResponse
-	(*MetricRequests)(nil),               // 13: workflow.MetricRequests
-	(*ResponseCodesRequest)(nil),         // 14: workflow.ResponseCodesRequest
-	(*ResponseCodesResponse)(nil),        // 15: workflow.ResponseCodesResponse
-	(*MetricResponseCodes)(nil),          // 16: workflow.MetricResponseCodes
-	(*ResponseTimesRequest)(nil),         // 17: workflow.ResponseTimesRequest
-	(*ResponseTimesResponse)(nil),        // 18: workflow.ResponseTimesResponse
-	(*MetricResponseTimes)(nil),          // 19: workflow.MetricResponseTimes
-	(*CacheRatioRequest)(nil),            // 20: workflow.CacheRatioRequest
-	(*CacheRatioResponse)(nil),           // 21: workflow.CacheRatioResponse
-	(*MetricCacheRatio)(nil),             // 22: workflow.MetricCacheRatio
-	(*OriginErrorsRequest)(nil),          // 23: workflow.OriginErrorsRequest
-	(*OriginErrorsResponse)(nil),         // 24: workflow.OriginErrorsResponse
-	(*MetricOriginErrors)(nil),           // 25: workflow.MetricOriginErrors
-	(*InvalidationRequestsRequest)(nil),  // 26: workflow.InvalidationRequestsRequest
-	(*InvalidationRequestsResponse)(nil), // 27: workflow.InvalidationRequestsResponse
-	(*MetricInvalidationRequests)(nil),   // 28: workflow.MetricInvalidationRequests
-	(*InvalidationPathsRequest)(nil),     // 29: workflow.InvalidationPathsRequest
-	(*InvalidationPathsResponse)(nil),    // 30: workflow.InvalidationPathsResponse
-	(*MetricInvalidationPaths)(nil),      // 31: workflow.MetricInvalidationPaths
-	(*ResourceUsageRequest)(nil),         // 32: workflow.ResourceUsageRequest
-	(*ResourceUsageResponse)(nil),        // 33: workflow.ResourceUsageResponse
-	(*MetricResourceUsage)(nil),          // 34: workflow.MetricResourceUsage
-	(*timestamppb.Timestamp)(nil),        // 35: google.protobuf.Timestamp
+	(MetricType)(0),                      // 0: workflow.MetricType
+	(*AvailableMetricsRequest)(nil),      // 1: workflow.AvailableMetricsRequest
+	(*AvailableMetricsResponse)(nil),     // 2: workflow.AvailableMetricsResponse
+	(*AvailableMetric)(nil),              // 3: workflow.AvailableMetric
+	(*AbsoluteRangeRequest)(nil),         // 4: workflow.AbsoluteRangeRequest
+	(*AbsoluteRangeResponse)(nil),        // 5: workflow.AbsoluteRangeResponse
+	(*MetricValueResponse)(nil),          // 6: workflow.MetricValueResponse
+	(*ClusterRequestsRequest)(nil),       // 7: workflow.ClusterRequestsRequest
+	(*ClusterRequestsResponse)(nil),      // 8: workflow.ClusterRequestsResponse
+	(*MetricClusterRequests)(nil),        // 9: workflow.MetricClusterRequests
+	(*ClusterResponseCodesRequest)(nil),  // 10: workflow.ClusterResponseCodesRequest
+	(*ClusterResponseCodesResponse)(nil), // 11: workflow.ClusterResponseCodesResponse
+	(*MetricClusterResponseCodes)(nil),   // 12: workflow.MetricClusterResponseCodes
+	(*RequestsRequest)(nil),              // 13: workflow.RequestsRequest
+	(*RequestsResponse)(nil),             // 14: workflow.RequestsResponse
+	(*MetricRequests)(nil),               // 15: workflow.MetricRequests
+	(*ResponseCodesRequest)(nil),         // 16: workflow.ResponseCodesRequest
+	(*ResponseCodesResponse)(nil),        // 17: workflow.ResponseCodesResponse
+	(*MetricResponseCodes)(nil),          // 18: workflow.MetricResponseCodes
+	(*ResponseTimesRequest)(nil),         // 19: workflow.ResponseTimesRequest
+	(*ResponseTimesResponse)(nil),        // 20: workflow.ResponseTimesResponse
+	(*MetricResponseTimes)(nil),          // 21: workflow.MetricResponseTimes
+	(*CacheRatioRequest)(nil),            // 22: workflow.CacheRatioRequest
+	(*CacheRatioResponse)(nil),           // 23: workflow.CacheRatioResponse
+	(*MetricCacheRatio)(nil),             // 24: workflow.MetricCacheRatio
+	(*OriginErrorsRequest)(nil),          // 25: workflow.OriginErrorsRequest
+	(*OriginErrorsResponse)(nil),         // 26: workflow.OriginErrorsResponse
+	(*MetricOriginErrors)(nil),           // 27: workflow.MetricOriginErrors
+	(*InvalidationRequestsRequest)(nil),  // 28: workflow.InvalidationRequestsRequest
+	(*InvalidationRequestsResponse)(nil), // 29: workflow.InvalidationRequestsResponse
+	(*MetricInvalidationRequests)(nil),   // 30: workflow.MetricInvalidationRequests
+	(*InvalidationPathsRequest)(nil),     // 31: workflow.InvalidationPathsRequest
+	(*InvalidationPathsResponse)(nil),    // 32: workflow.InvalidationPathsResponse
+	(*MetricInvalidationPaths)(nil),      // 33: workflow.MetricInvalidationPaths
+	(*ResourceUsageRequest)(nil),         // 34: workflow.ResourceUsageRequest
+	(*ResourceUsageResponse)(nil),        // 35: workflow.ResourceUsageResponse
+	(*MetricResourceUsage)(nil),          // 36: workflow.MetricResourceUsage
+	(*timestamppb.Timestamp)(nil),        // 37: google.protobuf.Timestamp
 }
 var file_metrics_proto_depIdxs = []int32{
-	35, // 0: workflow.AbsoluteRangeRequest.start_time:type_name -> google.protobuf.Timestamp
-	35, // 1: workflow.AbsoluteRangeRequest.end_time:type_name -> google.protobuf.Timestamp
-	4,  // 2: workflow.AbsoluteRangeResponse.metrics:type_name -> workflow.MetricValueResponse
-	35, // 3: workflow.MetricValueResponse.timestamp:type_name -> google.protobuf.Timestamp
-	7,  // 4: workflow.ClusterRequestsResponse.Metrics:type_name -> workflow.MetricClusterRequests
-	10, // 5: workflow.ClusterResponseCodesResponse.Metrics:type_name -> workflow.MetricClusterResponseCodes
-	13, // 6: workflow.RequestsResponse.Metrics:type_name -> workflow.MetricRequests
-	16, // 7: workflow.ResponseCodesResponse.Metrics:type_name -> workflow.MetricResponseCodes
-	19, // 8: workflow.ResponseTimesResponse.Metrics:type_name -> workflow.MetricResponseTimes
-	22, // 9: workflow.CacheRatioResponse.Metrics:type_name -> workflow.MetricCacheRatio
-	25, // 10: workflow.OriginErrorsResponse.Metrics:type_name -> workflow.MetricOriginErrors
-	28, // 11: workflow.InvalidationRequestsResponse.Metrics:type_name -> workflow.MetricInvalidationRequests
-	31, // 12: workflow.InvalidationPathsResponse.Metrics:type_name -> workflow.MetricInvalidationPaths
-	34, // 13: workflow.ResourceUsageResponse.Metrics:type_name -> workflow.MetricResourceUsage
-	5,  // 14: workflow.metrics.ClusterRequests:input_type -> workflow.ClusterRequestsRequest
-	8,  // 15: workflow.metrics.ClusterResponseCodes:input_type -> workflow.ClusterResponseCodesRequest
-	11, // 16: workflow.metrics.Requests:input_type -> workflow.RequestsRequest
-	14, // 17: workflow.metrics.ResponseCodes:input_type -> workflow.ResponseCodesRequest
-	17, // 18: workflow.metrics.ResponseTimes:input_type -> workflow.ResponseTimesRequest
-	20, // 19: workflow.metrics.CacheRatio:input_type -> workflow.CacheRatioRequest
-	23, // 20: workflow.metrics.OriginErrors:input_type -> workflow.OriginErrorsRequest
-	26, // 21: workflow.metrics.InvalidationRequests:input_type -> workflow.InvalidationRequestsRequest
-	29, // 22: workflow.metrics.InvalidationPaths:input_type -> workflow.InvalidationPathsRequest
-	32, // 23: workflow.metrics.ResourceUsage:input_type -> workflow.ResourceUsageRequest
-	0,  // 24: workflow.metrics.AvailableMetrics:input_type -> workflow.AvailableMetricsRequest
-	2,  // 25: workflow.metrics.AbsoluteRange:input_type -> workflow.AbsoluteRangeRequest
-	6,  // 26: workflow.metrics.ClusterRequests:output_type -> workflow.ClusterRequestsResponse
-	9,  // 27: workflow.metrics.ClusterResponseCodes:output_type -> workflow.ClusterResponseCodesResponse
-	12, // 28: workflow.metrics.Requests:output_type -> workflow.RequestsResponse
-	15, // 29: workflow.metrics.ResponseCodes:output_type -> workflow.ResponseCodesResponse
-	18, // 30: workflow.metrics.ResponseTimes:output_type -> workflow.ResponseTimesResponse
-	21, // 31: workflow.metrics.CacheRatio:output_type -> workflow.CacheRatioResponse
-	24, // 32: workflow.metrics.OriginErrors:output_type -> workflow.OriginErrorsResponse
-	27, // 33: workflow.metrics.InvalidationRequests:output_type -> workflow.InvalidationRequestsResponse
-	30, // 34: workflow.metrics.InvalidationPaths:output_type -> workflow.InvalidationPathsResponse
-	33, // 35: workflow.metrics.ResourceUsage:output_type -> workflow.ResourceUsageResponse
-	1,  // 36: workflow.metrics.AvailableMetrics:output_type -> workflow.AvailableMetricsResponse
-	3,  // 37: workflow.metrics.AbsoluteRange:output_type -> workflow.AbsoluteRangeResponse
-	26, // [26:38] is the sub-list for method output_type
-	14, // [14:26] is the sub-list for method input_type
-	14, // [14:14] is the sub-list for extension type_name
-	14, // [14:14] is the sub-list for extension extendee
-	0,  // [0:14] is the sub-list for field type_name
+	0,  // 0: workflow.AvailableMetricsRequest.type:type_name -> workflow.MetricType
+	3,  // 1: workflow.AvailableMetricsResponse.metrics:type_name -> workflow.AvailableMetric
+	0,  // 2: workflow.AvailableMetric.type:type_name -> workflow.MetricType
+	0,  // 3: workflow.AbsoluteRangeRequest.type:type_name -> workflow.MetricType
+	37, // 4: workflow.AbsoluteRangeRequest.start_time:type_name -> google.protobuf.Timestamp
+	37, // 5: workflow.AbsoluteRangeRequest.end_time:type_name -> google.protobuf.Timestamp
+	6,  // 6: workflow.AbsoluteRangeResponse.metrics:type_name -> workflow.MetricValueResponse
+	37, // 7: workflow.MetricValueResponse.timestamp:type_name -> google.protobuf.Timestamp
+	9,  // 8: workflow.ClusterRequestsResponse.Metrics:type_name -> workflow.MetricClusterRequests
+	12, // 9: workflow.ClusterResponseCodesResponse.Metrics:type_name -> workflow.MetricClusterResponseCodes
+	15, // 10: workflow.RequestsResponse.Metrics:type_name -> workflow.MetricRequests
+	18, // 11: workflow.ResponseCodesResponse.Metrics:type_name -> workflow.MetricResponseCodes
+	21, // 12: workflow.ResponseTimesResponse.Metrics:type_name -> workflow.MetricResponseTimes
+	24, // 13: workflow.CacheRatioResponse.Metrics:type_name -> workflow.MetricCacheRatio
+	27, // 14: workflow.OriginErrorsResponse.Metrics:type_name -> workflow.MetricOriginErrors
+	30, // 15: workflow.InvalidationRequestsResponse.Metrics:type_name -> workflow.MetricInvalidationRequests
+	33, // 16: workflow.InvalidationPathsResponse.Metrics:type_name -> workflow.MetricInvalidationPaths
+	36, // 17: workflow.ResourceUsageResponse.Metrics:type_name -> workflow.MetricResourceUsage
+	7,  // 18: workflow.metrics.ClusterRequests:input_type -> workflow.ClusterRequestsRequest
+	10, // 19: workflow.metrics.ClusterResponseCodes:input_type -> workflow.ClusterResponseCodesRequest
+	13, // 20: workflow.metrics.Requests:input_type -> workflow.RequestsRequest
+	16, // 21: workflow.metrics.ResponseCodes:input_type -> workflow.ResponseCodesRequest
+	19, // 22: workflow.metrics.ResponseTimes:input_type -> workflow.ResponseTimesRequest
+	22, // 23: workflow.metrics.CacheRatio:input_type -> workflow.CacheRatioRequest
+	25, // 24: workflow.metrics.OriginErrors:input_type -> workflow.OriginErrorsRequest
+	28, // 25: workflow.metrics.InvalidationRequests:input_type -> workflow.InvalidationRequestsRequest
+	31, // 26: workflow.metrics.InvalidationPaths:input_type -> workflow.InvalidationPathsRequest
+	34, // 27: workflow.metrics.ResourceUsage:input_type -> workflow.ResourceUsageRequest
+	1,  // 28: workflow.metrics.AvailableMetrics:input_type -> workflow.AvailableMetricsRequest
+	4,  // 29: workflow.metrics.AbsoluteRange:input_type -> workflow.AbsoluteRangeRequest
+	8,  // 30: workflow.metrics.ClusterRequests:output_type -> workflow.ClusterRequestsResponse
+	11, // 31: workflow.metrics.ClusterResponseCodes:output_type -> workflow.ClusterResponseCodesResponse
+	14, // 32: workflow.metrics.Requests:output_type -> workflow.RequestsResponse
+	17, // 33: workflow.metrics.ResponseCodes:output_type -> workflow.ResponseCodesResponse
+	20, // 34: workflow.metrics.ResponseTimes:output_type -> workflow.ResponseTimesResponse
+	23, // 35: workflow.metrics.CacheRatio:output_type -> workflow.CacheRatioResponse
+	26, // 36: workflow.metrics.OriginErrors:output_type -> workflow.OriginErrorsResponse
+	29, // 37: workflow.metrics.InvalidationRequests:output_type -> workflow.InvalidationRequestsResponse
+	32, // 38: workflow.metrics.InvalidationPaths:output_type -> workflow.InvalidationPathsResponse
+	35, // 39: workflow.metrics.ResourceUsage:output_type -> workflow.ResourceUsageResponse
+	2,  // 40: workflow.metrics.AvailableMetrics:output_type -> workflow.AvailableMetricsResponse
+	5,  // 41: workflow.metrics.AbsoluteRange:output_type -> workflow.AbsoluteRangeResponse
+	30, // [30:42] is the sub-list for method output_type
+	18, // [18:30] is the sub-list for method input_type
+	18, // [18:18] is the sub-list for extension type_name
+	18, // [18:18] is the sub-list for extension extendee
+	0,  // [0:18] is the sub-list for field type_name
 }
 
 func init() { file_metrics_proto_init() }
@@ -2340,7 +2491,7 @@ func file_metrics_proto_init() {
 			}
 		}
 		file_metrics_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*AbsoluteRangeRequest); i {
+			switch v := v.(*AvailableMetric); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2352,7 +2503,7 @@ func file_metrics_proto_init() {
 			}
 		}
 		file_metrics_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*AbsoluteRangeResponse); i {
+			switch v := v.(*AbsoluteRangeRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2364,7 +2515,7 @@ func file_metrics_proto_init() {
 			}
 		}
 		file_metrics_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MetricValueResponse); i {
+			switch v := v.(*AbsoluteRangeResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2376,7 +2527,7 @@ func file_metrics_proto_init() {
 			}
 		}
 		file_metrics_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ClusterRequestsRequest); i {
+			switch v := v.(*MetricValueResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2388,7 +2539,7 @@ func file_metrics_proto_init() {
 			}
 		}
 		file_metrics_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ClusterRequestsResponse); i {
+			switch v := v.(*ClusterRequestsRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2400,7 +2551,7 @@ func file_metrics_proto_init() {
 			}
 		}
 		file_metrics_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MetricClusterRequests); i {
+			switch v := v.(*ClusterRequestsResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2412,7 +2563,7 @@ func file_metrics_proto_init() {
 			}
 		}
 		file_metrics_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ClusterResponseCodesRequest); i {
+			switch v := v.(*MetricClusterRequests); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2424,7 +2575,7 @@ func file_metrics_proto_init() {
 			}
 		}
 		file_metrics_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ClusterResponseCodesResponse); i {
+			switch v := v.(*ClusterResponseCodesRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2436,7 +2587,7 @@ func file_metrics_proto_init() {
 			}
 		}
 		file_metrics_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MetricClusterResponseCodes); i {
+			switch v := v.(*ClusterResponseCodesResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2448,7 +2599,7 @@ func file_metrics_proto_init() {
 			}
 		}
 		file_metrics_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*RequestsRequest); i {
+			switch v := v.(*MetricClusterResponseCodes); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2460,7 +2611,7 @@ func file_metrics_proto_init() {
 			}
 		}
 		file_metrics_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*RequestsResponse); i {
+			switch v := v.(*RequestsRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2472,7 +2623,7 @@ func file_metrics_proto_init() {
 			}
 		}
 		file_metrics_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MetricRequests); i {
+			switch v := v.(*RequestsResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2484,7 +2635,7 @@ func file_metrics_proto_init() {
 			}
 		}
 		file_metrics_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ResponseCodesRequest); i {
+			switch v := v.(*MetricRequests); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2496,7 +2647,7 @@ func file_metrics_proto_init() {
 			}
 		}
 		file_metrics_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ResponseCodesResponse); i {
+			switch v := v.(*ResponseCodesRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2508,7 +2659,7 @@ func file_metrics_proto_init() {
 			}
 		}
 		file_metrics_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MetricResponseCodes); i {
+			switch v := v.(*ResponseCodesResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2520,7 +2671,7 @@ func file_metrics_proto_init() {
 			}
 		}
 		file_metrics_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ResponseTimesRequest); i {
+			switch v := v.(*MetricResponseCodes); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2532,7 +2683,7 @@ func file_metrics_proto_init() {
 			}
 		}
 		file_metrics_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ResponseTimesResponse); i {
+			switch v := v.(*ResponseTimesRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2544,7 +2695,7 @@ func file_metrics_proto_init() {
 			}
 		}
 		file_metrics_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MetricResponseTimes); i {
+			switch v := v.(*ResponseTimesResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2556,7 +2707,7 @@ func file_metrics_proto_init() {
 			}
 		}
 		file_metrics_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CacheRatioRequest); i {
+			switch v := v.(*MetricResponseTimes); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2568,7 +2719,7 @@ func file_metrics_proto_init() {
 			}
 		}
 		file_metrics_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CacheRatioResponse); i {
+			switch v := v.(*CacheRatioRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2580,7 +2731,7 @@ func file_metrics_proto_init() {
 			}
 		}
 		file_metrics_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MetricCacheRatio); i {
+			switch v := v.(*CacheRatioResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2592,7 +2743,7 @@ func file_metrics_proto_init() {
 			}
 		}
 		file_metrics_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*OriginErrorsRequest); i {
+			switch v := v.(*MetricCacheRatio); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2604,7 +2755,7 @@ func file_metrics_proto_init() {
 			}
 		}
 		file_metrics_proto_msgTypes[24].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*OriginErrorsResponse); i {
+			switch v := v.(*OriginErrorsRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2616,7 +2767,7 @@ func file_metrics_proto_init() {
 			}
 		}
 		file_metrics_proto_msgTypes[25].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MetricOriginErrors); i {
+			switch v := v.(*OriginErrorsResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2628,7 +2779,7 @@ func file_metrics_proto_init() {
 			}
 		}
 		file_metrics_proto_msgTypes[26].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*InvalidationRequestsRequest); i {
+			switch v := v.(*MetricOriginErrors); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2640,7 +2791,7 @@ func file_metrics_proto_init() {
 			}
 		}
 		file_metrics_proto_msgTypes[27].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*InvalidationRequestsResponse); i {
+			switch v := v.(*InvalidationRequestsRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2652,7 +2803,7 @@ func file_metrics_proto_init() {
 			}
 		}
 		file_metrics_proto_msgTypes[28].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MetricInvalidationRequests); i {
+			switch v := v.(*InvalidationRequestsResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2664,7 +2815,7 @@ func file_metrics_proto_init() {
 			}
 		}
 		file_metrics_proto_msgTypes[29].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*InvalidationPathsRequest); i {
+			switch v := v.(*MetricInvalidationRequests); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2676,7 +2827,7 @@ func file_metrics_proto_init() {
 			}
 		}
 		file_metrics_proto_msgTypes[30].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*InvalidationPathsResponse); i {
+			switch v := v.(*InvalidationPathsRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2688,7 +2839,7 @@ func file_metrics_proto_init() {
 			}
 		}
 		file_metrics_proto_msgTypes[31].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MetricInvalidationPaths); i {
+			switch v := v.(*InvalidationPathsResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2700,7 +2851,7 @@ func file_metrics_proto_init() {
 			}
 		}
 		file_metrics_proto_msgTypes[32].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ResourceUsageRequest); i {
+			switch v := v.(*MetricInvalidationPaths); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2712,7 +2863,7 @@ func file_metrics_proto_init() {
 			}
 		}
 		file_metrics_proto_msgTypes[33].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ResourceUsageResponse); i {
+			switch v := v.(*ResourceUsageRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2724,6 +2875,18 @@ func file_metrics_proto_init() {
 			}
 		}
 		file_metrics_proto_msgTypes[34].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ResourceUsageResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_metrics_proto_msgTypes[35].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*MetricResourceUsage); i {
 			case 0:
 				return &v.state
@@ -2737,19 +2900,20 @@ func file_metrics_proto_init() {
 		}
 	}
 	file_metrics_proto_msgTypes[0].OneofWrappers = []interface{}{}
-	file_metrics_proto_msgTypes[2].OneofWrappers = []interface{}{}
+	file_metrics_proto_msgTypes[3].OneofWrappers = []interface{}{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_metrics_proto_rawDesc,
-			NumEnums:      0,
-			NumMessages:   35,
+			NumEnums:      1,
+			NumMessages:   36,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_metrics_proto_goTypes,
 		DependencyIndexes: file_metrics_proto_depIdxs,
+		EnumInfos:         file_metrics_proto_enumTypes,
 		MessageInfos:      file_metrics_proto_msgTypes,
 	}.Build()
 	File_metrics_proto = out.File
