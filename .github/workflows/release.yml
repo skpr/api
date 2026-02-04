@@ -18,6 +18,13 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: 📦 Install Mise
         run: |
           curl https://mise.run | sh
@@ -27,5 +34,3 @@ jobs:
 
       - name: Run GoReleaser
         run: mise release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
