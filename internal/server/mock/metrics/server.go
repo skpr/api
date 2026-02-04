@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"github.com/skpr/api/pb"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -82,6 +84,9 @@ func (s *Server) AvailableMetrics(ctx context.Context, req *pb.AvailableMetricsR
 // AbsoluteRange gets a metric for a given timestamp range.
 func (s *Server) AbsoluteRange(ctx context.Context, req *pb.AbsoluteRangeRequest) (*pb.AbsoluteRangeResponse, error) {
 	mappings := metricMappings(req.Type)
+	if _, ok := mappings[req.Metric]; !ok {
+		return nil, status.Errorf(codes.NotFound, "metric %s not found", req.Metric)
+	}
 	metricMin, metricMax := mappings[req.Metric][0], mappings[req.Metric][1]
 
 	output := []*pb.MetricValue{}
