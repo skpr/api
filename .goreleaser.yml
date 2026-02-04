@@ -9,7 +9,7 @@ builds:
       - -extldflags '-static'
     env:
       - CGO_ENABLED=0
-    goos: [ linux ]
+    goos: [ linux, darwin ]
     goarch: [ amd64, arm64 ]
 
 dockers:
