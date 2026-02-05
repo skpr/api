@@ -21,6 +21,7 @@ run = "go mod tidy"
 
 [tasks.generate]
 description = "Build the grpc protocol"
+sources = ['**/*.proto']
 run = '''
 rm -rf $PB_DIR
 mkdir -p $PB_DIR

@@ -3,6 +3,9 @@ syntax = "proto3";
 
 package workflow;
 
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+
 option go_package = "./pb";
 
 service metrics {
@@ -26,6 +29,67 @@ service metrics {
   rpc InvalidationPaths (InvalidationPathsRequest) returns (InvalidationPathsResponse) {}
   // The amount of resources used by an environment.
   rpc ResourceUsage (ResourceUsageRequest) returns (ResourceUsageResponse) {}
+  // A list of all available metrics.
+  rpc AvailableMetrics (AvailableMetricsRequest) returns (AvailableMetricsResponse) {}
+  // Metric values for a given absolute range.
+  rpc AbsoluteRange (AbsoluteRangeRequest) returns (AbsoluteRangeResponse) {}
+}
+
+// Top-level enum definition
+enum MetricType {
+  METRIC_TYPE_UNSPECIFIED = 0;
+  CLUSTER = 1;
+  PROJECT = 2;
+  ENVIRONMENT = 3;
+}
+
+/**
+ * Input for AvailableMetricsRequest.
+ */
+message AvailableMetricsRequest {
+  MetricType type = 1; // The type of the metric.
+  optional string environment = 2; // Name of the environment. Required when using ENVIRONMENT type.
+}
+
+/**
+ * Output for AvailableMetricsRequest.
+ */
+message AvailableMetricsResponse {
+  repeated MetricDefinition metrics = 1; // A list of all available metrics for the type.
+}
+
+/**
+ * Record for an individual metric that's available.
+ */
+message MetricDefinition {
+  string name = 1; // The name of the metric.
+  MetricType type = 2; // The type of the metric.
+}
+
+/**
+ * Input for AbsoluteRangeRequest.
+ */
+message AbsoluteRangeRequest {
+  MetricType type = 1; // The type of the metric.
+  optional string environment = 2; // Name of the environment. Required when using ENVIRONMENT type.
+  string metric = 3; // The metric that's being requested.
+  google.protobuf.Timestamp start_time = 4; // The start time for metrics gathering.
+  google.protobuf.Timestamp end_time = 5; // The end time for metrics gathering.
+}
+
+/**
+ * Output for AbsoluteRangeRequest.
+ */
+message AbsoluteRangeResponse {
+  repeated MetricValue metrics = 1; // List of metrics.
+}
+
+/**
+ * Output for a single metric response.
+ */
+message MetricValue {
+  google.protobuf.Timestamp timestamp = 1; // The timestamp of the metric..
+  int64 value = 2; // The value of the metric at the given timestamp.
 }
 
 /**
