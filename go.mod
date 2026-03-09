@@ -3,12 +3,12 @@ module github.com/skpr/api
 go 1.26.0
 
 require (
-	github.com/brianvoe/gofakeit/v7 v7.14.0
+	github.com/brianvoe/gofakeit/v7 v7.14.1
 	github.com/christgf/env v0.0.0-20230511114549-ccdc1a7b5961
 	github.com/gitploy-io/cronexpr v0.2.2
 	github.com/jwalton/gchalk v1.3.0
 	github.com/spf13/cobra v1.10.2
-	google.golang.org/grpc v1.79.1
+	google.golang.org/grpc v1.79.2
 	google.golang.org/protobuf v1.36.11
 )
 
