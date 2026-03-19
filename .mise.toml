@@ -2,7 +2,7 @@
 go = "1.26"
 "go:github.com/daixiang0/gci" = "latest"
 "ubi:golangci/golangci-lint" = "2.10"
-"ubi:goreleaser/goreleaser" = "2.12"
+"ubi:goreleaser/goreleaser" = "2.14"
 
 [env]
 CGO_ENABLED=0
