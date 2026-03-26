@@ -19,19 +19,19 @@ type Server struct {
 	pb.UnimplementedMetricsServer
 }
 
-func deterministicRange(t time.Time, minVal, maxVal, seconds int64, key string) int64 {
+func deterministicRange(t time.Time, minVal, maxVal float32, seconds int64, key string) float32 {
 	h := fnv.New32a()
 
 	bucketKey := fmt.Sprintf("%d-%s", t.Unix()/seconds, key)
 	_, _ = h.Write([]byte(bucketKey))
-	hashVal := int64(h.Sum32())
+	hashVal := float32(h.Sum32()) / float32(^uint32(0))
 
-	rangeSize := maxVal - minVal + 1
-	return minVal + (hashVal % rangeSize)
+	rangeSize := maxVal - minVal
+	return minVal + (hashVal * rangeSize)
 }
 
-func metricMappings(metricType pb.MetricType) map[string][]int64 {
-	data := map[pb.MetricType]map[string][]int64{
+func metricMappings(metricType pb.MetricType) map[string][]float32 {
+	data := map[pb.MetricType]map[string][]float32{
 		pb.MetricType_CLUSTER: {
 			"requests":            {250_000, 4_000_000},
 			"httpcode_target_200": {500, 1_000},
