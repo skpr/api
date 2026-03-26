@@ -68,5 +68,5 @@ message AbsoluteRangeResponse {
  */
 message MetricValue {
   google.protobuf.Timestamp timestamp = 1; // The timestamp of the metric..
-  float value = 2; // The value of the metric at the given timestamp.
+  double value = 2; // The value of the metric at the given timestamp.
 }
