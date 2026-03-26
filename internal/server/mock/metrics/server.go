@@ -19,12 +19,13 @@ type Server struct {
 	pb.UnimplementedMetricsServer
 }
 
+// deterministicRange returns a specific value consistently for a point in a time series.
 func deterministicRange(t time.Time, minVal, maxVal float64, seconds int64, key string) float64 {
 	h := fnv.New32a()
 
 	bucketKey := fmt.Sprintf("%d-%s", t.Unix()/seconds, key)
 	_, _ = h.Write([]byte(bucketKey))
-	hashVal := float64(h.Sum32()) / float64(^uint64(0))
+	hashVal := float64(h.Sum32()) / float64(^uint32(0))
 
 	rangeSize := maxVal - minVal
 	return minVal + (hashVal * rangeSize)
