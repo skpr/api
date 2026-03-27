@@ -43,7 +43,7 @@ func metricMappings(metricType pb.MetricType) map[string][]float64 {
 		pb.MetricType_ENVIRONMENT: {
 			"requests":              {25_000, 200_000},
 			"cpu":                   {25, 100},
-			"memory":                {512, 4096},
+			"memory":                {512_000, 4_294_967_296}, // 512KB to 4GB
 			"replicas":              {2, 8},
 			"php_active":            {4, 48},
 			"php_idle":              {2, 12},
@@ -56,9 +56,9 @@ func metricMappings(metricType pb.MetricType) map[string][]float64 {
 			"httpcode_target_300":   {25, 50},
 			"httpcode_target_400":   {10, 25},
 			"httpcode_target_500":   {0, 10},
-			"response_times_avg":    {100, 250},
-			"response_times_p95":    {2_000, 5_000},
-			"response_times_p99":    {10_000, 20_000},
+			"response_times_avg":    {0.1, 0.25},
+			"response_times_p95":    {2.0, 5.0},
+			"response_times_p99":    {10.0, 20.0},
 		},
 	}
 	return data[metricType]
