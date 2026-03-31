@@ -19,19 +19,20 @@ type Server struct {
 	pb.UnimplementedMetricsServer
 }
 
-func deterministicRange(t time.Time, minVal, maxVal, seconds int64, key string) int64 {
+// deterministicRange returns a specific value consistently for a point in a time series.
+func deterministicRange(t time.Time, minVal, maxVal float64, seconds int64, key string) float64 {
 	h := fnv.New32a()
 
 	bucketKey := fmt.Sprintf("%d-%s", t.Unix()/seconds, key)
 	_, _ = h.Write([]byte(bucketKey))
-	hashVal := int64(h.Sum32())
+	hashVal := float64(h.Sum32()) / float64(^uint32(0))
 
-	rangeSize := maxVal - minVal + 1
-	return minVal + (hashVal % rangeSize)
+	rangeSize := maxVal - minVal
+	return minVal + (hashVal * rangeSize)
 }
 
-func metricMappings(metricType pb.MetricType) map[string][]int64 {
-	data := map[pb.MetricType]map[string][]int64{
+func metricMappings(metricType pb.MetricType) map[string][]float64 {
+	data := map[pb.MetricType]map[string][]float64{
 		pb.MetricType_CLUSTER: {
 			"requests":            {250_000, 4_000_000},
 			"httpcode_target_200": {500, 1_000},
@@ -42,7 +43,7 @@ func metricMappings(metricType pb.MetricType) map[string][]int64 {
 		pb.MetricType_ENVIRONMENT: {
 			"requests":              {25_000, 200_000},
 			"cpu":                   {25, 100},
-			"memory":                {512, 4096},
+			"memory":                {512_000, 4_294_967_296}, // 512KB to 4GB
 			"replicas":              {2, 8},
 			"php_active":            {4, 48},
 			"php_idle":              {2, 12},
@@ -55,9 +56,9 @@ func metricMappings(metricType pb.MetricType) map[string][]int64 {
 			"httpcode_target_300":   {25, 50},
 			"httpcode_target_400":   {10, 25},
 			"httpcode_target_500":   {0, 10},
-			"response_times_avg":    {100, 250},
-			"response_times_p95":    {2_000, 5_000},
-			"response_times_p99":    {10_000, 20_000},
+			"response_times_avg":    {0.1, 0.25},
+			"response_times_p95":    {2.0, 5.0},
+			"response_times_p99":    {10.0, 20.0},
 		},
 	}
 	return data[metricType]
