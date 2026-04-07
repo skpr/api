@@ -96,7 +96,7 @@ func (s *Server) AbsoluteRange(ctx context.Context, req *pb.AbsoluteRangeRequest
 		cacheKey := fmt.Sprintf("%s_%s", req.Type, req.Metric)
 		metric := pb.MetricValue{
 			Timestamp: timestamppb.New(metricTime),
-			Value:     deterministicRange(metricTime, metricMin, metricMax, 60, cacheKey),
+			Value:     new(deterministicRange(metricTime, metricMin, metricMax, 60, cacheKey)),
 		}
 		output = append(output, &metric)
 		metricTime = metricTime.Add(time.Minute)

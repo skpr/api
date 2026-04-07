@@ -28,6 +28,7 @@ enum MetricType {
 message AvailableMetricsRequest {
   MetricType type = 1; // The type of the metric.
   optional string environment = 2; // Name of the environment. Required when using ENVIRONMENT type.
+  optional bool application = 3; // Whether to return application metrics or not. Unset for both.
 }
 
 /**
@@ -43,6 +44,7 @@ message AvailableMetricsResponse {
 message MetricDefinition {
   string name = 1; // The name of the metric.
   MetricType type = 2; // The type of the metric.
+  bool application = 3; // Whether the metric is an application metric or not.
 }
 
 /**
@@ -67,6 +69,6 @@ message AbsoluteRangeResponse {
  * Output for a single metric response.
  */
 message MetricValue {
-  google.protobuf.Timestamp timestamp = 1; // The timestamp of the metric..
-  double value = 2; // The value of the metric at the given timestamp.
+  google.protobuf.Timestamp timestamp = 1; // The timestamp of the metric.
+  optional double value = 2; // The value of the metric at the given timestamp.
 }
