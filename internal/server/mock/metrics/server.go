@@ -4,8 +4,7 @@ import (
 	"context"
 	"fmt"
 	"hash/fnv"
-	"maps"
-	"slices"
+	"strings"
 	"time"
 
 	"github.com/skpr/api/pb"
@@ -17,6 +16,12 @@ import (
 // Server implements the GRPC "events" definition.
 type Server struct {
 	pb.UnimplementedMetricsServer
+}
+
+type MockMetric struct {
+	Min         float64
+	Max         float64
+	Application bool
 }
 
 // deterministicRange returns a specific value consistently for a point in a time series.
@@ -31,34 +36,37 @@ func deterministicRange(t time.Time, minVal, maxVal float64, seconds int64, key 
 	return minVal + (hashVal * rangeSize)
 }
 
-func metricMappings(metricType pb.MetricType) map[string][]float64 {
-	data := map[pb.MetricType]map[string][]float64{
+func metricMappings(metricType pb.MetricType) map[string]MockMetric {
+	data := map[pb.MetricType]map[string]MockMetric{
 		pb.MetricType_CLUSTER: {
-			"requests":            {250_000, 4_000_000},
-			"httpcode_target_200": {500, 1_000},
-			"httpcode_target_300": {25, 50},
-			"httpcode_target_400": {10, 25},
-			"httpcode_target_500": {0, 10},
+			"requests":            {250_000, 4_000_000, false},
+			"httpcode_target_200": {500, 1_000, false},
+			"httpcode_target_300": {25, 50, false},
+			"httpcode_target_400": {10, 25, false},
+			"httpcode_target_500": {0, 10, false},
 		},
 		pb.MetricType_ENVIRONMENT: {
-			"requests":              {25_000, 200_000},
-			"cpu":                   {25, 100},
-			"memory":                {512_000, 4_294_967_296}, // 512KB to 4GB
-			"replicas":              {2, 8},
-			"php_active":            {4, 48},
-			"php_idle":              {2, 12},
-			"php_queued":            {0, 8},
-			"cache_hit_rate":        {60, 99},
-			"invalidation_paths":    {10, 50},
-			"invalidation_requests": {5, 20},
-			"origin_errors":         {0, 10},
-			"httpcode_target_200":   {200, 500},
-			"httpcode_target_300":   {25, 50},
-			"httpcode_target_400":   {10, 25},
-			"httpcode_target_500":   {0, 10},
-			"response_times_avg":    {0.1, 0.25},
-			"response_times_p95":    {2.0, 5.0},
-			"response_times_p99":    {10.0, 20.0},
+			"requests":              {25_000, 200_000, false},
+			"cpu":                   {25, 100, false},
+			"memory":                {512_000, 4_294_967_296, false}, // 512KB to 4GB
+			"replicas":              {2, 8, false},
+			"php_active":            {4, 48, false},
+			"php_idle":              {2, 12, false},
+			"php_queued":            {0, 8, false},
+			"cache_hit_rate":        {60, 99, false},
+			"invalidation_paths":    {10, 50, false},
+			"invalidation_requests": {5, 20, false},
+			"origin_errors":         {0, 10, false},
+			"httpcode_target_200":   {200, 500, false},
+			"httpcode_target_300":   {25, 50, false},
+			"httpcode_target_400":   {10, 25, false},
+			"httpcode_target_500":   {0, 10, false},
+			"response_times_avg":    {0.1, 0.25, false},
+			"response_times_p95":    {2.0, 5.0, false},
+			"response_times_p99":    {10.0, 20.0, false},
+			"mock_application_1":    {0, 100, true},
+			"mock_application_2":    {0.3, 1.4, true},
+			"mock_application_3":    {0, 100_000_000, true},
 		},
 	}
 	return data[metricType]
@@ -67,14 +75,17 @@ func metricMappings(metricType pb.MetricType) map[string][]float64 {
 // AvailableMetrics lists all available metrics.
 func (s *Server) AvailableMetrics(ctx context.Context, req *pb.AvailableMetricsRequest) (*pb.AvailableMetricsResponse, error) {
 	mappings := metricMappings(req.Type)
-	keys := slices.Collect(maps.Keys(mappings))
 
-	metrics := make([]*pb.MetricDefinition, len(keys))
-	for i, key := range keys {
-		metrics[i] = &pb.MetricDefinition{
-			Name: key,
-			Type: req.Type,
+	metrics := []*pb.MetricDefinition{}
+	for key, _ := range mappings {
+		if req.Application != nil && mappings[key].Application != *req.Application {
+			continue
 		}
+		metrics = append(metrics, &pb.MetricDefinition{
+			Name:  key,
+			Type:  req.Type,
+			Title: strings.ReplaceAll(key, "_", " "),
+		})
 	}
 
 	return &pb.AvailableMetricsResponse{
@@ -88,7 +99,7 @@ func (s *Server) AbsoluteRange(ctx context.Context, req *pb.AbsoluteRangeRequest
 	if _, ok := mappings[req.Metric]; !ok {
 		return nil, status.Errorf(codes.NotFound, "metric %s not found", req.Metric)
 	}
-	metricMin, metricMax := mappings[req.Metric][0], mappings[req.Metric][1]
+	metricMin, metricMax := mappings[req.Metric].Min, mappings[req.Metric].Max
 
 	output := []*pb.MetricValue{}
 	metricTime := req.StartTime.AsTime()

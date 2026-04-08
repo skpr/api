@@ -45,6 +45,7 @@ message MetricDefinition {
   string name = 1; // The name of the metric.
   MetricType type = 2; // The type of the metric.
   bool application = 3; // Whether the metric is an application metric or not.
+  string title = 4; // A human-readable title for the metric.
 }
 
 /**
