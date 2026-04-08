@@ -77,7 +77,7 @@ func (s *Server) AvailableMetrics(ctx context.Context, req *pb.AvailableMetricsR
 	mappings := metricMappings(req.Type)
 
 	metrics := []*pb.MetricDefinition{}
-	for key, _ := range mappings {
+	for key := range mappings {
 		if req.Application != nil && mappings[key].Application != *req.Application {
 			continue
 		}
