@@ -76,20 +76,18 @@ func metricMappings(metricType pb.MetricType) map[string]MockMetric {
 func (s *Server) AvailableMetrics(ctx context.Context, req *pb.AvailableMetricsRequest) (*pb.AvailableMetricsResponse, error) {
 	mappings := metricMappings(req.Type)
 
-	metrics := []*pb.MetricDefinition{}
-	for key := range mappings {
-		if req.Application != nil && mappings[key].Application != *req.Application {
-			continue
-		}
-		metrics = append(metrics, &pb.MetricDefinition{
-			Name:  key,
-			Type:  req.Type,
-			Title: strings.ReplaceAll(key, "_", " "),
+	availableMetrics := []*pb.MetricDefinition{}
+	for key, metric := range mappings {
+		availableMetrics = append(availableMetrics, &pb.MetricDefinition{
+			Name:        key,
+			Type:        req.Type,
+			Title:       strings.ReplaceAll(key, "_", " "),
+			Application: metric.Application,
 		})
 	}
 
 	return &pb.AvailableMetricsResponse{
-		Metrics: metrics,
+		Metrics: availableMetrics,
 	}, nil
 }
 
