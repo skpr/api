@@ -24,6 +24,40 @@ type MockMetric struct {
 	Application bool
 }
 
+// metricData is built once at package initialization
+var metricData = map[pb.MetricType]map[string]MockMetric{
+	pb.MetricType_CLUSTER: {
+		"requests":            {250_000, 4_000_000, false},
+		"httpcode_target_200": {500, 1_000, false},
+		"httpcode_target_300": {25, 50, false},
+		"httpcode_target_400": {10, 25, false},
+		"httpcode_target_500": {0, 10, false},
+	},
+	pb.MetricType_ENVIRONMENT: {
+		"requests":              {25_000, 200_000, false},
+		"cpu":                   {25, 100, false},
+		"memory":                {512_000, 4_294_967_296, false}, // 512KB to 4GB
+		"replicas":              {2, 8, false},
+		"php_active":            {4, 48, false},
+		"php_idle":              {2, 12, false},
+		"php_queued":            {0, 8, false},
+		"cache_hit_rate":        {60, 99, false},
+		"invalidation_paths":    {10, 50, false},
+		"invalidation_requests": {5, 20, false},
+		"origin_errors":         {0, 10, false},
+		"httpcode_target_200":   {200, 500, false},
+		"httpcode_target_300":   {25, 50, false},
+		"httpcode_target_400":   {10, 25, false},
+		"httpcode_target_500":   {0, 10, false},
+		"response_times_avg":    {0.1, 0.25, false},
+		"response_times_p95":    {2.0, 5.0, false},
+		"response_times_p99":    {10.0, 20.0, false},
+		"mock_application_1":    {0, 100, true},
+		"mock_application_2":    {0.3, 1.4, true},
+		"mock_application_3":    {0, 100_000_000, true},
+	},
+}
+
 // deterministicRange returns a specific value consistently for a point in a time series.
 func deterministicRange(t time.Time, minVal, maxVal float64, seconds int64, key string) float64 {
 	h := fnv.New32a()
@@ -37,39 +71,7 @@ func deterministicRange(t time.Time, minVal, maxVal float64, seconds int64, key 
 }
 
 func metricMappings(metricType pb.MetricType) map[string]MockMetric {
-	data := map[pb.MetricType]map[string]MockMetric{
-		pb.MetricType_CLUSTER: {
-			"requests":            {250_000, 4_000_000, false},
-			"httpcode_target_200": {500, 1_000, false},
-			"httpcode_target_300": {25, 50, false},
-			"httpcode_target_400": {10, 25, false},
-			"httpcode_target_500": {0, 10, false},
-		},
-		pb.MetricType_ENVIRONMENT: {
-			"requests":              {25_000, 200_000, false},
-			"cpu":                   {25, 100, false},
-			"memory":                {512_000, 4_294_967_296, false}, // 512KB to 4GB
-			"replicas":              {2, 8, false},
-			"php_active":            {4, 48, false},
-			"php_idle":              {2, 12, false},
-			"php_queued":            {0, 8, false},
-			"cache_hit_rate":        {60, 99, false},
-			"invalidation_paths":    {10, 50, false},
-			"invalidation_requests": {5, 20, false},
-			"origin_errors":         {0, 10, false},
-			"httpcode_target_200":   {200, 500, false},
-			"httpcode_target_300":   {25, 50, false},
-			"httpcode_target_400":   {10, 25, false},
-			"httpcode_target_500":   {0, 10, false},
-			"response_times_avg":    {0.1, 0.25, false},
-			"response_times_p95":    {2.0, 5.0, false},
-			"response_times_p99":    {10.0, 20.0, false},
-			"mock_application_1":    {0, 100, true},
-			"mock_application_2":    {0.3, 1.4, true},
-			"mock_application_3":    {0, 100_000_000, true},
-		},
-	}
-	return data[metricType]
+	return metricData[metricType]
 }
 
 // AvailableMetrics lists all available metrics.
@@ -100,12 +102,12 @@ func (s *Server) AbsoluteRange(ctx context.Context, req *pb.AbsoluteRangeRequest
 	metricMin, metricMax := mappings[req.Metric].Min, mappings[req.Metric].Max
 
 	output := []*pb.MetricValue{}
+	seedKey := fmt.Sprintf("%s_%s", req.Type, req.Metric)
 	metricTime := req.StartTime.AsTime()
 	for metricTime.Before(req.EndTime.AsTime()) {
-		cacheKey := fmt.Sprintf("%s_%s", req.Type, req.Metric)
 		metric := pb.MetricValue{
 			Timestamp: timestamppb.New(metricTime),
-			Value:     new(deterministicRange(metricTime, metricMin, metricMax, 60, cacheKey)),
+			Value:     new(deterministicRange(metricTime, metricMin, metricMax, 60, seedKey)),
 		}
 		output = append(output, &metric)
 		metricTime = metricTime.Add(time.Minute)
