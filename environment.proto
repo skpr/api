@@ -480,7 +480,7 @@ message EnvironmentDashboard {
 }
 
 /**
- * Environment dashboard configuration
+ * Environment metrics configuration
  */
 message EnvironmentMetrics {
   bool Enabled = 1; // Application metrics are enabled
