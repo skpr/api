@@ -66,6 +66,7 @@ message Environment {
   EnvironmentDashboard Dashboard = 18; // Link to dashboard
   repeated Daemon Daemon = 19; // Daemon configuration for an environment
   EnvironmentResources Resources = 20; // Resources utilised by this environment
+  EnvironmentMetrics Metrics = 21; // Metrics configuration for this environment
 }
 
 /**
@@ -476,4 +477,11 @@ message VolumeBackupSanitizeRules {
  */
 message EnvironmentDashboard {
   string URL = 1; // Link to dashboard
+}
+
+/**
+ * Environment dashboard configuration
+ */
+message EnvironmentMetrics {
+  bool Enabled = 1; // Application metrics are enabled
 }

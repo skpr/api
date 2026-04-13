@@ -40,7 +40,7 @@ func (s *Model) GetEnvironments() []*Environment {
 	return response
 }
 
-func (s *Model) CreateEnvironment(name string, size int) {
+func (s *Model) CreateEnvironment(name string, size int, metrics bool) {
 	environment := &pb.Environment{
 		Name:       name,
 		Version:    "v0.0.1",
@@ -88,6 +88,9 @@ func (s *Model) CreateEnvironment(name string, size int) {
 				Command:  "drush data-pipelines:reindex my_source_data_from_json_url && drush dn:invalidate-paths /path/to/page/that/uses/data",
 				Schedule: "*/30 * * * *",
 			},
+		},
+		Metrics: &pb.EnvironmentMetrics{
+			Enabled: metrics,
 		},
 	}
 	if name == "prod" {
