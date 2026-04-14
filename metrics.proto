@@ -14,12 +14,19 @@ service metrics {
   rpc AbsoluteRange (AbsoluteRangeRequest) returns (AbsoluteRangeResponse) {}
 }
 
-// Top-level enum definition
+// What the metric scope is.
 enum MetricType {
   METRIC_TYPE_UNSPECIFIED = 0;
   CLUSTER = 1;
   PROJECT = 2;
   ENVIRONMENT = 3;
+}
+
+// Where this metric data is sourced.
+enum MetricSource {
+  METRIC_SOURCE_UNSPECIFIED = 0;
+  SYSTEM = 1;
+  APPLICATION = 2;
 }
 
 /**
@@ -44,7 +51,7 @@ message AvailableMetricsResponse {
 message MetricDefinition {
   string name = 1; // The name of the metric.
   MetricType type = 2; // The type of the metric.
-  bool application = 3; // Whether the metric is an application metric or not.
+  MetricSource source = 3; // The source of the metric data.
   string title = 4; // A human-readable title for the metric.
 }
 

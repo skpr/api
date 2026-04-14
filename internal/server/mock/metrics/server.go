@@ -80,11 +80,15 @@ func (s *Server) AvailableMetrics(ctx context.Context, req *pb.AvailableMetricsR
 
 	availableMetrics := []*pb.MetricDefinition{}
 	for key, metric := range mappings {
+		source := pb.MetricSource_SYSTEM
+		if metric.Application {
+			source = pb.MetricSource_APPLICATION
+		}
 		availableMetrics = append(availableMetrics, &pb.MetricDefinition{
-			Name:        key,
-			Type:        req.Type,
-			Title:       strings.ReplaceAll(key, "_", " "),
-			Application: metric.Application,
+			Name:   key,
+			Type:   req.Type,
+			Title:  strings.ReplaceAll(key, "_", " "),
+			Source: source,
 		})
 	}
 
