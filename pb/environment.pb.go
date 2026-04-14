@@ -3414,7 +3414,7 @@ func (x *EnvironmentDashboard) GetURL() string {
 }
 
 // *
-// Environment dashboard configuration
+// Environment metrics configuration
 type EnvironmentMetrics struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
