@@ -19,42 +19,42 @@ type Server struct {
 }
 
 type MockMetric struct {
-	Min         float64
-	Max         float64
-	Application bool
+	Min    float64
+	Max    float64
+	Source pb.MetricSource
 }
 
 // metricData is built once at package initialization
 var metricData = map[pb.MetricType]map[string]MockMetric{
 	pb.MetricType_CLUSTER: {
-		"requests":            {250_000, 4_000_000, false},
-		"httpcode_target_200": {500, 1_000, false},
-		"httpcode_target_300": {25, 50, false},
-		"httpcode_target_400": {10, 25, false},
-		"httpcode_target_500": {0, 10, false},
+		"requests":            {250_000, 4_000_000, pb.MetricSource_SYSTEM},
+		"httpcode_target_200": {500, 1_000, pb.MetricSource_SYSTEM},
+		"httpcode_target_300": {25, 50, pb.MetricSource_SYSTEM},
+		"httpcode_target_400": {10, 25, pb.MetricSource_SYSTEM},
+		"httpcode_target_500": {0, 10, pb.MetricSource_SYSTEM},
 	},
 	pb.MetricType_ENVIRONMENT: {
-		"requests":              {25_000, 200_000, false},
-		"cpu":                   {25, 100, false},
-		"memory":                {512_000, 4_294_967_296, false}, // 512KB to 4GB
-		"replicas":              {2, 8, false},
-		"php_active":            {4, 48, false},
-		"php_idle":              {2, 12, false},
-		"php_queued":            {0, 8, false},
-		"cache_hit_rate":        {60, 99, false},
-		"invalidation_paths":    {10, 50, false},
-		"invalidation_requests": {5, 20, false},
-		"origin_errors":         {0, 10, false},
-		"httpcode_target_200":   {200, 500, false},
-		"httpcode_target_300":   {25, 50, false},
-		"httpcode_target_400":   {10, 25, false},
-		"httpcode_target_500":   {0, 10, false},
-		"response_times_avg":    {0.1, 0.25, false},
-		"response_times_p95":    {2.0, 5.0, false},
-		"response_times_p99":    {10.0, 20.0, false},
-		"mock_application_1":    {0, 100, true},
-		"mock_application_2":    {0.3, 1.4, true},
-		"mock_application_3":    {0, 100_000_000, true},
+		"requests":              {25_000, 200_000, pb.MetricSource_SYSTEM},
+		"cpu":                   {25, 100, pb.MetricSource_SYSTEM},
+		"memory":                {512_000, 4_294_967_296, pb.MetricSource_SYSTEM}, // 512KB to 4GB
+		"replicas":              {2, 8, pb.MetricSource_SYSTEM},
+		"php_active":            {4, 48, pb.MetricSource_SYSTEM},
+		"php_idle":              {2, 12, pb.MetricSource_SYSTEM},
+		"php_queued":            {0, 8, pb.MetricSource_SYSTEM},
+		"cache_hit_rate":        {60, 99, pb.MetricSource_SYSTEM},
+		"invalidation_paths":    {10, 50, pb.MetricSource_SYSTEM},
+		"invalidation_requests": {5, 20, pb.MetricSource_SYSTEM},
+		"origin_errors":         {0, 10, pb.MetricSource_SYSTEM},
+		"httpcode_target_200":   {200, 500, pb.MetricSource_SYSTEM},
+		"httpcode_target_300":   {25, 50, pb.MetricSource_SYSTEM},
+		"httpcode_target_400":   {10, 25, pb.MetricSource_SYSTEM},
+		"httpcode_target_500":   {0, 10, pb.MetricSource_SYSTEM},
+		"response_times_avg":    {0.1, 0.25, pb.MetricSource_SYSTEM},
+		"response_times_p95":    {2.0, 5.0, pb.MetricSource_SYSTEM},
+		"response_times_p99":    {10.0, 20.0, pb.MetricSource_SYSTEM},
+		"mock_application_1":    {0, 100, pb.MetricSource_APPLICATION},
+		"mock_application_2":    {0.3, 1.4, pb.MetricSource_APPLICATION},
+		"mock_application_3":    {0, 100_000_000, pb.MetricSource_APPLICATION},
 	},
 }
 
@@ -80,15 +80,16 @@ func (s *Server) AvailableMetrics(ctx context.Context, req *pb.AvailableMetricsR
 
 	availableMetrics := []*pb.MetricDefinition{}
 	for key, metric := range mappings {
-		source := pb.MetricSource_SYSTEM
-		if metric.Application {
-			source = pb.MetricSource_APPLICATION
+		// Hide application metrics for the prod environment.
+		if req.Environment != nil && *req.Environment == "prod" && metric.Source == pb.MetricSource_APPLICATION {
+			continue
 		}
+
 		availableMetrics = append(availableMetrics, &pb.MetricDefinition{
 			Name:   key,
 			Type:   req.Type,
 			Title:  strings.ReplaceAll(key, "_", " "),
-			Source: source,
+			Source: metric.Source,
 		})
 	}
 

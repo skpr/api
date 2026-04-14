@@ -35,7 +35,7 @@ enum MetricSource {
 message AvailableMetricsRequest {
   MetricType type = 1; // The type of the metric.
   optional string environment = 2; // Name of the environment. Required when using ENVIRONMENT type.
-  optional bool application = 3; // Whether to return application metrics or not. Unset for both.
+  optional MetricSource source = 3; // Whether to return only metrics with a specific source.
 }
 
 /**
