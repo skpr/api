@@ -42,6 +42,8 @@ var metricData = map[pb.MetricType]map[string]MockMetric{
 		"php_idle":              {2, 12, pb.MetricSource_SYSTEM},
 		"php_queued":            {0, 8, pb.MetricSource_SYSTEM},
 		"cache_hit_rate":        {60, 99, pb.MetricSource_SYSTEM},
+		"cdn_download":          {50_000_000, 300_000_000, pb.MetricSource_SYSTEM},
+		"cdn_upload":            {0, 20_000, pb.MetricSource_SYSTEM},
 		"invalidation_paths":    {10, 50, pb.MetricSource_SYSTEM},
 		"invalidation_requests": {5, 20, pb.MetricSource_SYSTEM},
 		"origin_errors":         {0, 10, pb.MetricSource_SYSTEM},
