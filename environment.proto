@@ -22,13 +22,6 @@ message Cache {
 }
 
 /**
- * Environment origin configuration
- */
-message Origin {
-  string Policy = 1; // Origin policy assigned to an environment
-}
-
-/**
  * Environment cron configuration
  */
 message Cron {
@@ -285,6 +278,13 @@ message MySQLSanitize {
 message MySQLImageSanitize {
   SanitizationPolicy Backup = 1; // Rules applied to a backup
   SanitizationPolicy Image = 2; // Rules applied to an image
+}
+
+/**
+ * Environment origin configuration
+ */
+message Origin {
+  string Policy = 1; // Origin policy assigned to an environment
 }
 
 /**
