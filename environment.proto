@@ -22,6 +22,13 @@ message Cache {
 }
 
 /**
+ * Environment origin configuration
+ */
+message Origin {
+  string Policy = 1; // Origin policy assigned to an environment
+}
+
+/**
  * Environment cron configuration
  */
 message Cron {
@@ -241,6 +248,7 @@ message Ingress {
   Mode mode = 8; // The mode this CDN is configured for
   string LoadBalancer = 9; // Load balancer configuration
   Cache Cache = 10; // Cache configuration
+  Origin Origin = 11; // Origin configuration
 }
 
 /**
