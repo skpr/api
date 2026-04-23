@@ -24,6 +24,8 @@ const _ = grpc.SupportPackageIsVersion7
 type LogsClient interface {
 	Tail(ctx context.Context, in *LogTailRequest, opts ...grpc.CallOption) (Logs_TailClient, error)
 	ListStreams(ctx context.Context, in *LogListStreamsRequest, opts ...grpc.CallOption) (*LogListStreamsResponse, error)
+	Query(ctx context.Context, in *LogQueryRequest, opts ...grpc.CallOption) (Logs_QueryClient, error)
+	Summarise(ctx context.Context, in *LogSummariseRequest, opts ...grpc.CallOption) (*LogSummariseResponse, error)
 }
 
 type logsClient struct {
@@ -75,12 +77,55 @@ func (c *logsClient) ListStreams(ctx context.Context, in *LogListStreamsRequest,
 	return out, nil
 }
 
+func (c *logsClient) Query(ctx context.Context, in *LogQueryRequest, opts ...grpc.CallOption) (Logs_QueryClient, error) {
+	stream, err := c.cc.NewStream(ctx, &Logs_ServiceDesc.Streams[1], "/workflow.logs/Query", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &logsQueryClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type Logs_QueryClient interface {
+	Recv() (*LogQueryResponse, error)
+	grpc.ClientStream
+}
+
+type logsQueryClient struct {
+	grpc.ClientStream
+}
+
+func (x *logsQueryClient) Recv() (*LogQueryResponse, error) {
+	m := new(LogQueryResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *logsClient) Summarise(ctx context.Context, in *LogSummariseRequest, opts ...grpc.CallOption) (*LogSummariseResponse, error) {
+	out := new(LogSummariseResponse)
+	err := c.cc.Invoke(ctx, "/workflow.logs/Summarise", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // LogsServer is the server API for Logs service.
 // All implementations must embed UnimplementedLogsServer
 // for forward compatibility
 type LogsServer interface {
 	Tail(*LogTailRequest, Logs_TailServer) error
 	ListStreams(context.Context, *LogListStreamsRequest) (*LogListStreamsResponse, error)
+	Query(*LogQueryRequest, Logs_QueryServer) error
+	Summarise(context.Context, *LogSummariseRequest) (*LogSummariseResponse, error)
 	mustEmbedUnimplementedLogsServer()
 }
 
@@ -93,6 +138,12 @@ func (UnimplementedLogsServer) Tail(*LogTailRequest, Logs_TailServer) error {
 }
 func (UnimplementedLogsServer) ListStreams(context.Context, *LogListStreamsRequest) (*LogListStreamsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListStreams not implemented")
+}
+func (UnimplementedLogsServer) Query(*LogQueryRequest, Logs_QueryServer) error {
+	return status.Errorf(codes.Unimplemented, "method Query not implemented")
+}
+func (UnimplementedLogsServer) Summarise(context.Context, *LogSummariseRequest) (*LogSummariseResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Summarise not implemented")
 }
 func (UnimplementedLogsServer) mustEmbedUnimplementedLogsServer() {}
 
@@ -146,6 +197,45 @@ func _Logs_ListStreams_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Logs_Query_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(LogQueryRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(LogsServer).Query(m, &logsQueryServer{stream})
+}
+
+type Logs_QueryServer interface {
+	Send(*LogQueryResponse) error
+	grpc.ServerStream
+}
+
+type logsQueryServer struct {
+	grpc.ServerStream
+}
+
+func (x *logsQueryServer) Send(m *LogQueryResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func _Logs_Summarise_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LogSummariseRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LogsServer).Summarise(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/workflow.logs/Summarise",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LogsServer).Summarise(ctx, req.(*LogSummariseRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Logs_ServiceDesc is the grpc.ServiceDesc for Logs service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -157,11 +247,20 @@ var Logs_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "ListStreams",
 			Handler:    _Logs_ListStreams_Handler,
 		},
+		{
+			MethodName: "Summarise",
+			Handler:    _Logs_Summarise_Handler,
+		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "Tail",
 			Handler:       _Logs_Tail_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "Query",
+			Handler:       _Logs_Query_Handler,
 			ServerStreams: true,
 		},
 	},
