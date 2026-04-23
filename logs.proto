@@ -3,11 +3,16 @@ syntax = "proto3";
 
 package workflow;
 
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
 option go_package = "./pb";
 
 service logs {
   rpc Tail (LogTailRequest) returns (stream LogTailResponse) {}
   rpc ListStreams (LogListStreamsRequest) returns (LogListStreamsResponse) {}
+  rpc Query (LogQueryRequest) returns (stream LogQueryResponse) {}
+  rpc Summarise (LogSummariseRequest) returns (LogSummariseResponse) {}
 }
 
 /**
@@ -38,4 +43,79 @@ message LogListStreamsRequest {
 message LogListStreamsResponse {
   repeated string Streams = 1; // Streams available for an environment
   string Default = 2; // Default stream
+}
+
+/**
+ * Shared filter block for bounded log queries and summarisation
+ */
+message LogFilter {
+  string Environment = 1; // Name of the environment
+  repeated string Streams = 2; // Stream IDs to include; empty means all
+  google.protobuf.Duration Timeframe = 3; // Window duration relative to now; mutually exclusive with TimeRange
+  LogTimeRange TimeRange = 4; // Custom absolute time range; used when Timeframe is unset
+  string Contains = 5; // Substring / multi-line query text
+}
+
+/**
+ * Custom time range for a log query
+ */
+message LogTimeRange {
+  google.protobuf.Timestamp From = 1; // Start of range
+  google.protobuf.Timestamp To = 2; // End of range
+}
+
+/**
+ * Run a bounded log query
+ */
+message LogQueryRequest {
+  LogFilter Filter = 1; // Filter block
+  int32 Limit = 2; // Cap on returned events; 0 for server default
+}
+
+/**
+ * Streamed query response: events followed by a final Meta message
+ */
+message LogQueryResponse {
+  oneof Body {
+    LogEvent Event = 1; // A single matched log event
+    LogQueryMeta Meta = 2; // Final message summarising the run
+  }
+}
+
+/**
+ * A single log event returned by a query
+ */
+message LogEvent {
+  string Id = 1; // Unique event ID
+  google.protobuf.Timestamp Timestamp = 2; // Event timestamp
+  string Stream = 3; // Stream ID e.g. "nginx","fpm","cli","cloudfront","invalidations","waf"
+  string Message = 4; // Human-readable message line
+  string Level = 5; // Level e.g. "info","warning","error" (optional)
+  int32 Status = 6; // HTTP status code if applicable; 0 when not applicable
+  string Raw = 7; // Original JSON payload, serialised as a string
+}
+
+/**
+ * Metadata for a completed query run, emitted as the final stream message
+ */
+message LogQueryMeta {
+  int64 Scanned = 1; // Total events scanned across selected streams
+  google.protobuf.Timestamp RanAt = 2; // Timestamp of when the query ran
+}
+
+/**
+ * Summarise a log window using a natural-language prompt
+ */
+message LogSummariseRequest {
+  LogFilter Filter = 1; // Filter block describing the window to summarise
+  string Prompt = 2; // Natural-language question for the summariser
+}
+
+/**
+ * AI-generated summary of a log window
+ */
+message LogSummariseResponse {
+  string Tldr = 1; // One-paragraph summary
+  repeated string Bullets = 2; // Notable events / observations
+  repeated string SuggestedActions = 3; // Suggested follow-up actions
 }
