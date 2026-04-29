@@ -157,11 +157,28 @@ func (s *Server) Query(req *pb.LogQueryRequest, stream pb.Logs_QueryServer) erro
 		events = filtered
 	}
 
-	// Filter by substring query if provided.
-	if req.Filter.Contains != "" {
+	// Filter by substring queries if provided. Each entry must be satisfied:
+	// include entries require the substring to be present, exclude entries
+	// require it to be absent. Empty Value entries are skipped.
+	if len(req.Filter.Contains) > 0 {
 		filtered := events[:0:0]
 		for _, evt := range events {
-			if strings.Contains(evt.Message, req.Filter.Contains) {
+			ok := true
+			for _, f := range req.Filter.Contains {
+				if f == nil || f.Value == "" {
+					continue
+				}
+				has := strings.Contains(evt.Message, f.Value)
+				if f.Exclude && has {
+					ok = false
+					break
+				}
+				if !f.Exclude && !has {
+					ok = false
+					break
+				}
+			}
+			if ok {
 				filtered = append(filtered, evt)
 			}
 		}

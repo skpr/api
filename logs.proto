@@ -53,7 +53,15 @@ message LogFilter {
   repeated string Streams = 2; // Stream IDs to include; empty means all
   google.protobuf.Duration Timeframe = 3; // Window duration relative to now; mutually exclusive with TimeRange
   LogTimeRange TimeRange = 4; // Custom absolute time range; used when Timeframe is unset
-  string Contains = 5; // Substring / multi-line query text
+  repeated LogContainsFilter Contains = 5; // Substring filters; an event must satisfy every entry (include AND, exclude AND)
+}
+
+/**
+ * A single substring filter applied to log event messages
+ */
+message LogContainsFilter {
+  string Value = 1; // Substring to match against the event message
+  bool Exclude = 2; // false = event message must contain Value; true = event message must NOT contain Value
 }
 
 /**
