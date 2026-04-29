@@ -172,9 +172,16 @@ func (s *Server) Query(req *pb.LogQueryRequest, stream pb.Logs_QueryServer) erro
 		events = events[:req.Limit]
 	}
 
-	for _, evt := range events {
+	const batchSize = 2
+	for i := 0; i < len(events); i += batchSize {
+		end := i + batchSize
+		if end > len(events) {
+			end = len(events)
+		}
 		resp := &pb.LogQueryResponse{
-			Body: &pb.LogQueryResponse_Event{Event: evt},
+			Body: &pb.LogQueryResponse_Batch{
+				Batch: &pb.LogEventBatch{Events: events[i:end]},
+			},
 		}
 		if err := stream.Send(resp); err != nil {
 			return err

@@ -84,13 +84,20 @@ message LogQueryRequest {
 }
 
 /**
- * Streamed query response: events followed by a final Meta message
+ * Streamed query response: batches of events followed by a final Meta message
  */
 message LogQueryResponse {
   oneof Body {
-    LogEvent Event = 1; // A single matched log event
+    LogEventBatch Batch = 1; // A batch of matched log events
     LogQueryMeta Meta = 2; // Final message summarising the run
   }
+}
+
+/**
+ * A batch of log events emitted as a single streamed response chunk
+ */
+message LogEventBatch {
+  repeated LogEvent Events = 1; // Events in this batch
 }
 
 /**
