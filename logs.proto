@@ -99,10 +99,7 @@ message LogQueryResponse {
 message LogEvent {
   google.protobuf.Timestamp Timestamp = 1; // Event timestamp
   string Stream = 2; // Stream ID e.g. "nginx","fpm","cli","cloudfront","invalidations","waf"
-  string Message = 3; // Human-readable message line
-  string Level = 4; // Level e.g. "info","warning","error" (optional)
-  int32 Status = 5; // HTTP status code if applicable; 0 when not applicable
-  string Raw = 6; // Original JSON payload, serialised as a string
+  string Message = 3; // Original payload (typically JSON), serialised as a string
 }
 
 /**
@@ -125,7 +122,7 @@ message LogSummariseRequest {
  * AI-generated summary of a log window
  */
 message LogSummariseResponse {
-  string Tldr = 1; // One-paragraph summary
+  string Overview = 1; // One-paragraph summary
   repeated string Bullets = 2; // Notable events / observations
   repeated string SuggestedActions = 3; // Suggested follow-up actions
 }

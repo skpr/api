@@ -84,50 +84,32 @@ func buildMockEvents() []*pb.LogEvent {
 		{
 			Timestamp: timestamppb.New(now.Add(-1 * time.Minute)),
 			Stream:    StreamNginx,
-			Message:   "GET /readyz 200",
-			Level:     "info",
-			Status:    200,
-			Raw:       rawNginx,
+			Message:   rawNginx,
 		},
 		{
 			Timestamp: timestamppb.New(now.Add(-3 * time.Minute)),
 			Stream:    StreamFPM,
-			Message:   "GET /readyz 200",
-			Level:     "info",
-			Status:    200,
-			Raw:       rawFPM,
+			Message:   rawFPM,
 		},
 		{
 			Timestamp: timestamppb.New(now.Add(-7 * time.Minute)),
 			Stream:    StreamNginx,
-			Message:   "GET /node/1 200",
-			Level:     "info",
-			Status:    200,
-			Raw:       rawNginx,
+			Message:   rawNginx,
 		},
 		{
 			Timestamp: timestamppb.New(now.Add(-12 * time.Minute)),
 			Stream:    StreamFPM,
-			Message:   "PHP Fatal error: Allowed memory size exhausted",
-			Level:     "error",
-			Status:    500,
-			Raw:       rawFPM,
+			Message:   rawFPM,
 		},
 		{
 			Timestamp: timestamppb.New(now.Add(-25 * time.Minute)),
 			Stream:    StreamNginx,
-			Message:   "GET /admin 403",
-			Level:     "warning",
-			Status:    403,
-			Raw:       rawNginx,
+			Message:   rawNginx,
 		},
 		{
 			Timestamp: timestamppb.New(now.Add(-45 * time.Minute)),
 			Stream:    StreamFPM,
-			Message:   "Slow request detected: 5.2s",
-			Level:     "warning",
-			Status:    200,
-			Raw:       rawFPM,
+			Message:   rawFPM,
 		},
 	}
 }
@@ -222,7 +204,7 @@ func (s *Server) Summarise(ctx context.Context, req *pb.LogSummariseRequest) (*p
 	}
 
 	return &pb.LogSummariseResponse{
-		Tldr: "Traffic is nominal with a small number of 5xx errors originating from the fpm stream; nginx is healthy.",
+		Overview: "Traffic is nominal with a small number of 5xx errors originating from the fpm stream; nginx is healthy.",
 		Bullets: []string{
 			"99.2% of requests returned 2xx",
 			"3 elevated-error windows detected in fpm between 01:20-01:40 UTC",
