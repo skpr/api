@@ -133,7 +133,7 @@ func buildMockEvents() []*pb.LogEvent {
 }
 
 // Query streams matching log events followed by a terminal metadata message.
-// Timeframe and TimeRange on the filter are accepted but ignored by the mock.
+// The Window oneof (Timeframe or TimeRange) on the filter is accepted but ignored by the mock.
 func (s *Server) Query(req *pb.LogQueryRequest, stream pb.Logs_QueryServer) error {
 	if req.Filter == nil {
 		return fmt.Errorf("filter not provided")

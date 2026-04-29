@@ -51,8 +51,11 @@ message LogListStreamsResponse {
 message LogFilter {
   string Environment = 1; // Name of the environment
   repeated string Streams = 2; // Stream IDs to include; empty means all
-  google.protobuf.Duration Timeframe = 3; // Window duration relative to now; mutually exclusive with TimeRange
-  LogTimeRange TimeRange = 4; // Custom absolute time range; used when Timeframe is unset
+  // Time window for the query; exactly one variant should be set.
+  oneof Window {
+    google.protobuf.Duration Timeframe = 3; // Window duration relative to now
+    LogTimeRange TimeRange = 4; // Custom absolute time range
+  }
   repeated LogContainsFilter Contains = 5; // Substring filters; an event must satisfy every entry (include AND, exclude AND)
 }
 
