@@ -3,11 +3,16 @@ syntax = "proto3";
 
 package workflow;
 
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
 option go_package = "./pb";
 
 service logs {
   rpc Tail (LogTailRequest) returns (stream LogTailResponse) {}
   rpc ListStreams (LogListStreamsRequest) returns (LogListStreamsResponse) {}
+  rpc Query (LogQueryRequest) returns (stream LogQueryResponse) {}
+  rpc Summarise (LogSummariseRequest) returns (LogSummariseResponse) {}
 }
 
 /**
@@ -38,4 +43,93 @@ message LogListStreamsRequest {
 message LogListStreamsResponse {
   repeated string Streams = 1; // Streams available for an environment
   string Default = 2; // Default stream
+}
+
+/**
+ * Shared filter block for bounded log queries and summarisation
+ */
+message LogFilter {
+  string Environment = 1; // Name of the environment
+  repeated string Streams = 2; // Stream IDs to include; empty means all
+  // Time window for the query; exactly one variant should be set.
+  oneof Window {
+    google.protobuf.Duration Timeframe = 3; // Window duration relative to now
+    LogTimeRange TimeRange = 4; // Custom absolute time range
+  }
+  repeated LogContainsFilter Contains = 5; // Substring filters; an event must satisfy every entry (include AND, exclude AND)
+}
+
+/**
+ * A single substring filter applied to log event messages
+ */
+message LogContainsFilter {
+  string Value = 1; // Substring to match against the event message
+  bool Exclude = 2; // false = event message must contain Value; true = event message must NOT contain Value
+}
+
+/**
+ * Custom time range for a log query
+ */
+message LogTimeRange {
+  google.protobuf.Timestamp From = 1; // Start of range
+  google.protobuf.Timestamp To = 2; // End of range
+}
+
+/**
+ * Run a bounded log query
+ */
+message LogQueryRequest {
+  LogFilter Filter = 1; // Filter block
+  int32 Limit = 2; // Cap on returned events; 0 for server default
+}
+
+/**
+ * Streamed query response: batches of events followed by a final Meta message
+ */
+message LogQueryResponse {
+  oneof Body {
+    LogEventBatch Batch = 1; // A batch of matched log events
+    LogQueryMeta Meta = 2; // Final message summarising the run
+  }
+}
+
+/**
+ * A batch of log events emitted as a single streamed response chunk
+ */
+message LogEventBatch {
+  repeated LogEvent Events = 1; // Events in this batch
+}
+
+/**
+ * A single log event returned by a query
+ */
+message LogEvent {
+  google.protobuf.Timestamp Timestamp = 1; // Event timestamp
+  string Stream = 2; // Stream ID e.g. "nginx","fpm","cli","cloudfront","invalidations","waf"
+  string Message = 3; // Original payload (typically JSON), serialised as a string
+}
+
+/**
+ * Metadata for a completed query run, emitted as the final stream message
+ */
+message LogQueryMeta {
+  int64 Scanned = 1; // Total events scanned across selected streams
+  google.protobuf.Timestamp RanAt = 2; // Timestamp of when the query ran
+}
+
+/**
+ * Summarise a log window using a natural-language prompt
+ */
+message LogSummariseRequest {
+  LogFilter Filter = 1; // Filter block describing the window to summarise
+  string Prompt = 2; // Natural-language question for the summariser
+}
+
+/**
+ * AI-generated summary of a log window
+ */
+message LogSummariseResponse {
+  string Overview = 1; // One-paragraph summary
+  repeated string Bullets = 2; // Notable events / observations
+  repeated string SuggestedActions = 3; // Suggested follow-up actions
 }
