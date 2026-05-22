@@ -100,24 +100,65 @@ func (s *Server) AvailableMetrics(ctx context.Context, req *pb.AvailableMetricsR
 	}, nil
 }
 
+// pickStep returns an appropriate step duration for the requested time range so
+// that the number of data points in a response stays manageable.
+//
+//	range <= 2h   → 1 minute
+//	range <= 12h  → 5 minutes
+//	range <= 48h  → 15 minutes
+//	range <= 7d   → 1 hour
+//	range >  7d   → 6 hours
+func pickStep(d time.Duration) time.Duration {
+	switch {
+	case d <= 2*time.Hour:
+		return time.Minute
+	case d <= 12*time.Hour:
+		return 5 * time.Minute
+	case d <= 48*time.Hour:
+		return 15 * time.Minute
+	case d <= 7*24*time.Hour:
+		return time.Hour
+	default:
+		return 6 * time.Hour
+	}
+}
+
 // AbsoluteRange gets a metric for a given timestamp range.
 func (s *Server) AbsoluteRange(ctx context.Context, req *pb.AbsoluteRangeRequest) (*pb.AbsoluteRangeResponse, error) {
+	// Validate start_time and end_time.
+	if req.StartTime == nil || req.EndTime == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "start_time and end_time are required")
+	}
+	start := req.StartTime.AsTime()
+	end := req.EndTime.AsTime()
+	if start.IsZero() || end.IsZero() {
+		return nil, status.Errorf(codes.InvalidArgument, "start_time and end_time are required")
+	}
+	if !end.After(start) {
+		return nil, status.Errorf(codes.InvalidArgument, "end_time must be after start_time")
+	}
+
 	mappings := metricMappings(req.Type)
 	if _, ok := mappings[req.Metric]; !ok {
 		return nil, status.Errorf(codes.NotFound, "metric %s not found", req.Metric)
 	}
 	metricMin, metricMax := mappings[req.Metric].Min, mappings[req.Metric].Max
 
-	output := []*pb.MetricValue{}
+	step := pickStep(end.Sub(start))
 	seedKey := fmt.Sprintf("%s_%s", req.Type, req.Metric)
-	metricTime := req.StartTime.AsTime()
-	for metricTime.Before(req.EndTime.AsTime()) {
-		metric := pb.MetricValue{
+
+	// Align the starting point to a clean step boundary so that bucket keys
+	// remain stable regardless of the exact second the caller provides.
+	metricTime := start.Truncate(step)
+
+	output := []*pb.MetricValue{}
+	for !metricTime.After(end) {
+		v := deterministicRange(metricTime, metricMin, metricMax, int64(step.Seconds()), seedKey)
+		output = append(output, &pb.MetricValue{
 			Timestamp: timestamppb.New(metricTime),
-			Value:     new(deterministicRange(metricTime, metricMin, metricMax, 60, seedKey)),
-		}
-		output = append(output, &metric)
-		metricTime = metricTime.Add(time.Minute)
+			Value:     &v,
+		})
+		metricTime = metricTime.Add(step)
 	}
 
 	return &pb.AbsoluteRangeResponse{
