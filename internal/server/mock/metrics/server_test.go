@@ -15,27 +15,42 @@ var srv = &Server{}
 
 // --- pickStep ---
 
+// TestPickStep exercises every tier boundary of pickStep, which computes
+// duration as (end - 1m) - start to mirror the platform's
+// NewTimeSeriesAutoStep.  The table lists the requested (end - start) span
+// and the resulting effective duration_used = span - 1m.
 func TestPickStep(t *testing.T) {
+	ref := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
+
 	cases := []struct {
 		name string
-		d    time.Duration
+		span time.Duration // end - start supplied to pickStep
 		want time.Duration
 	}{
-		{"30m → 1m", 30 * time.Minute, time.Minute},
-		{"2h exact → 1m", 2 * time.Hour, time.Minute},
-		{"2h1s → 5m", 2*time.Hour + time.Second, 5 * time.Minute},
-		{"12h exact → 5m", 12 * time.Hour, 5 * time.Minute},
-		{"12h1s → 15m", 12*time.Hour + time.Second, 15 * time.Minute},
-		{"48h exact → 15m", 48 * time.Hour, 15 * time.Minute},
-		{"48h1s → 1h", 48*time.Hour + time.Second, time.Hour},
-		{"7d exact → 1h", 7 * 24 * time.Hour, time.Hour},
-		{"8d → 6h", 8 * 24 * time.Hour, 6 * time.Hour},
+		// <= 1h tier (30s)
+		{"30m → 30s", 30 * time.Minute, 30 * time.Second},
+		{"1h1m → 30s (boundary)", 1*time.Hour + time.Minute, 30 * time.Second},
+		// <= 3h tier (1m)
+		{"1h2m → 1m", 1*time.Hour + 2*time.Minute, time.Minute},
+		{"3h1m → 1m (boundary)", 3*time.Hour + time.Minute, time.Minute},
+		// <= 12h tier (5m)
+		{"3h2m → 5m", 3*time.Hour + 2*time.Minute, 5 * time.Minute},
+		{"12h1m → 5m (boundary)", 12*time.Hour + time.Minute, 5 * time.Minute},
+		// <= 24h tier (10m)
+		{"12h2m → 10m", 12*time.Hour + 2*time.Minute, 10 * time.Minute},
+		{"24h1m → 10m (boundary)", 24*time.Hour + time.Minute, 10 * time.Minute},
+		// <= 72h tier (30m)
+		{"24h2m → 30m", 24*time.Hour + 2*time.Minute, 30 * time.Minute},
+		{"72h1m → 30m (boundary)", 72*time.Hour + time.Minute, 30 * time.Minute},
+		// > 72h fallthrough (5m — matches platform)
+		{"72h2m → 5m (fallthrough)", 72*time.Hour + 2*time.Minute, 5 * time.Minute},
+		{"30d → 5m (fallthrough)", 30 * 24 * time.Hour, 5 * time.Minute},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			got := pickStep(tc.d)
+			got := pickStep(ref, ref.Add(tc.span))
 			if got != tc.want {
-				t.Errorf("pickStep(%v) = %v, want %v", tc.d, got, tc.want)
+				t.Errorf("pickStep(span=%v) = %v, want %v", tc.span, got, tc.want)
 			}
 		})
 	}
@@ -104,8 +119,9 @@ func TestAbsoluteRange_UnknownMetric(t *testing.T) {
 // --- AbsoluteRange happy-path / data correctness ---
 
 // TestAbsoluteRange_PointCount checks that the number of returned points matches
-// the expected count given the adaptive step.  For a 1-hour range the step is
-// 1 minute.  The loop is inclusive of the end boundary, so we expect exactly
+// the expected count given the adaptive step.  For a 1-hour range the
+// effective duration_used = 59m <= 1h, so the step is 30s.  The loop is
+// inclusive of the end boundary, so we expect exactly
 // floor((end-start)/step) + 1 points after truncation.
 func TestAbsoluteRange_PointCount_1h(t *testing.T) {
 	// Use a fixed, clean reference time so truncation is deterministic.
@@ -123,8 +139,8 @@ func TestAbsoluteRange_PointCount_1h(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	// step = 1m → 60 intervals → 61 points (inclusive)
-	wantStep := time.Minute
+	// duration_used = 59m <= 1h → step = 30s → 120 intervals → 121 points (inclusive)
+	wantStep := 30 * time.Second
 	wantPoints := int(end.Sub(start)/wantStep) + 1
 	if len(resp.Metrics) != wantPoints {
 		t.Errorf("got %d points, want %d (step=%v)", len(resp.Metrics), wantPoints, wantStep)
@@ -169,8 +185,31 @@ func TestAbsoluteRange_PointCount_3d(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	// 3d is <= 7d → step = 1h → 72 intervals → 73 points
-	wantStep := time.Hour
+	// duration_used = 71h59m <= 72h → step = 30m → 144 intervals → 145 points
+	wantStep := 30 * time.Minute
+	wantPoints := int(end.Sub(start)/wantStep) + 1
+	if len(resp.Metrics) != wantPoints {
+		t.Errorf("got %d points, want %d (step=%v)", len(resp.Metrics), wantPoints, wantStep)
+	}
+}
+
+func TestAbsoluteRange_PointCount_30d(t *testing.T) {
+	start := time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
+	end := start.Add(30 * 24 * time.Hour)
+
+	req := &pb.AbsoluteRangeRequest{
+		Type:      pb.MetricType_ENVIRONMENT,
+		Metric:    "requests",
+		StartTime: timestamppb.New(start),
+		EndTime:   timestamppb.New(end),
+	}
+	resp, err := srv.AbsoluteRange(context.Background(), req)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	// duration_used = 30d - 1m > 72h → fallthrough → step = 5m → 8640 intervals → 8641 points
+	wantStep := 5 * time.Minute
 	wantPoints := int(end.Sub(start)/wantStep) + 1
 	if len(resp.Metrics) != wantPoints {
 		t.Errorf("got %d points, want %d (step=%v)", len(resp.Metrics), wantPoints, wantStep)

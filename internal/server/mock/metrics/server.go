@@ -100,27 +100,36 @@ func (s *Server) AvailableMetrics(ctx context.Context, req *pb.AvailableMetricsR
 	}, nil
 }
 
-// pickStep returns an appropriate step duration for the requested time range so
-// that the number of data points in a response stays manageable.
+// pickStep mirrors the platform's NewTimeSeriesAutoStep, aiming for ~100
+// points per period on a sensible boundary.
 //
-//	range <= 2h   → 1 minute
-//	range <= 12h  → 5 minutes
-//	range <= 48h  → 15 minutes
-//	range <= 7d   → 1 hour
-//	range >  7d   → 6 hours
-func pickStep(d time.Duration) time.Duration {
+// Duration is computed as (end - 1m) - start to keep comparison bounds
+// aligned with the platform.
+//
+//	duration <= 1h   → 30s
+//	duration <= 3h   → 1m
+//	duration <= 12h  → 5m
+//	duration <= 24h  → 10m
+//	duration <= 72h  → 30m
+//	duration >  72h  → 5m  (matches platform fallthrough)
+func pickStep(start, end time.Time) time.Duration {
+	// Remove 1 minute to ensure we're in comparison bounds — mirrors platform.
+	duration := end.Add(-1 * time.Minute).Sub(start)
+
+	step := 5 * time.Minute
 	switch {
-	case d <= 2*time.Hour:
-		return time.Minute
-	case d <= 12*time.Hour:
-		return 5 * time.Minute
-	case d <= 48*time.Hour:
-		return 15 * time.Minute
-	case d <= 7*24*time.Hour:
-		return time.Hour
-	default:
-		return 6 * time.Hour
+	case duration <= 1*time.Hour:
+		step = 30 * time.Second
+	case duration <= 3*time.Hour:
+		step = time.Minute
+	case duration <= 12*time.Hour:
+		step = 5 * time.Minute
+	case duration <= 24*time.Hour:
+		step = 10 * time.Minute
+	case duration <= 72*time.Hour:
+		step = 30 * time.Minute
 	}
+	return step
 }
 
 // AbsoluteRange gets a metric for a given timestamp range.
@@ -144,7 +153,7 @@ func (s *Server) AbsoluteRange(ctx context.Context, req *pb.AbsoluteRangeRequest
 	}
 	metricMin, metricMax := mappings[req.Metric].Min, mappings[req.Metric].Max
 
-	step := pickStep(end.Sub(start))
+	step := pickStep(start, end)
 	seedKey := fmt.Sprintf("%s_%s", req.Type, req.Metric)
 
 	// Align the starting point to a clean step boundary so that bucket keys
