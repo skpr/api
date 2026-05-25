@@ -100,24 +100,77 @@ func (s *Server) AvailableMetrics(ctx context.Context, req *pb.AvailableMetricsR
 	}, nil
 }
 
+// pickStep mirrors the platform's NewTimeSeriesAutoStep, aiming for ~100
+// points per period on a sensible boundary.
+//
+// Duration is computed as (end - 1m) - start to keep comparison bounds
+// aligned with the platform.
+//
+//	duration <= 30m  → 15s
+//	duration <= 1h   → 30s
+//	duration <= 3h   → 1m
+//	duration <= 12h  → 5m
+//	duration <= 24h  → 10m
+//	duration <= 72h  → 30m
+//	duration >  72h  → 5m  (matches platform fallthrough)
+func pickStep(start, end time.Time) time.Duration {
+	// Remove 1 minute to ensure we're in comparison bounds — mirrors platform.
+	duration := end.Add(-1 * time.Minute).Sub(start)
+
+	step := 5 * time.Minute
+	switch {
+	case duration <= 30*time.Minute:
+		step = 15 * time.Second
+	case duration <= 1*time.Hour:
+		step = 30 * time.Second
+	case duration <= 3*time.Hour:
+		step = time.Minute
+	case duration <= 12*time.Hour:
+		step = 5 * time.Minute
+	case duration <= 24*time.Hour:
+		step = 10 * time.Minute
+	case duration <= 72*time.Hour:
+		step = 30 * time.Minute
+	}
+	return step
+}
+
 // AbsoluteRange gets a metric for a given timestamp range.
 func (s *Server) AbsoluteRange(ctx context.Context, req *pb.AbsoluteRangeRequest) (*pb.AbsoluteRangeResponse, error) {
+	// Validate start_time and end_time.
+	if req.StartTime == nil || req.EndTime == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "start_time and end_time are required")
+	}
+	start := req.StartTime.AsTime()
+	end := req.EndTime.AsTime()
+	if start.IsZero() || end.IsZero() {
+		return nil, status.Errorf(codes.InvalidArgument, "start_time and end_time are required")
+	}
+	if !end.After(start) {
+		return nil, status.Errorf(codes.InvalidArgument, "end_time must be after start_time")
+	}
+
 	mappings := metricMappings(req.Type)
 	if _, ok := mappings[req.Metric]; !ok {
 		return nil, status.Errorf(codes.NotFound, "metric %s not found", req.Metric)
 	}
 	metricMin, metricMax := mappings[req.Metric].Min, mappings[req.Metric].Max
 
-	output := []*pb.MetricValue{}
+	step := pickStep(start, end)
 	seedKey := fmt.Sprintf("%s_%s", req.Type, req.Metric)
-	metricTime := req.StartTime.AsTime()
-	for metricTime.Before(req.EndTime.AsTime()) {
-		metric := pb.MetricValue{
+
+	// Align the starting point to a clean step boundary so that bucket keys
+	// remain stable regardless of the exact second the caller provides.
+	metricTime := start.Truncate(step)
+
+	output := []*pb.MetricValue{}
+	for !metricTime.After(end) {
+		v := deterministicRange(metricTime, metricMin, metricMax, int64(step.Seconds()), seedKey)
+		output = append(output, &pb.MetricValue{
 			Timestamp: timestamppb.New(metricTime),
-			Value:     new(deterministicRange(metricTime, metricMin, metricMax, 60, seedKey)),
-		}
-		output = append(output, &metric)
-		metricTime = metricTime.Add(time.Minute)
+			Value:     &v,
+		})
+		metricTime = metricTime.Add(step)
 	}
 
 	return &pb.AbsoluteRangeResponse{
