@@ -106,6 +106,7 @@ func (s *Server) AvailableMetrics(ctx context.Context, req *pb.AvailableMetricsR
 // Duration is computed as (end - 1m) - start to keep comparison bounds
 // aligned with the platform.
 //
+//	duration <= 30m  → 15s
 //	duration <= 1h   → 30s
 //	duration <= 3h   → 1m
 //	duration <= 12h  → 5m
@@ -118,6 +119,8 @@ func pickStep(start, end time.Time) time.Duration {
 
 	step := 5 * time.Minute
 	switch {
+	case duration <= 30*time.Minute:
+		step = 15 * time.Second
 	case duration <= 1*time.Hour:
 		step = 30 * time.Second
 	case duration <= 3*time.Hour:

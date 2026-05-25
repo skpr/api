@@ -27,8 +27,11 @@ func TestPickStep(t *testing.T) {
 		span time.Duration // end - start supplied to pickStep
 		want time.Duration
 	}{
+		// <= 30m tier (15s)
+		{"10m → 15s", 10 * time.Minute, 15 * time.Second},
+		{"31m → 15s (boundary)", 31 * time.Minute, 15 * time.Second},
 		// <= 1h tier (30s)
-		{"30m → 30s", 30 * time.Minute, 30 * time.Second},
+		{"32m → 30s", 32 * time.Minute, 30 * time.Second},
 		{"1h1m → 30s (boundary)", 1*time.Hour + time.Minute, 30 * time.Second},
 		// <= 3h tier (1m)
 		{"1h2m → 1m", 1*time.Hour + 2*time.Minute, time.Minute},
