@@ -100,38 +100,37 @@ func (s *Server) AvailableMetrics(ctx context.Context, req *pb.AvailableMetricsR
 	}, nil
 }
 
-// pickStep mirrors the platform's NewTimeSeriesAutoStep, aiming for ~100
+// pickStep mirrors the platform's NewTimeSeriesAutoStep, aiming for ~200
 // points per period on a sensible boundary.
-//
-// Duration is computed as (end - 1m) - start to keep comparison bounds
-// aligned with the platform.
-//
-//	duration <= 30m  → 15s
-//	duration <= 1h   → 30s
-//	duration <= 3h   → 1m
-//	duration <= 12h  → 5m
-//	duration <= 24h  → 10m
-//	duration <= 72h  → 30m
-//	duration >  72h  → 5m  (matches platform fallthrough)
 func pickStep(start, end time.Time) time.Duration {
-	// Remove 1 minute to ensure we're in comparison bounds — mirrors platform.
-	duration := end.Add(-1 * time.Minute).Sub(start)
+	duration := end.Sub(start)
 
-	step := 5 * time.Minute
+	var step time.Duration
 	switch {
-	case duration <= 30*time.Minute:
+	case duration <= 45*time.Minute:
 		step = 15 * time.Second
-	case duration <= 1*time.Hour:
+	case duration <= 90*time.Minute:
 		step = 30 * time.Second
 	case duration <= 3*time.Hour:
 		step = time.Minute
-	case duration <= 12*time.Hour:
+	case duration <= 8*time.Hour:
+		step = 2 * time.Minute
+	case duration <= 16*time.Hour:
 		step = 5 * time.Minute
-	case duration <= 24*time.Hour:
+	case duration <= 2*24*time.Hour:
 		step = 10 * time.Minute
-	case duration <= 72*time.Hour:
+	case duration <= 4*24*time.Hour:
 		step = 30 * time.Minute
+	case duration <= 8*24*time.Hour:
+		step = time.Hour
+	case duration <= 21*24*time.Hour:
+		step = 2 * time.Hour
+	case duration <= 42*24*time.Hour:
+		step = 4 * time.Hour
+	default:
+		step = 6 * time.Hour
 	}
+
 	return step
 }
 
