@@ -42,14 +42,25 @@ func (s *Server) ListStreams(ctx context.Context, req *pb.LogListStreamsRequest)
 }
 
 func (s *Server) ListStreamsV2(ctx context.Context, req *pb.LogListStreamsV2Request) (*pb.LogListStreamsV2Response, error) {
-	return &pb.LogListStreamsV2Response{
-		Streams: []*pb.LogStream{
-			{Name: StreamNginx, RealTime: true, Default: false},
-			{Name: StreamFPM, RealTime: true, Default: true},
-			{Name: StreamCloudfront, RealTime: false, Default: false},
-			{Name: StreamEvents, RealTime: false, Default: false},
-		},
-	}, nil
+	all := []*pb.LogStream{
+		{Name: StreamNginx, RealTime: true, Default: false},
+		{Name: StreamFPM, RealTime: true, Default: true},
+		{Name: StreamCloudfront, RealTime: false, Default: false},
+		{Name: StreamEvents, RealTime: false, Default: false},
+	}
+
+	var result []*pb.LogStream
+	for _, stream := range all {
+		if req.RealTime != nil && stream.RealTime != *req.RealTime {
+			continue
+		}
+		if req.Default != nil && stream.Default != *req.Default {
+			continue
+		}
+		result = append(result, stream)
+	}
+
+	return &pb.LogListStreamsV2Response{Streams: result}, nil
 }
 
 func (s *Server) Tail(req *pb.LogTailRequest, server pb.Logs_TailServer) error {

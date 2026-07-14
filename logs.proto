@@ -51,6 +51,8 @@ message LogListStreamsResponse {
  */
 message LogListStreamsV2Request {
   string Environment = 1; // Name of the environment
+  optional bool RealTime = 2; // Filter by real-time capability
+  optional bool Default = 3; // Filter by default status
 }
 
 /**
