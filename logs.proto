@@ -11,6 +11,7 @@ option go_package = "./pb";
 service logs {
   rpc Tail (LogTailRequest) returns (stream LogTailResponse) {}
   rpc ListStreams (LogListStreamsRequest) returns (LogListStreamsResponse) {}
+  rpc ListStreamsV2 (LogListStreamsV2Request) returns (LogListStreamsV2Response) {}
   rpc Query (LogQueryRequest) returns (stream LogQueryResponse) {}
   rpc Summarise (LogSummariseRequest) returns (LogSummariseResponse) {}
 }
@@ -43,6 +44,29 @@ message LogListStreamsRequest {
 message LogListStreamsResponse {
   repeated string Streams = 1; // Streams available for an environment
   string Default = 2; // Default stream
+}
+
+/**
+ * List streams for an environment (V2)
+ */
+message LogListStreamsV2Request {
+  string Environment = 1; // Name of the environment
+}
+
+/**
+ * A single stream descriptor
+ */
+message LogStream {
+  string Name = 1; // Stream identifier
+  bool RealTime = 2; // True for tail streams, false for query-only
+  bool Default = 3; // True if this is the default stream
+}
+
+/**
+ * Returns a list of stream descriptors (V2)
+ */
+message LogListStreamsV2Response {
+  repeated LogStream Streams = 1; // Available streams with metadata
 }
 
 /**

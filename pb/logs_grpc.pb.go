@@ -24,6 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type LogsClient interface {
 	Tail(ctx context.Context, in *LogTailRequest, opts ...grpc.CallOption) (Logs_TailClient, error)
 	ListStreams(ctx context.Context, in *LogListStreamsRequest, opts ...grpc.CallOption) (*LogListStreamsResponse, error)
+	ListStreamsV2(ctx context.Context, in *LogListStreamsV2Request, opts ...grpc.CallOption) (*LogListStreamsV2Response, error)
 	Query(ctx context.Context, in *LogQueryRequest, opts ...grpc.CallOption) (Logs_QueryClient, error)
 	Summarise(ctx context.Context, in *LogSummariseRequest, opts ...grpc.CallOption) (*LogSummariseResponse, error)
 }
@@ -77,6 +78,15 @@ func (c *logsClient) ListStreams(ctx context.Context, in *LogListStreamsRequest,
 	return out, nil
 }
 
+func (c *logsClient) ListStreamsV2(ctx context.Context, in *LogListStreamsV2Request, opts ...grpc.CallOption) (*LogListStreamsV2Response, error) {
+	out := new(LogListStreamsV2Response)
+	err := c.cc.Invoke(ctx, "/workflow.logs/ListStreamsV2", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *logsClient) Query(ctx context.Context, in *LogQueryRequest, opts ...grpc.CallOption) (Logs_QueryClient, error) {
 	stream, err := c.cc.NewStream(ctx, &Logs_ServiceDesc.Streams[1], "/workflow.logs/Query", opts...)
 	if err != nil {
@@ -124,6 +134,7 @@ func (c *logsClient) Summarise(ctx context.Context, in *LogSummariseRequest, opt
 type LogsServer interface {
 	Tail(*LogTailRequest, Logs_TailServer) error
 	ListStreams(context.Context, *LogListStreamsRequest) (*LogListStreamsResponse, error)
+	ListStreamsV2(context.Context, *LogListStreamsV2Request) (*LogListStreamsV2Response, error)
 	Query(*LogQueryRequest, Logs_QueryServer) error
 	Summarise(context.Context, *LogSummariseRequest) (*LogSummariseResponse, error)
 	mustEmbedUnimplementedLogsServer()
@@ -138,6 +149,9 @@ func (UnimplementedLogsServer) Tail(*LogTailRequest, Logs_TailServer) error {
 }
 func (UnimplementedLogsServer) ListStreams(context.Context, *LogListStreamsRequest) (*LogListStreamsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListStreams not implemented")
+}
+func (UnimplementedLogsServer) ListStreamsV2(context.Context, *LogListStreamsV2Request) (*LogListStreamsV2Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListStreamsV2 not implemented")
 }
 func (UnimplementedLogsServer) Query(*LogQueryRequest, Logs_QueryServer) error {
 	return status.Errorf(codes.Unimplemented, "method Query not implemented")
@@ -197,6 +211,24 @@ func _Logs_ListStreams_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Logs_ListStreamsV2_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LogListStreamsV2Request)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(LogsServer).ListStreamsV2(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/workflow.logs/ListStreamsV2",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(LogsServer).ListStreamsV2(ctx, req.(*LogListStreamsV2Request))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Logs_Query_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(LogQueryRequest)
 	if err := stream.RecvMsg(m); err != nil {
@@ -246,6 +278,10 @@ var Logs_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListStreams",
 			Handler:    _Logs_ListStreams_Handler,
+		},
+		{
+			MethodName: "ListStreamsV2",
+			Handler:    _Logs_ListStreamsV2_Handler,
 		},
 		{
 			MethodName: "Summarise",

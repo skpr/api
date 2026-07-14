@@ -13,8 +13,10 @@ import (
 )
 
 const (
-	StreamNginx = "nginx"
-	StreamFPM   = "fpm"
+	StreamNginx      = "nginx"
+	StreamFPM        = "fpm"
+	StreamCloudfront = "cloudfront"
+	StreamEvents     = "events"
 )
 
 // Raw JSON payloads reused from the Tail mock, kept here so fixture events
@@ -35,6 +37,17 @@ func (s *Server) ListStreams(ctx context.Context, req *pb.LogListStreamsRequest)
 		Streams: []string{
 			StreamNginx,
 			StreamFPM,
+		},
+	}, nil
+}
+
+func (s *Server) ListStreamsV2(ctx context.Context, req *pb.LogListStreamsV2Request) (*pb.LogListStreamsV2Response, error) {
+	return &pb.LogListStreamsV2Response{
+		Streams: []*pb.LogStream{
+			{Name: StreamNginx, RealTime: true, Default: false},
+			{Name: StreamFPM, RealTime: true, Default: true},
+			{Name: StreamCloudfront, RealTime: false, Default: false},
+			{Name: StreamEvents, RealTime: false, Default: false},
 		},
 	}, nil
 }
