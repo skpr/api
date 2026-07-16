@@ -8,9 +8,18 @@ import "google/protobuf/timestamp.proto";
 
 option go_package = "./pb";
 
+/**
+ * Stream capability type
+ */
+enum LogStreamType {
+  Tail = 0;  // Stream supports real-time tailing
+  Query = 1; // Stream supports bounded queries
+}
+
 service logs {
   rpc Tail (LogTailRequest) returns (stream LogTailResponse) {}
   rpc ListStreams (LogListStreamsRequest) returns (LogListStreamsResponse) {}
+  rpc ListStreamsV2 (LogListStreamsV2Request) returns (LogListStreamsV2Response) {}
   rpc Query (LogQueryRequest) returns (stream LogQueryResponse) {}
   rpc Summarise (LogSummariseRequest) returns (LogSummariseResponse) {}
 }
@@ -43,6 +52,38 @@ message LogListStreamsRequest {
 message LogListStreamsResponse {
   repeated string Streams = 1; // Streams available for an environment
   string Default = 2; // Default stream
+}
+
+/**
+ * List streams for an environment (V2)
+ */
+message LogListStreamsV2Request {
+  string Environment = 1; // Name of the environment
+  repeated LogStreamType Types = 2; // Filter by stream capabilities; empty means all
+}
+
+/**
+ * A single stream descriptor
+ */
+message LogStream {
+  string Name = 1; // Stream identifier
+  repeated LogStreamType Types = 2; // Capabilities this stream supports
+}
+
+/**
+ * Default streams for each capability type
+ */
+message LogStreamDefaults {
+  repeated string Tail = 1;  // Default streams for tailing
+  repeated string Query = 2; // Default streams for queries
+}
+
+/**
+ * Returns a list of stream descriptors (V2)
+ */
+message LogListStreamsV2Response {
+  repeated LogStream Streams = 1; // Available streams with metadata
+  LogStreamDefaults Defaults = 2; // Default streams for each capability
 }
 
 /**

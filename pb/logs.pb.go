@@ -25,6 +25,54 @@ const (
 )
 
 // *
+// Stream capability type
+type LogStreamType int32
+
+const (
+	LogStreamType_Tail  LogStreamType = 0 // Stream supports real-time tailing
+	LogStreamType_Query LogStreamType = 1 // Stream supports bounded queries
+)
+
+// Enum value maps for LogStreamType.
+var (
+	LogStreamType_name = map[int32]string{
+		0: "Tail",
+		1: "Query",
+	}
+	LogStreamType_value = map[string]int32{
+		"Tail":  0,
+		"Query": 1,
+	}
+)
+
+func (x LogStreamType) Enum() *LogStreamType {
+	p := new(LogStreamType)
+	*p = x
+	return p
+}
+
+func (x LogStreamType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (LogStreamType) Descriptor() protoreflect.EnumDescriptor {
+	return file_logs_proto_enumTypes[0].Descriptor()
+}
+
+func (LogStreamType) Type() protoreflect.EnumType {
+	return &file_logs_proto_enumTypes[0]
+}
+
+func (x LogStreamType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use LogStreamType.Descriptor instead.
+func (LogStreamType) EnumDescriptor() ([]byte, []int) {
+	return file_logs_proto_rawDescGZIP(), []int{0}
+}
+
+// *
 // Start a log tailing stream
 type LogTailRequest struct {
 	state         protoimpl.MessageState
@@ -237,6 +285,234 @@ func (x *LogListStreamsResponse) GetDefault() string {
 }
 
 // *
+// List streams for an environment (V2)
+type LogListStreamsV2Request struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Environment string          `protobuf:"bytes,1,opt,name=Environment,proto3" json:"Environment,omitempty"`                         // Name of the environment
+	Types       []LogStreamType `protobuf:"varint,2,rep,packed,name=Types,proto3,enum=workflow.LogStreamType" json:"Types,omitempty"` // Filter by stream capabilities; empty means all
+}
+
+func (x *LogListStreamsV2Request) Reset() {
+	*x = LogListStreamsV2Request{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_logs_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *LogListStreamsV2Request) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LogListStreamsV2Request) ProtoMessage() {}
+
+func (x *LogListStreamsV2Request) ProtoReflect() protoreflect.Message {
+	mi := &file_logs_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LogListStreamsV2Request.ProtoReflect.Descriptor instead.
+func (*LogListStreamsV2Request) Descriptor() ([]byte, []int) {
+	return file_logs_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *LogListStreamsV2Request) GetEnvironment() string {
+	if x != nil {
+		return x.Environment
+	}
+	return ""
+}
+
+func (x *LogListStreamsV2Request) GetTypes() []LogStreamType {
+	if x != nil {
+		return x.Types
+	}
+	return nil
+}
+
+// *
+// A single stream descriptor
+type LogStream struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Name  string          `protobuf:"bytes,1,opt,name=Name,proto3" json:"Name,omitempty"`                                       // Stream identifier
+	Types []LogStreamType `protobuf:"varint,2,rep,packed,name=Types,proto3,enum=workflow.LogStreamType" json:"Types,omitempty"` // Capabilities this stream supports
+}
+
+func (x *LogStream) Reset() {
+	*x = LogStream{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_logs_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *LogStream) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LogStream) ProtoMessage() {}
+
+func (x *LogStream) ProtoReflect() protoreflect.Message {
+	mi := &file_logs_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LogStream.ProtoReflect.Descriptor instead.
+func (*LogStream) Descriptor() ([]byte, []int) {
+	return file_logs_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *LogStream) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *LogStream) GetTypes() []LogStreamType {
+	if x != nil {
+		return x.Types
+	}
+	return nil
+}
+
+// *
+// Default streams for each capability type
+type LogStreamDefaults struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Tail  []string `protobuf:"bytes,1,rep,name=Tail,proto3" json:"Tail,omitempty"`   // Default streams for tailing
+	Query []string `protobuf:"bytes,2,rep,name=Query,proto3" json:"Query,omitempty"` // Default streams for queries
+}
+
+func (x *LogStreamDefaults) Reset() {
+	*x = LogStreamDefaults{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_logs_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *LogStreamDefaults) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LogStreamDefaults) ProtoMessage() {}
+
+func (x *LogStreamDefaults) ProtoReflect() protoreflect.Message {
+	mi := &file_logs_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LogStreamDefaults.ProtoReflect.Descriptor instead.
+func (*LogStreamDefaults) Descriptor() ([]byte, []int) {
+	return file_logs_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *LogStreamDefaults) GetTail() []string {
+	if x != nil {
+		return x.Tail
+	}
+	return nil
+}
+
+func (x *LogStreamDefaults) GetQuery() []string {
+	if x != nil {
+		return x.Query
+	}
+	return nil
+}
+
+// *
+// Returns a list of stream descriptors (V2)
+type LogListStreamsV2Response struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Streams  []*LogStream       `protobuf:"bytes,1,rep,name=Streams,proto3" json:"Streams,omitempty"`   // Available streams with metadata
+	Defaults *LogStreamDefaults `protobuf:"bytes,2,opt,name=Defaults,proto3" json:"Defaults,omitempty"` // Default streams for each capability
+}
+
+func (x *LogListStreamsV2Response) Reset() {
+	*x = LogListStreamsV2Response{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_logs_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *LogListStreamsV2Response) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LogListStreamsV2Response) ProtoMessage() {}
+
+func (x *LogListStreamsV2Response) ProtoReflect() protoreflect.Message {
+	mi := &file_logs_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LogListStreamsV2Response.ProtoReflect.Descriptor instead.
+func (*LogListStreamsV2Response) Descriptor() ([]byte, []int) {
+	return file_logs_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *LogListStreamsV2Response) GetStreams() []*LogStream {
+	if x != nil {
+		return x.Streams
+	}
+	return nil
+}
+
+func (x *LogListStreamsV2Response) GetDefaults() *LogStreamDefaults {
+	if x != nil {
+		return x.Defaults
+	}
+	return nil
+}
+
+// *
 // Shared filter block for bounded log queries and summarisation
 type LogFilter struct {
 	state         protoimpl.MessageState
@@ -258,7 +534,7 @@ type LogFilter struct {
 func (x *LogFilter) Reset() {
 	*x = LogFilter{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_logs_proto_msgTypes[4]
+		mi := &file_logs_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -271,7 +547,7 @@ func (x *LogFilter) String() string {
 func (*LogFilter) ProtoMessage() {}
 
 func (x *LogFilter) ProtoReflect() protoreflect.Message {
-	mi := &file_logs_proto_msgTypes[4]
+	mi := &file_logs_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -284,7 +560,7 @@ func (x *LogFilter) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LogFilter.ProtoReflect.Descriptor instead.
 func (*LogFilter) Descriptor() ([]byte, []int) {
-	return file_logs_proto_rawDescGZIP(), []int{4}
+	return file_logs_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *LogFilter) GetEnvironment() string {
@@ -359,7 +635,7 @@ type LogContainsFilter struct {
 func (x *LogContainsFilter) Reset() {
 	*x = LogContainsFilter{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_logs_proto_msgTypes[5]
+		mi := &file_logs_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -372,7 +648,7 @@ func (x *LogContainsFilter) String() string {
 func (*LogContainsFilter) ProtoMessage() {}
 
 func (x *LogContainsFilter) ProtoReflect() protoreflect.Message {
-	mi := &file_logs_proto_msgTypes[5]
+	mi := &file_logs_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -385,7 +661,7 @@ func (x *LogContainsFilter) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LogContainsFilter.ProtoReflect.Descriptor instead.
 func (*LogContainsFilter) Descriptor() ([]byte, []int) {
-	return file_logs_proto_rawDescGZIP(), []int{5}
+	return file_logs_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *LogContainsFilter) GetValue() string {
@@ -416,7 +692,7 @@ type LogTimeRange struct {
 func (x *LogTimeRange) Reset() {
 	*x = LogTimeRange{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_logs_proto_msgTypes[6]
+		mi := &file_logs_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -429,7 +705,7 @@ func (x *LogTimeRange) String() string {
 func (*LogTimeRange) ProtoMessage() {}
 
 func (x *LogTimeRange) ProtoReflect() protoreflect.Message {
-	mi := &file_logs_proto_msgTypes[6]
+	mi := &file_logs_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -442,7 +718,7 @@ func (x *LogTimeRange) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LogTimeRange.ProtoReflect.Descriptor instead.
 func (*LogTimeRange) Descriptor() ([]byte, []int) {
-	return file_logs_proto_rawDescGZIP(), []int{6}
+	return file_logs_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *LogTimeRange) GetFrom() *timestamppb.Timestamp {
@@ -473,7 +749,7 @@ type LogQueryRequest struct {
 func (x *LogQueryRequest) Reset() {
 	*x = LogQueryRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_logs_proto_msgTypes[7]
+		mi := &file_logs_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -486,7 +762,7 @@ func (x *LogQueryRequest) String() string {
 func (*LogQueryRequest) ProtoMessage() {}
 
 func (x *LogQueryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_logs_proto_msgTypes[7]
+	mi := &file_logs_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -499,7 +775,7 @@ func (x *LogQueryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LogQueryRequest.ProtoReflect.Descriptor instead.
 func (*LogQueryRequest) Descriptor() ([]byte, []int) {
-	return file_logs_proto_rawDescGZIP(), []int{7}
+	return file_logs_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *LogQueryRequest) GetFilter() *LogFilter {
@@ -533,7 +809,7 @@ type LogQueryResponse struct {
 func (x *LogQueryResponse) Reset() {
 	*x = LogQueryResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_logs_proto_msgTypes[8]
+		mi := &file_logs_proto_msgTypes[12]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -546,7 +822,7 @@ func (x *LogQueryResponse) String() string {
 func (*LogQueryResponse) ProtoMessage() {}
 
 func (x *LogQueryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_logs_proto_msgTypes[8]
+	mi := &file_logs_proto_msgTypes[12]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -559,7 +835,7 @@ func (x *LogQueryResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LogQueryResponse.ProtoReflect.Descriptor instead.
 func (*LogQueryResponse) Descriptor() ([]byte, []int) {
-	return file_logs_proto_rawDescGZIP(), []int{8}
+	return file_logs_proto_rawDescGZIP(), []int{12}
 }
 
 func (m *LogQueryResponse) GetBody() isLogQueryResponse_Body {
@@ -612,7 +888,7 @@ type LogEventBatch struct {
 func (x *LogEventBatch) Reset() {
 	*x = LogEventBatch{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_logs_proto_msgTypes[9]
+		mi := &file_logs_proto_msgTypes[13]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -625,7 +901,7 @@ func (x *LogEventBatch) String() string {
 func (*LogEventBatch) ProtoMessage() {}
 
 func (x *LogEventBatch) ProtoReflect() protoreflect.Message {
-	mi := &file_logs_proto_msgTypes[9]
+	mi := &file_logs_proto_msgTypes[13]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -638,7 +914,7 @@ func (x *LogEventBatch) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LogEventBatch.ProtoReflect.Descriptor instead.
 func (*LogEventBatch) Descriptor() ([]byte, []int) {
-	return file_logs_proto_rawDescGZIP(), []int{9}
+	return file_logs_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *LogEventBatch) GetEvents() []*LogEvent {
@@ -663,7 +939,7 @@ type LogEvent struct {
 func (x *LogEvent) Reset() {
 	*x = LogEvent{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_logs_proto_msgTypes[10]
+		mi := &file_logs_proto_msgTypes[14]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -676,7 +952,7 @@ func (x *LogEvent) String() string {
 func (*LogEvent) ProtoMessage() {}
 
 func (x *LogEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_logs_proto_msgTypes[10]
+	mi := &file_logs_proto_msgTypes[14]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -689,7 +965,7 @@ func (x *LogEvent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LogEvent.ProtoReflect.Descriptor instead.
 func (*LogEvent) Descriptor() ([]byte, []int) {
-	return file_logs_proto_rawDescGZIP(), []int{10}
+	return file_logs_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *LogEvent) GetTimestamp() *timestamppb.Timestamp {
@@ -727,7 +1003,7 @@ type LogQueryMeta struct {
 func (x *LogQueryMeta) Reset() {
 	*x = LogQueryMeta{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_logs_proto_msgTypes[11]
+		mi := &file_logs_proto_msgTypes[15]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -740,7 +1016,7 @@ func (x *LogQueryMeta) String() string {
 func (*LogQueryMeta) ProtoMessage() {}
 
 func (x *LogQueryMeta) ProtoReflect() protoreflect.Message {
-	mi := &file_logs_proto_msgTypes[11]
+	mi := &file_logs_proto_msgTypes[15]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -753,7 +1029,7 @@ func (x *LogQueryMeta) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LogQueryMeta.ProtoReflect.Descriptor instead.
 func (*LogQueryMeta) Descriptor() ([]byte, []int) {
-	return file_logs_proto_rawDescGZIP(), []int{11}
+	return file_logs_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *LogQueryMeta) GetScanned() int64 {
@@ -784,7 +1060,7 @@ type LogSummariseRequest struct {
 func (x *LogSummariseRequest) Reset() {
 	*x = LogSummariseRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_logs_proto_msgTypes[12]
+		mi := &file_logs_proto_msgTypes[16]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -797,7 +1073,7 @@ func (x *LogSummariseRequest) String() string {
 func (*LogSummariseRequest) ProtoMessage() {}
 
 func (x *LogSummariseRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_logs_proto_msgTypes[12]
+	mi := &file_logs_proto_msgTypes[16]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -810,7 +1086,7 @@ func (x *LogSummariseRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LogSummariseRequest.ProtoReflect.Descriptor instead.
 func (*LogSummariseRequest) Descriptor() ([]byte, []int) {
-	return file_logs_proto_rawDescGZIP(), []int{12}
+	return file_logs_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *LogSummariseRequest) GetFilter() *LogFilter {
@@ -842,7 +1118,7 @@ type LogSummariseResponse struct {
 func (x *LogSummariseResponse) Reset() {
 	*x = LogSummariseResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_logs_proto_msgTypes[13]
+		mi := &file_logs_proto_msgTypes[17]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -855,7 +1131,7 @@ func (x *LogSummariseResponse) String() string {
 func (*LogSummariseResponse) ProtoMessage() {}
 
 func (x *LogSummariseResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_logs_proto_msgTypes[13]
+	mi := &file_logs_proto_msgTypes[17]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -868,7 +1144,7 @@ func (x *LogSummariseResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LogSummariseResponse.ProtoReflect.Descriptor instead.
 func (*LogSummariseResponse) Descriptor() ([]byte, []int) {
-	return file_logs_proto_rawDescGZIP(), []int{13}
+	return file_logs_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *LogSummariseResponse) GetOverview() string {
@@ -916,7 +1192,31 @@ var file_logs_proto_rawDesc = []byte{
 	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x73,
 	0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52, 0x07, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x73, 0x12,
 	0x18, 0x0a, 0x07, 0x44, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x07, 0x44, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x22, 0xfd, 0x01, 0x0a, 0x09, 0x4c, 0x6f,
+	0x52, 0x07, 0x44, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x22, 0x6a, 0x0a, 0x17, 0x4c, 0x6f, 0x67,
+	0x4c, 0x69, 0x73, 0x74, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x73, 0x56, 0x32, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x12, 0x20, 0x0a, 0x0b, 0x45, 0x6e, 0x76, 0x69, 0x72, 0x6f, 0x6e, 0x6d,
+	0x65, 0x6e, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x45, 0x6e, 0x76, 0x69, 0x72,
+	0x6f, 0x6e, 0x6d, 0x65, 0x6e, 0x74, 0x12, 0x2d, 0x0a, 0x05, 0x54, 0x79, 0x70, 0x65, 0x73, 0x18,
+	0x02, 0x20, 0x03, 0x28, 0x0e, 0x32, 0x17, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77,
+	0x2e, 0x4c, 0x6f, 0x67, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x54, 0x79, 0x70, 0x65, 0x52, 0x05,
+	0x54, 0x79, 0x70, 0x65, 0x73, 0x22, 0x4e, 0x0a, 0x09, 0x4c, 0x6f, 0x67, 0x53, 0x74, 0x72, 0x65,
+	0x61, 0x6d, 0x12, 0x12, 0x0a, 0x04, 0x4e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x04, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x2d, 0x0a, 0x05, 0x54, 0x79, 0x70, 0x65, 0x73, 0x18,
+	0x02, 0x20, 0x03, 0x28, 0x0e, 0x32, 0x17, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77,
+	0x2e, 0x4c, 0x6f, 0x67, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x54, 0x79, 0x70, 0x65, 0x52, 0x05,
+	0x54, 0x79, 0x70, 0x65, 0x73, 0x22, 0x3d, 0x0a, 0x11, 0x4c, 0x6f, 0x67, 0x53, 0x74, 0x72, 0x65,
+	0x61, 0x6d, 0x44, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x73, 0x12, 0x12, 0x0a, 0x04, 0x54, 0x61,
+	0x69, 0x6c, 0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52, 0x04, 0x54, 0x61, 0x69, 0x6c, 0x12, 0x14,
+	0x0a, 0x05, 0x51, 0x75, 0x65, 0x72, 0x79, 0x18, 0x02, 0x20, 0x03, 0x28, 0x09, 0x52, 0x05, 0x51,
+	0x75, 0x65, 0x72, 0x79, 0x22, 0x82, 0x01, 0x0a, 0x18, 0x4c, 0x6f, 0x67, 0x4c, 0x69, 0x73, 0x74,
+	0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x73, 0x56, 0x32, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x12, 0x2d, 0x0a, 0x07, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x73, 0x18, 0x01, 0x20, 0x03,
+	0x28, 0x0b, 0x32, 0x13, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x4c, 0x6f,
+	0x67, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x52, 0x07, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x73,
+	0x12, 0x37, 0x0a, 0x08, 0x44, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x73, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x1b, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x4c, 0x6f,
+	0x67, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x44, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x73, 0x52,
+	0x08, 0x44, 0x65, 0x66, 0x61, 0x75, 0x6c, 0x74, 0x73, 0x22, 0xfd, 0x01, 0x0a, 0x09, 0x4c, 0x6f,
 	0x67, 0x46, 0x69, 0x6c, 0x74, 0x65, 0x72, 0x12, 0x20, 0x0a, 0x0b, 0x45, 0x6e, 0x76, 0x69, 0x72,
 	0x6f, 0x6e, 0x6d, 0x65, 0x6e, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x45, 0x6e,
 	0x76, 0x69, 0x72, 0x6f, 0x6e, 0x6d, 0x65, 0x6e, 0x74, 0x12, 0x18, 0x0a, 0x07, 0x53, 0x74, 0x72,
@@ -987,16 +1287,24 @@ var file_logs_proto_rawDesc = []byte{
 	0x75, 0x6c, 0x6c, 0x65, 0x74, 0x73, 0x12, 0x2a, 0x0a, 0x10, 0x53, 0x75, 0x67, 0x67, 0x65, 0x73,
 	0x74, 0x65, 0x64, 0x41, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x18, 0x03, 0x20, 0x03, 0x28, 0x09,
 	0x52, 0x10, 0x53, 0x75, 0x67, 0x67, 0x65, 0x73, 0x74, 0x65, 0x64, 0x41, 0x63, 0x74, 0x69, 0x6f,
-	0x6e, 0x73, 0x32, 0xad, 0x02, 0x0a, 0x04, 0x6c, 0x6f, 0x67, 0x73, 0x12, 0x3f, 0x0a, 0x04, 0x54,
-	0x61, 0x69, 0x6c, 0x12, 0x18, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x4c,
-	0x6f, 0x67, 0x54, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x19, 0x2e,
-	0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x4c, 0x6f, 0x67, 0x54, 0x61, 0x69, 0x6c,
-	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x30, 0x01, 0x12, 0x52, 0x0a, 0x0b,
-	0x4c, 0x69, 0x73, 0x74, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x73, 0x12, 0x1f, 0x2e, 0x77, 0x6f,
-	0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x4c, 0x6f, 0x67, 0x4c, 0x69, 0x73, 0x74, 0x53, 0x74,
-	0x72, 0x65, 0x61, 0x6d, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x20, 0x2e, 0x77,
-	0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x4c, 0x6f, 0x67, 0x4c, 0x69, 0x73, 0x74, 0x53,
-	0x74, 0x72, 0x65, 0x61, 0x6d, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00,
+	0x6e, 0x73, 0x2a, 0x24, 0x0a, 0x0d, 0x4c, 0x6f, 0x67, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x54,
+	0x79, 0x70, 0x65, 0x12, 0x08, 0x0a, 0x04, 0x54, 0x61, 0x69, 0x6c, 0x10, 0x00, 0x12, 0x09, 0x0a,
+	0x05, 0x51, 0x75, 0x65, 0x72, 0x79, 0x10, 0x01, 0x32, 0x87, 0x03, 0x0a, 0x04, 0x6c, 0x6f, 0x67,
+	0x73, 0x12, 0x3f, 0x0a, 0x04, 0x54, 0x61, 0x69, 0x6c, 0x12, 0x18, 0x2e, 0x77, 0x6f, 0x72, 0x6b,
+	0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x4c, 0x6f, 0x67, 0x54, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x1a, 0x19, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x4c,
+	0x6f, 0x67, 0x54, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00,
+	0x30, 0x01, 0x12, 0x52, 0x0a, 0x0b, 0x4c, 0x69, 0x73, 0x74, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d,
+	0x73, 0x12, 0x1f, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x4c, 0x6f, 0x67,
+	0x4c, 0x69, 0x73, 0x74, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x1a, 0x20, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x4c, 0x6f,
+	0x67, 0x4c, 0x69, 0x73, 0x74, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x73, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x58, 0x0a, 0x0d, 0x4c, 0x69, 0x73, 0x74, 0x53, 0x74,
+	0x72, 0x65, 0x61, 0x6d, 0x73, 0x56, 0x32, 0x12, 0x21, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c,
+	0x6f, 0x77, 0x2e, 0x4c, 0x6f, 0x67, 0x4c, 0x69, 0x73, 0x74, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d,
+	0x73, 0x56, 0x32, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x22, 0x2e, 0x77, 0x6f, 0x72,
+	0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x4c, 0x6f, 0x67, 0x4c, 0x69, 0x73, 0x74, 0x53, 0x74, 0x72,
+	0x65, 0x61, 0x6d, 0x73, 0x56, 0x32, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00,
 	0x12, 0x42, 0x0a, 0x05, 0x51, 0x75, 0x65, 0x72, 0x79, 0x12, 0x19, 0x2e, 0x77, 0x6f, 0x72, 0x6b,
 	0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x4c, 0x6f, 0x67, 0x51, 0x75, 0x65, 0x72, 0x79, 0x52, 0x65, 0x71,
 	0x75, 0x65, 0x73, 0x74, 0x1a, 0x1a, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e,
@@ -1022,51 +1330,63 @@ func file_logs_proto_rawDescGZIP() []byte {
 	return file_logs_proto_rawDescData
 }
 
-var file_logs_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_logs_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_logs_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
 var file_logs_proto_goTypes = []interface{}{
-	(*LogTailRequest)(nil),         // 0: workflow.LogTailRequest
-	(*LogTailResponse)(nil),        // 1: workflow.LogTailResponse
-	(*LogListStreamsRequest)(nil),  // 2: workflow.LogListStreamsRequest
-	(*LogListStreamsResponse)(nil), // 3: workflow.LogListStreamsResponse
-	(*LogFilter)(nil),              // 4: workflow.LogFilter
-	(*LogContainsFilter)(nil),      // 5: workflow.LogContainsFilter
-	(*LogTimeRange)(nil),           // 6: workflow.LogTimeRange
-	(*LogQueryRequest)(nil),        // 7: workflow.LogQueryRequest
-	(*LogQueryResponse)(nil),       // 8: workflow.LogQueryResponse
-	(*LogEventBatch)(nil),          // 9: workflow.LogEventBatch
-	(*LogEvent)(nil),               // 10: workflow.LogEvent
-	(*LogQueryMeta)(nil),           // 11: workflow.LogQueryMeta
-	(*LogSummariseRequest)(nil),    // 12: workflow.LogSummariseRequest
-	(*LogSummariseResponse)(nil),   // 13: workflow.LogSummariseResponse
-	(*durationpb.Duration)(nil),    // 14: google.protobuf.Duration
-	(*timestamppb.Timestamp)(nil),  // 15: google.protobuf.Timestamp
+	(LogStreamType)(0),               // 0: workflow.LogStreamType
+	(*LogTailRequest)(nil),           // 1: workflow.LogTailRequest
+	(*LogTailResponse)(nil),          // 2: workflow.LogTailResponse
+	(*LogListStreamsRequest)(nil),    // 3: workflow.LogListStreamsRequest
+	(*LogListStreamsResponse)(nil),   // 4: workflow.LogListStreamsResponse
+	(*LogListStreamsV2Request)(nil),  // 5: workflow.LogListStreamsV2Request
+	(*LogStream)(nil),                // 6: workflow.LogStream
+	(*LogStreamDefaults)(nil),        // 7: workflow.LogStreamDefaults
+	(*LogListStreamsV2Response)(nil), // 8: workflow.LogListStreamsV2Response
+	(*LogFilter)(nil),                // 9: workflow.LogFilter
+	(*LogContainsFilter)(nil),        // 10: workflow.LogContainsFilter
+	(*LogTimeRange)(nil),             // 11: workflow.LogTimeRange
+	(*LogQueryRequest)(nil),          // 12: workflow.LogQueryRequest
+	(*LogQueryResponse)(nil),         // 13: workflow.LogQueryResponse
+	(*LogEventBatch)(nil),            // 14: workflow.LogEventBatch
+	(*LogEvent)(nil),                 // 15: workflow.LogEvent
+	(*LogQueryMeta)(nil),             // 16: workflow.LogQueryMeta
+	(*LogSummariseRequest)(nil),      // 17: workflow.LogSummariseRequest
+	(*LogSummariseResponse)(nil),     // 18: workflow.LogSummariseResponse
+	(*durationpb.Duration)(nil),      // 19: google.protobuf.Duration
+	(*timestamppb.Timestamp)(nil),    // 20: google.protobuf.Timestamp
 }
 var file_logs_proto_depIdxs = []int32{
-	14, // 0: workflow.LogFilter.Timeframe:type_name -> google.protobuf.Duration
-	6,  // 1: workflow.LogFilter.TimeRange:type_name -> workflow.LogTimeRange
-	5,  // 2: workflow.LogFilter.Contains:type_name -> workflow.LogContainsFilter
-	15, // 3: workflow.LogTimeRange.From:type_name -> google.protobuf.Timestamp
-	15, // 4: workflow.LogTimeRange.To:type_name -> google.protobuf.Timestamp
-	4,  // 5: workflow.LogQueryRequest.Filter:type_name -> workflow.LogFilter
-	9,  // 6: workflow.LogQueryResponse.Batch:type_name -> workflow.LogEventBatch
-	11, // 7: workflow.LogQueryResponse.Meta:type_name -> workflow.LogQueryMeta
-	10, // 8: workflow.LogEventBatch.Events:type_name -> workflow.LogEvent
-	15, // 9: workflow.LogEvent.Timestamp:type_name -> google.protobuf.Timestamp
-	15, // 10: workflow.LogQueryMeta.RanAt:type_name -> google.protobuf.Timestamp
-	4,  // 11: workflow.LogSummariseRequest.Filter:type_name -> workflow.LogFilter
-	0,  // 12: workflow.logs.Tail:input_type -> workflow.LogTailRequest
-	2,  // 13: workflow.logs.ListStreams:input_type -> workflow.LogListStreamsRequest
-	7,  // 14: workflow.logs.Query:input_type -> workflow.LogQueryRequest
-	12, // 15: workflow.logs.Summarise:input_type -> workflow.LogSummariseRequest
-	1,  // 16: workflow.logs.Tail:output_type -> workflow.LogTailResponse
-	3,  // 17: workflow.logs.ListStreams:output_type -> workflow.LogListStreamsResponse
-	8,  // 18: workflow.logs.Query:output_type -> workflow.LogQueryResponse
-	13, // 19: workflow.logs.Summarise:output_type -> workflow.LogSummariseResponse
-	16, // [16:20] is the sub-list for method output_type
-	12, // [12:16] is the sub-list for method input_type
-	12, // [12:12] is the sub-list for extension type_name
-	12, // [12:12] is the sub-list for extension extendee
-	0,  // [0:12] is the sub-list for field type_name
+	0,  // 0: workflow.LogListStreamsV2Request.Types:type_name -> workflow.LogStreamType
+	0,  // 1: workflow.LogStream.Types:type_name -> workflow.LogStreamType
+	6,  // 2: workflow.LogListStreamsV2Response.Streams:type_name -> workflow.LogStream
+	7,  // 3: workflow.LogListStreamsV2Response.Defaults:type_name -> workflow.LogStreamDefaults
+	19, // 4: workflow.LogFilter.Timeframe:type_name -> google.protobuf.Duration
+	11, // 5: workflow.LogFilter.TimeRange:type_name -> workflow.LogTimeRange
+	10, // 6: workflow.LogFilter.Contains:type_name -> workflow.LogContainsFilter
+	20, // 7: workflow.LogTimeRange.From:type_name -> google.protobuf.Timestamp
+	20, // 8: workflow.LogTimeRange.To:type_name -> google.protobuf.Timestamp
+	9,  // 9: workflow.LogQueryRequest.Filter:type_name -> workflow.LogFilter
+	14, // 10: workflow.LogQueryResponse.Batch:type_name -> workflow.LogEventBatch
+	16, // 11: workflow.LogQueryResponse.Meta:type_name -> workflow.LogQueryMeta
+	15, // 12: workflow.LogEventBatch.Events:type_name -> workflow.LogEvent
+	20, // 13: workflow.LogEvent.Timestamp:type_name -> google.protobuf.Timestamp
+	20, // 14: workflow.LogQueryMeta.RanAt:type_name -> google.protobuf.Timestamp
+	9,  // 15: workflow.LogSummariseRequest.Filter:type_name -> workflow.LogFilter
+	1,  // 16: workflow.logs.Tail:input_type -> workflow.LogTailRequest
+	3,  // 17: workflow.logs.ListStreams:input_type -> workflow.LogListStreamsRequest
+	5,  // 18: workflow.logs.ListStreamsV2:input_type -> workflow.LogListStreamsV2Request
+	12, // 19: workflow.logs.Query:input_type -> workflow.LogQueryRequest
+	17, // 20: workflow.logs.Summarise:input_type -> workflow.LogSummariseRequest
+	2,  // 21: workflow.logs.Tail:output_type -> workflow.LogTailResponse
+	4,  // 22: workflow.logs.ListStreams:output_type -> workflow.LogListStreamsResponse
+	8,  // 23: workflow.logs.ListStreamsV2:output_type -> workflow.LogListStreamsV2Response
+	13, // 24: workflow.logs.Query:output_type -> workflow.LogQueryResponse
+	18, // 25: workflow.logs.Summarise:output_type -> workflow.LogSummariseResponse
+	21, // [21:26] is the sub-list for method output_type
+	16, // [16:21] is the sub-list for method input_type
+	16, // [16:16] is the sub-list for extension type_name
+	16, // [16:16] is the sub-list for extension extendee
+	0,  // [0:16] is the sub-list for field type_name
 }
 
 func init() { file_logs_proto_init() }
@@ -1124,7 +1444,7 @@ func file_logs_proto_init() {
 			}
 		}
 		file_logs_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*LogFilter); i {
+			switch v := v.(*LogListStreamsV2Request); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1136,7 +1456,7 @@ func file_logs_proto_init() {
 			}
 		}
 		file_logs_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*LogContainsFilter); i {
+			switch v := v.(*LogStream); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1148,7 +1468,7 @@ func file_logs_proto_init() {
 			}
 		}
 		file_logs_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*LogTimeRange); i {
+			switch v := v.(*LogStreamDefaults); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1160,7 +1480,7 @@ func file_logs_proto_init() {
 			}
 		}
 		file_logs_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*LogQueryRequest); i {
+			switch v := v.(*LogListStreamsV2Response); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1172,7 +1492,7 @@ func file_logs_proto_init() {
 			}
 		}
 		file_logs_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*LogQueryResponse); i {
+			switch v := v.(*LogFilter); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1184,7 +1504,7 @@ func file_logs_proto_init() {
 			}
 		}
 		file_logs_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*LogEventBatch); i {
+			switch v := v.(*LogContainsFilter); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1196,7 +1516,7 @@ func file_logs_proto_init() {
 			}
 		}
 		file_logs_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*LogEvent); i {
+			switch v := v.(*LogTimeRange); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1208,7 +1528,7 @@ func file_logs_proto_init() {
 			}
 		}
 		file_logs_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*LogQueryMeta); i {
+			switch v := v.(*LogQueryRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1220,7 +1540,7 @@ func file_logs_proto_init() {
 			}
 		}
 		file_logs_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*LogSummariseRequest); i {
+			switch v := v.(*LogQueryResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1232,6 +1552,54 @@ func file_logs_proto_init() {
 			}
 		}
 		file_logs_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*LogEventBatch); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_logs_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*LogEvent); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_logs_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*LogQueryMeta); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_logs_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*LogSummariseRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_logs_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*LogSummariseResponse); i {
 			case 0:
 				return &v.state
@@ -1244,11 +1612,11 @@ func file_logs_proto_init() {
 			}
 		}
 	}
-	file_logs_proto_msgTypes[4].OneofWrappers = []interface{}{
+	file_logs_proto_msgTypes[8].OneofWrappers = []interface{}{
 		(*LogFilter_Timeframe)(nil),
 		(*LogFilter_TimeRange)(nil),
 	}
-	file_logs_proto_msgTypes[8].OneofWrappers = []interface{}{
+	file_logs_proto_msgTypes[12].OneofWrappers = []interface{}{
 		(*LogQueryResponse_Batch)(nil),
 		(*LogQueryResponse_Meta)(nil),
 	}
@@ -1257,13 +1625,14 @@ func file_logs_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_logs_proto_rawDesc,
-			NumEnums:      0,
-			NumMessages:   14,
+			NumEnums:      1,
+			NumMessages:   18,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_logs_proto_goTypes,
 		DependencyIndexes: file_logs_proto_depIdxs,
+		EnumInfos:         file_logs_proto_enumTypes,
 		MessageInfos:      file_logs_proto_msgTypes,
 	}.Build()
 	File_logs_proto = out.File

@@ -13,8 +13,10 @@ import (
 )
 
 const (
-	StreamNginx = "nginx"
-	StreamFPM   = "fpm"
+	StreamNginx      = "nginx"
+	StreamFPM        = "fpm"
+	StreamCloudfront = "cloudfront"
+	StreamEvents     = "events"
 )
 
 // Raw JSON payloads reused from the Tail mock, kept here so fixture events
@@ -35,6 +37,40 @@ func (s *Server) ListStreams(ctx context.Context, req *pb.LogListStreamsRequest)
 		Streams: []string{
 			StreamNginx,
 			StreamFPM,
+		},
+	}, nil
+}
+
+func (s *Server) ListStreamsV2(ctx context.Context, req *pb.LogListStreamsV2Request) (*pb.LogListStreamsV2Response, error) {
+	all := []*pb.LogStream{
+		{Name: StreamNginx, Types: []pb.LogStreamType{pb.LogStreamType_Tail, pb.LogStreamType_Query}},
+		{Name: StreamFPM, Types: []pb.LogStreamType{pb.LogStreamType_Tail, pb.LogStreamType_Query}},
+		{Name: StreamCloudfront, Types: []pb.LogStreamType{pb.LogStreamType_Query}},
+		{Name: StreamEvents, Types: []pb.LogStreamType{pb.LogStreamType_Query}},
+	}
+
+	var result []*pb.LogStream
+	for _, stream := range all {
+		if len(req.Types) > 0 {
+			match := false
+			for _, t := range req.Types {
+				if slices.Contains(stream.Types, t) {
+					match = true
+					break
+				}
+			}
+			if !match {
+				continue
+			}
+		}
+		result = append(result, stream)
+	}
+
+	return &pb.LogListStreamsV2Response{
+		Streams: result,
+		Defaults: &pb.LogStreamDefaults{
+			Tail:  []string{StreamFPM},
+			Query: []string{StreamFPM},
 		},
 	}, nil
 }

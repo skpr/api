@@ -100,38 +100,28 @@ func (s *Server) AvailableMetrics(ctx context.Context, req *pb.AvailableMetricsR
 	}, nil
 }
 
-// pickStep mirrors the platform's NewTimeSeriesAutoStep, aiming for ~200
-// points per period on a sensible boundary.
+// pickStep mirrors the platform's NewTimeSeriesAutoStep, which computes
+// duration as (end - 1m) - start to determine the tier.
 func pickStep(start, end time.Time) time.Duration {
-	duration := end.Sub(start)
+	// ponytail: platform subtracts 1m from end before computing duration
+	duration := end.Add(-time.Minute).Sub(start)
 
-	var step time.Duration
 	switch {
-	case duration <= 45*time.Minute:
-		step = 15 * time.Second
-	case duration <= 90*time.Minute:
-		step = 30 * time.Second
+	case duration <= 30*time.Minute:
+		return 15 * time.Second
+	case duration <= time.Hour:
+		return 30 * time.Second
 	case duration <= 3*time.Hour:
-		step = time.Minute
-	case duration <= 8*time.Hour:
-		step = 2 * time.Minute
-	case duration <= 16*time.Hour:
-		step = 5 * time.Minute
-	case duration <= 2*24*time.Hour:
-		step = 10 * time.Minute
-	case duration <= 4*24*time.Hour:
-		step = 30 * time.Minute
-	case duration <= 8*24*time.Hour:
-		step = time.Hour
-	case duration <= 21*24*time.Hour:
-		step = 2 * time.Hour
-	case duration <= 42*24*time.Hour:
-		step = 4 * time.Hour
+		return time.Minute
+	case duration <= 12*time.Hour:
+		return 5 * time.Minute
+	case duration <= 24*time.Hour:
+		return 10 * time.Minute
+	case duration <= 72*time.Hour:
+		return 30 * time.Minute
 	default:
-		step = 6 * time.Hour
+		return 5 * time.Minute
 	}
-
-	return step
 }
 
 // AbsoluteRange gets a metric for a given timestamp range.
