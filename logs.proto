@@ -8,6 +8,14 @@ import "google/protobuf/timestamp.proto";
 
 option go_package = "./pb";
 
+/**
+ * Stream capability type
+ */
+enum LogStreamType {
+  Tail = 0;  // Stream supports real-time tailing
+  Query = 1; // Stream supports bounded queries
+}
+
 service logs {
   rpc Tail (LogTailRequest) returns (stream LogTailResponse) {}
   rpc ListStreams (LogListStreamsRequest) returns (LogListStreamsResponse) {}
@@ -51,8 +59,7 @@ message LogListStreamsResponse {
  */
 message LogListStreamsV2Request {
   string Environment = 1; // Name of the environment
-  optional bool RealTime = 2; // Filter by real-time capability
-  optional bool Default = 3; // Filter by default status
+  repeated LogStreamType Types = 2; // Filter by stream capabilities; empty means all
 }
 
 /**
@@ -60,8 +67,15 @@ message LogListStreamsV2Request {
  */
 message LogStream {
   string Name = 1; // Stream identifier
-  bool RealTime = 2; // True for tail streams, false for query-only
-  bool Default = 3; // True if this is the default stream
+  repeated LogStreamType Types = 2; // Capabilities this stream supports
+}
+
+/**
+ * Default streams for each capability type
+ */
+message LogStreamDefaults {
+  repeated string Tail = 1;  // Default streams for tailing
+  repeated string Query = 2; // Default streams for queries
 }
 
 /**
@@ -69,6 +83,7 @@ message LogStream {
  */
 message LogListStreamsV2Response {
   repeated LogStream Streams = 1; // Available streams with metadata
+  LogStreamDefaults Defaults = 2; // Default streams for each capability
 }
 
 /**

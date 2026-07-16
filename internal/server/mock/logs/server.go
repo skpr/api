@@ -43,24 +43,36 @@ func (s *Server) ListStreams(ctx context.Context, req *pb.LogListStreamsRequest)
 
 func (s *Server) ListStreamsV2(ctx context.Context, req *pb.LogListStreamsV2Request) (*pb.LogListStreamsV2Response, error) {
 	all := []*pb.LogStream{
-		{Name: StreamNginx, RealTime: true, Default: false},
-		{Name: StreamFPM, RealTime: true, Default: true},
-		{Name: StreamCloudfront, RealTime: false, Default: false},
-		{Name: StreamEvents, RealTime: false, Default: false},
+		{Name: StreamNginx, Types: []pb.LogStreamType{pb.LogStreamType_Tail, pb.LogStreamType_Query}},
+		{Name: StreamFPM, Types: []pb.LogStreamType{pb.LogStreamType_Tail, pb.LogStreamType_Query}},
+		{Name: StreamCloudfront, Types: []pb.LogStreamType{pb.LogStreamType_Query}},
+		{Name: StreamEvents, Types: []pb.LogStreamType{pb.LogStreamType_Query}},
 	}
 
 	var result []*pb.LogStream
 	for _, stream := range all {
-		if req.RealTime != nil && stream.RealTime != *req.RealTime {
-			continue
-		}
-		if req.Default != nil && stream.Default != *req.Default {
-			continue
+		if len(req.Types) > 0 {
+			match := false
+			for _, t := range req.Types {
+				if slices.Contains(stream.Types, t) {
+					match = true
+					break
+				}
+			}
+			if !match {
+				continue
+			}
 		}
 		result = append(result, stream)
 	}
 
-	return &pb.LogListStreamsV2Response{Streams: result}, nil
+	return &pb.LogListStreamsV2Response{
+		Streams: result,
+		Defaults: &pb.LogStreamDefaults{
+			Tail:  []string{StreamFPM},
+			Query: []string{StreamFPM},
+		},
+	}, nil
 }
 
 func (s *Server) Tail(req *pb.LogTailRequest, server pb.Logs_TailServer) error {
