@@ -30,5 +30,5 @@ message ClusterGetResponse {
   string        Version = 2; // Version number
   string        BuildDate = 3; // When this version was built
   string        UiBaseUri = 4; // Base URI for the UI
-  string        SshBaseUri = 5; // URI for SSH connections
+  string        SshUri = 5; // URI for SSH connections
 }
