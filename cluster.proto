@@ -26,9 +26,13 @@ message ClusterGetResponse {
     PartialOutage = 3;
     MajorOutage = 4;
   }
-  ClusterStatus Status = 1; // Status of the cluster
-  string        Version = 2; // Version number
-  string        BuildDate = 3; // When this version was built
-  string        UiBaseUri = 4; // Base URI for the UI
-  string        SshUri = 5; // URI for SSH connections
+  ClusterStatus    Status = 1; // Status of the cluster
+  string           Version = 2; // Version number
+  string           BuildDate = 3; // When this version was built
+  ClusterEndpoints Endpoints = 4; // Endpoints for the cluster
+}
+
+message ClusterEndpoints {
+  string Console = 1; // Base URI for the UI
+  string SSH = 2; // URI for SSH connections
 }
