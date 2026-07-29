@@ -16,6 +16,7 @@ import (
 
 	"github.com/skpr/api/internal/model"
 	"github.com/skpr/api/internal/server/mock/backup"
+	"github.com/skpr/api/internal/server/mock/cluster"
 	"github.com/skpr/api/internal/server/mock/config"
 	"github.com/skpr/api/internal/server/mock/cron"
 	"github.com/skpr/api/internal/server/mock/environment"
@@ -77,6 +78,9 @@ func main() {
 			pb.RegisterBackupServer(server, &backup.Server{
 				Model: globalModel,
 			})
+
+			log.Println("Registering service: Cluster")
+			pb.RegisterClusterServer(server, &cluster.Server{})
 
 			log.Println("Registering service: Trace")
 			pb.RegisterTraceServer(server, &trace.Server{})
