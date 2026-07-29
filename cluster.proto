@@ -1,0 +1,38 @@
+/** Service responsible for cluster information */
+syntax = "proto3";
+
+package workflow;
+
+option go_package = "./pb";
+
+service cluster {
+  rpc Get (ClusterGetRequest) returns (ClusterGetResponse) {}
+}
+
+/**
+ * Get the cluster status
+ */
+message ClusterGetRequest {
+}
+
+/**
+ * Returns the cluster status
+ */
+message ClusterGetResponse {
+  enum ClusterStatus {
+    None = 0;
+    Operational = 1;
+    Degraded = 2;
+    PartialOutage = 3;
+    MajorOutage = 4;
+  }
+  ClusterStatus    Status = 1; // Status of the cluster
+  string           Version = 2; // Version number
+  string           BuildDate = 3; // When this version was built
+  ClusterEndpoints Endpoints = 4; // Endpoints for the cluster
+}
+
+message ClusterEndpoints {
+  string Console = 1; // Base URI for the UI
+  string SSH = 2; // URI for SSH connections
+}
