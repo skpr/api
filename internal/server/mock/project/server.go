@@ -3,6 +3,7 @@ package project
 import (
 	"context"
 	"fmt"
+	"sort"
 
 	"google.golang.org/grpc/metadata"
 
@@ -19,7 +20,12 @@ type Server struct {
 func (s *Server) List(ctx context.Context, req *pb.ProjectListRequest) (*pb.ProjectListResponse, error) {
 	resp := &pb.ProjectListResponse{}
 
-	for _, project := range s.Model.GetProjects() {
+	projects := s.Model.GetProjects()
+	sort.Slice(projects, func(i, j int) bool {
+		return projects[i].Id < projects[j].Id
+	})
+
+	for _, project := range projects {
 		respProject, _ := buildProject(s.Model, project.Id)
 		resp.Projects = append(resp.Projects, respProject)
 	}
@@ -114,9 +120,9 @@ func buildProject(model *model.Model, id string) (*pb.Project, error) {
 
 	environments := model.GetEnvironments()
 	for _, env := range environments {
-		respProject.ResourceTotals.CPU = respProject.ResourceTotals.CPU + env.Environment.Resources.CPU.Limit
-		respProject.ResourceTotals.Memory = respProject.ResourceTotals.Memory + env.Environment.Resources.Memory.Limit
-		respProject.ResourceTotals.Replicas = respProject.ResourceTotals.Replicas + env.Environment.Resources.Replicas.Max
+		respProject.ResourceTotals.CPU = respProject.ResourceTotals.CPU + env.Environment.Resources.CPU.Current
+		respProject.ResourceTotals.Memory = respProject.ResourceTotals.Memory + env.Environment.Resources.Memory.Current
+		respProject.ResourceTotals.Replicas = respProject.ResourceTotals.Replicas + env.Environment.Resources.Replicas.Current
 
 		if env.Environment.Production {
 			respProject.Environments.Prod = env.Environment.Name
