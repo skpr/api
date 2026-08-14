@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/skpr/api/pb"
@@ -99,7 +100,7 @@ func (s *Model) CreateEnvironment(name string, size int, metrics bool) {
 		environment.Tier = pb.Environment_TierProduction
 		environment.Version = "v1.0.0"
 	}
-	if name[:3] == "pr-" {
+	if strings.HasPrefix(name, "pr-") {
 		environment.Tier = pb.Environment_TierScratch
 		environment.Version = "v1.0.1-a3ef9c"
 	}
