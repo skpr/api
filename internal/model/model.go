@@ -43,11 +43,10 @@ func (s *Model) GetEnvironments() []*Environment {
 
 func (s *Model) CreateEnvironment(name string, size int, metrics bool) {
 	environment := &pb.Environment{
-		Name:       name,
-		Version:    "v1.0.1",
-		Phase:      "Deployed",
-		Production: name == "prod",
-		Tier:       pb.Environment_TierNonProduction,
+		Name:    name,
+		Version: "v1.0.1",
+		Phase:   "Deployed",
+		Tier:    pb.Environment_TierNonProduction,
 		Ingress: &pb.Ingress{
 			Routes: []string{
 				fmt.Sprintf("%s.mock.local.skpr.dev", name),

@@ -1,14 +1,15 @@
 [tools]
 go = "1.26"
 "go:github.com/daixiang0/gci" = "latest"
-"ubi:golangci/golangci-lint" = "2.10"
-"ubi:goreleaser/goreleaser" = "2.14"
+"github:golangci/golangci-lint" = "latest"
+"github:goreleaser/goreleaser" = "2.14"
 
 [env]
 CGO_ENABLED=0
 LGFLAGS="-extldflags '-static'"
 IMAGE="skpr/grpc-go:latest"
 PB_DIR="./pb"
+APISERVER_MOCK_PORT=50051
 
 [tasks.vendor]
 description = "Vendor resets the main module's vendor directory to include all packages needed to build the application"

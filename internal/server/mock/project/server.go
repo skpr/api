@@ -124,7 +124,7 @@ func buildProject(model *model.Model, id string) (*pb.Project, error) {
 		respProject.ResourceTotals.Memory = respProject.ResourceTotals.Memory + env.Environment.Resources.Memory.Current
 		respProject.ResourceTotals.Replicas = respProject.ResourceTotals.Replicas + env.Environment.Resources.Replicas.Current
 
-		if env.Environment.Production {
+		if env.Environment.Tier == pb.Environment_TierProduction {
 			respProject.Environments.Prod = env.Environment.Name
 			respProject.Version = env.Environment.Version
 		} else {

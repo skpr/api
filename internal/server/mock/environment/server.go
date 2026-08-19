@@ -19,6 +19,11 @@ func (c *Server) Get(ctx context.Context, req *pb.EnvironmentGetRequest) (*pb.En
 		return nil, err
 	}
 
+	// Implement deprecated production based on tier.
+	if environment.Environment.Tier == pb.Environment_TierProduction {
+		environment.Environment.Production = true //nolint:staticcheck
+	}
+
 	resp := &pb.EnvironmentGetResponse{
 		Environment: environment.Environment,
 	}

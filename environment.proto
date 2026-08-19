@@ -48,8 +48,8 @@ message Environment {
     Drupal = 1; // Environment is Drupal
   }
   Type type = 2; // Type of environment
-  bool Production = 3; // If this is a production environment
-  bool Insecure = 4; // DEPRECATED: If the environment is insecure (no read only filesystem)
+  bool Production = 3 [deprecated = true]; // If this is a production environment
+  bool Insecure = 4 [deprecated = true]; // If the environment is insecure (no read only filesystem)
   string Version = 5; // Version associated with an environment
   string Size = 6; // Size of the environment
   Ingress Ingress = 7; // Ingress configuration for routing
