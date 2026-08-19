@@ -3,7 +3,6 @@ package project
 import (
 	"context"
 	"fmt"
-	"sort"
 
 	"google.golang.org/grpc/metadata"
 
@@ -20,12 +19,7 @@ type Server struct {
 func (s *Server) List(ctx context.Context, req *pb.ProjectListRequest) (*pb.ProjectListResponse, error) {
 	resp := &pb.ProjectListResponse{}
 
-	projects := s.Model.GetProjects()
-	sort.Slice(projects, func(i, j int) bool {
-		return projects[i].Id < projects[j].Id
-	})
-
-	for _, project := range projects {
+	for _, project := range s.Model.GetProjects() {
 		respProject, _ := buildProject(s.Model, project.Id)
 		resp.Projects = append(resp.Projects, respProject)
 	}
