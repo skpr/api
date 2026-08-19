@@ -54,8 +54,8 @@ message ProjectGetRequest {}
  * Returns project information
  */
 message ProjectGetResponse {
-  string Namespace = 1 [deprecated = true]; // Will be deprecated in a future release.
-  ProjectRegistry Registry = 2 [deprecated = true]; // Will be deprecated in a future release.
+  string Namespace = 1; // Will be deprecated in a future release.
+  ProjectRegistry Registry = 2; // Will be deprecated in a future release.
   Project Project = 3; // Project status information.
 }
 
