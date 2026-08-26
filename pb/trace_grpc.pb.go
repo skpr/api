@@ -22,7 +22,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TraceClient interface {
-	// Stream Compass traces from a specific environment.
+	Suspend(ctx context.Context, in *TraceSuspendRequest, opts ...grpc.CallOption) (*TraceSuspendResponse, error)
+	Resume(ctx context.Context, in *TraceResumeRequest, opts ...grpc.CallOption) (*TraceResumeResponse, error)
 	StreamTraces(ctx context.Context, in *StreamTracesRequest, opts ...grpc.CallOption) (Trace_StreamTracesClient, error)
 }
 
@@ -32,6 +33,24 @@ type traceClient struct {
 
 func NewTraceClient(cc grpc.ClientConnInterface) TraceClient {
 	return &traceClient{cc}
+}
+
+func (c *traceClient) Suspend(ctx context.Context, in *TraceSuspendRequest, opts ...grpc.CallOption) (*TraceSuspendResponse, error) {
+	out := new(TraceSuspendResponse)
+	err := c.cc.Invoke(ctx, "/workflow.trace/Suspend", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *traceClient) Resume(ctx context.Context, in *TraceResumeRequest, opts ...grpc.CallOption) (*TraceResumeResponse, error) {
+	out := new(TraceResumeResponse)
+	err := c.cc.Invoke(ctx, "/workflow.trace/Resume", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *traceClient) StreamTraces(ctx context.Context, in *StreamTracesRequest, opts ...grpc.CallOption) (Trace_StreamTracesClient, error) {
@@ -70,7 +89,8 @@ func (x *traceStreamTracesClient) Recv() (*StreamTracesResponse, error) {
 // All implementations must embed UnimplementedTraceServer
 // for forward compatibility
 type TraceServer interface {
-	// Stream Compass traces from a specific environment.
+	Suspend(context.Context, *TraceSuspendRequest) (*TraceSuspendResponse, error)
+	Resume(context.Context, *TraceResumeRequest) (*TraceResumeResponse, error)
 	StreamTraces(*StreamTracesRequest, Trace_StreamTracesServer) error
 	mustEmbedUnimplementedTraceServer()
 }
@@ -79,6 +99,12 @@ type TraceServer interface {
 type UnimplementedTraceServer struct {
 }
 
+func (UnimplementedTraceServer) Suspend(context.Context, *TraceSuspendRequest) (*TraceSuspendResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Suspend not implemented")
+}
+func (UnimplementedTraceServer) Resume(context.Context, *TraceResumeRequest) (*TraceResumeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Resume not implemented")
+}
 func (UnimplementedTraceServer) StreamTraces(*StreamTracesRequest, Trace_StreamTracesServer) error {
 	return status.Errorf(codes.Unimplemented, "method StreamTraces not implemented")
 }
@@ -93,6 +119,42 @@ type UnsafeTraceServer interface {
 
 func RegisterTraceServer(s grpc.ServiceRegistrar, srv TraceServer) {
 	s.RegisterService(&Trace_ServiceDesc, srv)
+}
+
+func _Trace_Suspend_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TraceSuspendRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TraceServer).Suspend(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/workflow.trace/Suspend",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TraceServer).Suspend(ctx, req.(*TraceSuspendRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Trace_Resume_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TraceResumeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TraceServer).Resume(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/workflow.trace/Resume",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TraceServer).Resume(ctx, req.(*TraceResumeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Trace_StreamTraces_Handler(srv interface{}, stream grpc.ServerStream) error {
@@ -122,7 +184,16 @@ func (x *traceStreamTracesServer) Send(m *StreamTracesResponse) error {
 var Trace_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "workflow.trace",
 	HandlerType: (*TraceServer)(nil),
-	Methods:     []grpc.MethodDesc{},
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Suspend",
+			Handler:    _Trace_Suspend_Handler,
+		},
+		{
+			MethodName: "Resume",
+			Handler:    _Trace_Resume_Handler,
+		},
+	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "StreamTraces",

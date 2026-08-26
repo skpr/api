@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/brianvoe/gofakeit/v7"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
@@ -13,8 +15,15 @@ import (
 )
 
 // StreamTraces streams traces from a specific environment.
-func (s *Server) StreamTraces(_ *pb.StreamTracesRequest, server pb.Trace_StreamTracesServer) error {
+func (s *Server) StreamTraces(req *pb.StreamTracesRequest, server pb.Trace_StreamTracesServer) error {
 	for {
+		// Tracing has been suspended for this environment, so there is nothing to
+		// send. Fail fast instead of holding open a stream which sends nothing,
+		// which the client cannot tell apart from an environment with no traffic.
+		if s.IsSuspended(req.Environment) {
+			return status.Errorf(codes.FailedPrecondition, "tracing is suspended for environment: %s", req.Environment)
+		}
+
 		now := time.Now()
 
 		// ~6ms realistic function execution time
