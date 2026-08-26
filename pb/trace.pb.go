@@ -175,6 +175,184 @@ func (TraceDrupalCacheOrigin) EnumDescriptor() ([]byte, []int) {
 }
 
 // *
+// Request that tracing is suspended for an environment
+type TraceSuspendRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Environment string `protobuf:"bytes,1,opt,name=Environment,proto3" json:"Environment,omitempty"` // Name of the environment
+}
+
+func (x *TraceSuspendRequest) Reset() {
+	*x = TraceSuspendRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_trace_proto_msgTypes[0]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *TraceSuspendRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TraceSuspendRequest) ProtoMessage() {}
+
+func (x *TraceSuspendRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_trace_proto_msgTypes[0]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TraceSuspendRequest.ProtoReflect.Descriptor instead.
+func (*TraceSuspendRequest) Descriptor() ([]byte, []int) {
+	return file_trace_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *TraceSuspendRequest) GetEnvironment() string {
+	if x != nil {
+		return x.Environment
+	}
+	return ""
+}
+
+// *
+// Response if the tracing suspend was successful
+type TraceSuspendResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *TraceSuspendResponse) Reset() {
+	*x = TraceSuspendResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_trace_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *TraceSuspendResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TraceSuspendResponse) ProtoMessage() {}
+
+func (x *TraceSuspendResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_trace_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TraceSuspendResponse.ProtoReflect.Descriptor instead.
+func (*TraceSuspendResponse) Descriptor() ([]byte, []int) {
+	return file_trace_proto_rawDescGZIP(), []int{1}
+}
+
+// *
+// Request that tracing be resumed
+type TraceResumeRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Environment string `protobuf:"bytes,1,opt,name=Environment,proto3" json:"Environment,omitempty"` // Name of the environment
+}
+
+func (x *TraceResumeRequest) Reset() {
+	*x = TraceResumeRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_trace_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *TraceResumeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TraceResumeRequest) ProtoMessage() {}
+
+func (x *TraceResumeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_trace_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TraceResumeRequest.ProtoReflect.Descriptor instead.
+func (*TraceResumeRequest) Descriptor() ([]byte, []int) {
+	return file_trace_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *TraceResumeRequest) GetEnvironment() string {
+	if x != nil {
+		return x.Environment
+	}
+	return ""
+}
+
+// *
+// Response if the tracing resume was successful
+type TraceResumeResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *TraceResumeResponse) Reset() {
+	*x = TraceResumeResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_trace_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *TraceResumeResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TraceResumeResponse) ProtoMessage() {}
+
+func (x *TraceResumeResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_trace_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TraceResumeResponse.ProtoReflect.Descriptor instead.
+func (*TraceResumeResponse) Descriptor() ([]byte, []int) {
+	return file_trace_proto_rawDescGZIP(), []int{3}
+}
+
+// *
 // Input for StreamTraces.
 type StreamTracesRequest struct {
 	state         protoimpl.MessageState
@@ -187,7 +365,7 @@ type StreamTracesRequest struct {
 func (x *StreamTracesRequest) Reset() {
 	*x = StreamTracesRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_trace_proto_msgTypes[0]
+		mi := &file_trace_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -200,7 +378,7 @@ func (x *StreamTracesRequest) String() string {
 func (*StreamTracesRequest) ProtoMessage() {}
 
 func (x *StreamTracesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_trace_proto_msgTypes[0]
+	mi := &file_trace_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -213,7 +391,7 @@ func (x *StreamTracesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StreamTracesRequest.ProtoReflect.Descriptor instead.
 func (*StreamTracesRequest) Descriptor() ([]byte, []int) {
-	return file_trace_proto_rawDescGZIP(), []int{0}
+	return file_trace_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *StreamTracesRequest) GetEnvironment() string {
@@ -236,7 +414,7 @@ type StreamTracesResponse struct {
 func (x *StreamTracesResponse) Reset() {
 	*x = StreamTracesResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_trace_proto_msgTypes[1]
+		mi := &file_trace_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -249,7 +427,7 @@ func (x *StreamTracesResponse) String() string {
 func (*StreamTracesResponse) ProtoMessage() {}
 
 func (x *StreamTracesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_trace_proto_msgTypes[1]
+	mi := &file_trace_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -262,7 +440,7 @@ func (x *StreamTracesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StreamTracesResponse.ProtoReflect.Descriptor instead.
 func (*StreamTracesResponse) Descriptor() ([]byte, []int) {
-	return file_trace_proto_rawDescGZIP(), []int{1}
+	return file_trace_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *StreamTracesResponse) GetTraces() []*Trace {
@@ -288,7 +466,7 @@ type Trace struct {
 func (x *Trace) Reset() {
 	*x = Trace{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_trace_proto_msgTypes[2]
+		mi := &file_trace_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -301,7 +479,7 @@ func (x *Trace) String() string {
 func (*Trace) ProtoMessage() {}
 
 func (x *Trace) ProtoReflect() protoreflect.Message {
-	mi := &file_trace_proto_msgTypes[2]
+	mi := &file_trace_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -314,7 +492,7 @@ func (x *Trace) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Trace.ProtoReflect.Descriptor instead.
 func (*Trace) Descriptor() ([]byte, []int) {
-	return file_trace_proto_rawDescGZIP(), []int{2}
+	return file_trace_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *Trace) GetMetadata() *TraceMetadata {
@@ -370,7 +548,7 @@ type TraceMetadata struct {
 func (x *TraceMetadata) Reset() {
 	*x = TraceMetadata{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_trace_proto_msgTypes[3]
+		mi := &file_trace_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -383,7 +561,7 @@ func (x *TraceMetadata) String() string {
 func (*TraceMetadata) ProtoMessage() {}
 
 func (x *TraceMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_trace_proto_msgTypes[3]
+	mi := &file_trace_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -396,7 +574,7 @@ func (x *TraceMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TraceMetadata.ProtoReflect.Descriptor instead.
 func (*TraceMetadata) Descriptor() ([]byte, []int) {
-	return file_trace_proto_rawDescGZIP(), []int{3}
+	return file_trace_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *TraceMetadata) GetRequestId() string {
@@ -462,7 +640,7 @@ type TraceMetadataHTTP struct {
 func (x *TraceMetadataHTTP) Reset() {
 	*x = TraceMetadataHTTP{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_trace_proto_msgTypes[4]
+		mi := &file_trace_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -475,7 +653,7 @@ func (x *TraceMetadataHTTP) String() string {
 func (*TraceMetadataHTTP) ProtoMessage() {}
 
 func (x *TraceMetadataHTTP) ProtoReflect() protoreflect.Message {
-	mi := &file_trace_proto_msgTypes[4]
+	mi := &file_trace_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -488,7 +666,7 @@ func (x *TraceMetadataHTTP) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TraceMetadataHTTP.ProtoReflect.Descriptor instead.
 func (*TraceMetadataHTTP) Descriptor() ([]byte, []int) {
-	return file_trace_proto_rawDescGZIP(), []int{4}
+	return file_trace_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *TraceMetadataHTTP) GetMethod() string {
@@ -518,7 +696,7 @@ type TraceMetadataCLI struct {
 func (x *TraceMetadataCLI) Reset() {
 	*x = TraceMetadataCLI{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_trace_proto_msgTypes[5]
+		mi := &file_trace_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -531,7 +709,7 @@ func (x *TraceMetadataCLI) String() string {
 func (*TraceMetadataCLI) ProtoMessage() {}
 
 func (x *TraceMetadataCLI) ProtoReflect() protoreflect.Message {
-	mi := &file_trace_proto_msgTypes[5]
+	mi := &file_trace_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -544,7 +722,7 @@ func (x *TraceMetadataCLI) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TraceMetadataCLI.ProtoReflect.Descriptor instead.
 func (*TraceMetadataCLI) Descriptor() ([]byte, []int) {
-	return file_trace_proto_rawDescGZIP(), []int{5}
+	return file_trace_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *TraceMetadataCLI) GetCommand() string {
@@ -567,7 +745,7 @@ type TraceResourceUtilisation struct {
 func (x *TraceResourceUtilisation) Reset() {
 	*x = TraceResourceUtilisation{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_trace_proto_msgTypes[6]
+		mi := &file_trace_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -580,7 +758,7 @@ func (x *TraceResourceUtilisation) String() string {
 func (*TraceResourceUtilisation) ProtoMessage() {}
 
 func (x *TraceResourceUtilisation) ProtoReflect() protoreflect.Message {
-	mi := &file_trace_proto_msgTypes[6]
+	mi := &file_trace_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -593,7 +771,7 @@ func (x *TraceResourceUtilisation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TraceResourceUtilisation.ProtoReflect.Descriptor instead.
 func (*TraceResourceUtilisation) Descriptor() ([]byte, []int) {
-	return file_trace_proto_rawDescGZIP(), []int{6}
+	return file_trace_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *TraceResourceUtilisation) GetMaxMemory() int64 {
@@ -619,7 +797,7 @@ type TraceFunctionCall struct {
 func (x *TraceFunctionCall) Reset() {
 	*x = TraceFunctionCall{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_trace_proto_msgTypes[7]
+		mi := &file_trace_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -632,7 +810,7 @@ func (x *TraceFunctionCall) String() string {
 func (*TraceFunctionCall) ProtoMessage() {}
 
 func (x *TraceFunctionCall) ProtoReflect() protoreflect.Message {
-	mi := &file_trace_proto_msgTypes[7]
+	mi := &file_trace_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -645,7 +823,7 @@ func (x *TraceFunctionCall) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TraceFunctionCall.ProtoReflect.Descriptor instead.
 func (*TraceFunctionCall) Descriptor() ([]byte, []int) {
-	return file_trace_proto_rawDescGZIP(), []int{7}
+	return file_trace_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *TraceFunctionCall) GetName() string {
@@ -694,7 +872,7 @@ type TraceDrupal struct {
 func (x *TraceDrupal) Reset() {
 	*x = TraceDrupal{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_trace_proto_msgTypes[8]
+		mi := &file_trace_proto_msgTypes[12]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -707,7 +885,7 @@ func (x *TraceDrupal) String() string {
 func (*TraceDrupal) ProtoMessage() {}
 
 func (x *TraceDrupal) ProtoReflect() protoreflect.Message {
-	mi := &file_trace_proto_msgTypes[8]
+	mi := &file_trace_proto_msgTypes[12]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -720,7 +898,7 @@ func (x *TraceDrupal) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TraceDrupal.ProtoReflect.Descriptor instead.
 func (*TraceDrupal) Descriptor() ([]byte, []int) {
-	return file_trace_proto_rawDescGZIP(), []int{8}
+	return file_trace_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *TraceDrupal) GetCacheEvents() []*TraceDrupalCacheEvent {
@@ -761,7 +939,7 @@ type TraceDrupalCacheEvent struct {
 func (x *TraceDrupalCacheEvent) Reset() {
 	*x = TraceDrupalCacheEvent{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_trace_proto_msgTypes[9]
+		mi := &file_trace_proto_msgTypes[13]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -774,7 +952,7 @@ func (x *TraceDrupalCacheEvent) String() string {
 func (*TraceDrupalCacheEvent) ProtoMessage() {}
 
 func (x *TraceDrupalCacheEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_trace_proto_msgTypes[9]
+	mi := &file_trace_proto_msgTypes[13]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -787,7 +965,7 @@ func (x *TraceDrupalCacheEvent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TraceDrupalCacheEvent.ProtoReflect.Descriptor instead.
 func (*TraceDrupalCacheEvent) Descriptor() ([]byte, []int) {
-	return file_trace_proto_rawDescGZIP(), []int{9}
+	return file_trace_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *TraceDrupalCacheEvent) GetOrigin() TraceDrupalCacheOrigin {
@@ -854,7 +1032,17 @@ var file_trace_proto_rawDesc = []byte{
 	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61,
 	0x6d, 0x70, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x1e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65,
 	0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x64, 0x75, 0x72, 0x61, 0x74, 0x69,
-	0x6f, 0x6e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x37, 0x0a, 0x13, 0x53, 0x74, 0x72, 0x65,
+	0x6f, 0x6e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x37, 0x0a, 0x13, 0x54, 0x72, 0x61, 0x63,
+	0x65, 0x53, 0x75, 0x73, 0x70, 0x65, 0x6e, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12,
+	0x20, 0x0a, 0x0b, 0x45, 0x6e, 0x76, 0x69, 0x72, 0x6f, 0x6e, 0x6d, 0x65, 0x6e, 0x74, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x45, 0x6e, 0x76, 0x69, 0x72, 0x6f, 0x6e, 0x6d, 0x65, 0x6e,
+	0x74, 0x22, 0x16, 0x0a, 0x14, 0x54, 0x72, 0x61, 0x63, 0x65, 0x53, 0x75, 0x73, 0x70, 0x65, 0x6e,
+	0x64, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x36, 0x0a, 0x12, 0x54, 0x72, 0x61,
+	0x63, 0x65, 0x52, 0x65, 0x73, 0x75, 0x6d, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12,
+	0x20, 0x0a, 0x0b, 0x45, 0x6e, 0x76, 0x69, 0x72, 0x6f, 0x6e, 0x6d, 0x65, 0x6e, 0x74, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x45, 0x6e, 0x76, 0x69, 0x72, 0x6f, 0x6e, 0x6d, 0x65, 0x6e,
+	0x74, 0x22, 0x15, 0x0a, 0x13, 0x54, 0x72, 0x61, 0x63, 0x65, 0x52, 0x65, 0x73, 0x75, 0x6d, 0x65,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x37, 0x0a, 0x13, 0x53, 0x74, 0x72, 0x65,
 	0x61, 0x6d, 0x54, 0x72, 0x61, 0x63, 0x65, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12,
 	0x20, 0x0a, 0x0b, 0x65, 0x6e, 0x76, 0x69, 0x72, 0x6f, 0x6e, 0x6d, 0x65, 0x6e, 0x74, 0x18, 0x01,
 	0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x65, 0x6e, 0x76, 0x69, 0x72, 0x6f, 0x6e, 0x6d, 0x65, 0x6e,
@@ -972,13 +1160,23 @@ var file_trace_proto_rawDesc = []byte{
 	0x45, 0x52, 0x5f, 0x41, 0x52, 0x52, 0x41, 0x59, 0x10, 0x01, 0x12, 0x24, 0x0a, 0x20, 0x54, 0x52,
 	0x41, 0x43, 0x45, 0x5f, 0x44, 0x52, 0x55, 0x50, 0x41, 0x4c, 0x5f, 0x43, 0x41, 0x43, 0x48, 0x45,
 	0x5f, 0x4f, 0x52, 0x49, 0x47, 0x49, 0x4e, 0x5f, 0x4f, 0x42, 0x4a, 0x45, 0x43, 0x54, 0x10, 0x02,
-	0x32, 0x5a, 0x0a, 0x05, 0x74, 0x72, 0x61, 0x63, 0x65, 0x12, 0x51, 0x0a, 0x0c, 0x53, 0x74, 0x72,
-	0x65, 0x61, 0x6d, 0x54, 0x72, 0x61, 0x63, 0x65, 0x73, 0x12, 0x1d, 0x2e, 0x77, 0x6f, 0x72, 0x6b,
-	0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x54, 0x72, 0x61, 0x63, 0x65,
-	0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1e, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66,
-	0x6c, 0x6f, 0x77, 0x2e, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x54, 0x72, 0x61, 0x63, 0x65, 0x73,
-	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x30, 0x01, 0x42, 0x06, 0x5a, 0x04,
-	0x2e, 0x2f, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x32, 0xef, 0x01, 0x0a, 0x05, 0x74, 0x72, 0x61, 0x63, 0x65, 0x12, 0x4a, 0x0a, 0x07, 0x53, 0x75,
+	0x73, 0x70, 0x65, 0x6e, 0x64, 0x12, 0x1d, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77,
+	0x2e, 0x54, 0x72, 0x61, 0x63, 0x65, 0x53, 0x75, 0x73, 0x70, 0x65, 0x6e, 0x64, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x1a, 0x1e, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e,
+	0x54, 0x72, 0x61, 0x63, 0x65, 0x53, 0x75, 0x73, 0x70, 0x65, 0x6e, 0x64, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x47, 0x0a, 0x06, 0x52, 0x65, 0x73, 0x75, 0x6d, 0x65,
+	0x12, 0x1c, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x54, 0x72, 0x61, 0x63,
+	0x65, 0x52, 0x65, 0x73, 0x75, 0x6d, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1d,
+	0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x54, 0x72, 0x61, 0x63, 0x65, 0x52,
+	0x65, 0x73, 0x75, 0x6d, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12,
+	0x51, 0x0a, 0x0c, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x54, 0x72, 0x61, 0x63, 0x65, 0x73, 0x12,
+	0x1d, 0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x53, 0x74, 0x72, 0x65, 0x61,
+	0x6d, 0x54, 0x72, 0x61, 0x63, 0x65, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1e,
+	0x2e, 0x77, 0x6f, 0x72, 0x6b, 0x66, 0x6c, 0x6f, 0x77, 0x2e, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d,
+	0x54, 0x72, 0x61, 0x63, 0x65, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00,
+	0x30, 0x01, 0x42, 0x06, 0x5a, 0x04, 0x2e, 0x2f, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x33,
 }
 
 var (
@@ -994,45 +1192,53 @@ func file_trace_proto_rawDescGZIP() []byte {
 }
 
 var file_trace_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_trace_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_trace_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_trace_proto_goTypes = []interface{}{
 	(TraceSource)(0),                 // 0: workflow.TraceSource
 	(TraceRuntime)(0),                // 1: workflow.TraceRuntime
 	(TraceDrupalCacheOrigin)(0),      // 2: workflow.TraceDrupalCacheOrigin
-	(*StreamTracesRequest)(nil),      // 3: workflow.StreamTracesRequest
-	(*StreamTracesResponse)(nil),     // 4: workflow.StreamTracesResponse
-	(*Trace)(nil),                    // 5: workflow.Trace
-	(*TraceMetadata)(nil),            // 6: workflow.TraceMetadata
-	(*TraceMetadataHTTP)(nil),        // 7: workflow.TraceMetadataHTTP
-	(*TraceMetadataCLI)(nil),         // 8: workflow.TraceMetadataCLI
-	(*TraceResourceUtilisation)(nil), // 9: workflow.TraceResourceUtilisation
-	(*TraceFunctionCall)(nil),        // 10: workflow.TraceFunctionCall
-	(*TraceDrupal)(nil),              // 11: workflow.TraceDrupal
-	(*TraceDrupalCacheEvent)(nil),    // 12: workflow.TraceDrupalCacheEvent
-	(*timestamppb.Timestamp)(nil),    // 13: google.protobuf.Timestamp
-	(*durationpb.Duration)(nil),      // 14: google.protobuf.Duration
+	(*TraceSuspendRequest)(nil),      // 3: workflow.TraceSuspendRequest
+	(*TraceSuspendResponse)(nil),     // 4: workflow.TraceSuspendResponse
+	(*TraceResumeRequest)(nil),       // 5: workflow.TraceResumeRequest
+	(*TraceResumeResponse)(nil),      // 6: workflow.TraceResumeResponse
+	(*StreamTracesRequest)(nil),      // 7: workflow.StreamTracesRequest
+	(*StreamTracesResponse)(nil),     // 8: workflow.StreamTracesResponse
+	(*Trace)(nil),                    // 9: workflow.Trace
+	(*TraceMetadata)(nil),            // 10: workflow.TraceMetadata
+	(*TraceMetadataHTTP)(nil),        // 11: workflow.TraceMetadataHTTP
+	(*TraceMetadataCLI)(nil),         // 12: workflow.TraceMetadataCLI
+	(*TraceResourceUtilisation)(nil), // 13: workflow.TraceResourceUtilisation
+	(*TraceFunctionCall)(nil),        // 14: workflow.TraceFunctionCall
+	(*TraceDrupal)(nil),              // 15: workflow.TraceDrupal
+	(*TraceDrupalCacheEvent)(nil),    // 16: workflow.TraceDrupalCacheEvent
+	(*timestamppb.Timestamp)(nil),    // 17: google.protobuf.Timestamp
+	(*durationpb.Duration)(nil),      // 18: google.protobuf.Duration
 }
 var file_trace_proto_depIdxs = []int32{
-	5,  // 0: workflow.StreamTracesResponse.Traces:type_name -> workflow.Trace
-	6,  // 1: workflow.Trace.metadata:type_name -> workflow.TraceMetadata
-	10, // 2: workflow.Trace.function_calls:type_name -> workflow.TraceFunctionCall
-	9,  // 3: workflow.Trace.resource_utilisation:type_name -> workflow.TraceResourceUtilisation
-	11, // 4: workflow.Trace.drupal:type_name -> workflow.TraceDrupal
-	13, // 5: workflow.TraceMetadata.start_time:type_name -> google.protobuf.Timestamp
-	13, // 6: workflow.TraceMetadata.end_time:type_name -> google.protobuf.Timestamp
+	9,  // 0: workflow.StreamTracesResponse.Traces:type_name -> workflow.Trace
+	10, // 1: workflow.Trace.metadata:type_name -> workflow.TraceMetadata
+	14, // 2: workflow.Trace.function_calls:type_name -> workflow.TraceFunctionCall
+	13, // 3: workflow.Trace.resource_utilisation:type_name -> workflow.TraceResourceUtilisation
+	15, // 4: workflow.Trace.drupal:type_name -> workflow.TraceDrupal
+	17, // 5: workflow.TraceMetadata.start_time:type_name -> google.protobuf.Timestamp
+	17, // 6: workflow.TraceMetadata.end_time:type_name -> google.protobuf.Timestamp
 	0,  // 7: workflow.TraceMetadata.source:type_name -> workflow.TraceSource
 	1,  // 8: workflow.TraceMetadata.runtime:type_name -> workflow.TraceRuntime
-	7,  // 9: workflow.TraceMetadata.http:type_name -> workflow.TraceMetadataHTTP
-	8,  // 10: workflow.TraceMetadata.cli:type_name -> workflow.TraceMetadataCLI
-	14, // 11: workflow.TraceFunctionCall.offset:type_name -> google.protobuf.Duration
-	14, // 12: workflow.TraceFunctionCall.elapsed:type_name -> google.protobuf.Duration
-	12, // 13: workflow.TraceDrupal.cache_events:type_name -> workflow.TraceDrupalCacheEvent
+	11, // 9: workflow.TraceMetadata.http:type_name -> workflow.TraceMetadataHTTP
+	12, // 10: workflow.TraceMetadata.cli:type_name -> workflow.TraceMetadataCLI
+	18, // 11: workflow.TraceFunctionCall.offset:type_name -> google.protobuf.Duration
+	18, // 12: workflow.TraceFunctionCall.elapsed:type_name -> google.protobuf.Duration
+	16, // 13: workflow.TraceDrupal.cache_events:type_name -> workflow.TraceDrupalCacheEvent
 	2,  // 14: workflow.TraceDrupalCacheEvent.origin:type_name -> workflow.TraceDrupalCacheOrigin
-	14, // 15: workflow.TraceDrupalCacheEvent.offset:type_name -> google.protobuf.Duration
-	3,  // 16: workflow.trace.StreamTraces:input_type -> workflow.StreamTracesRequest
-	4,  // 17: workflow.trace.StreamTraces:output_type -> workflow.StreamTracesResponse
-	17, // [17:18] is the sub-list for method output_type
-	16, // [16:17] is the sub-list for method input_type
+	18, // 15: workflow.TraceDrupalCacheEvent.offset:type_name -> google.protobuf.Duration
+	3,  // 16: workflow.trace.Suspend:input_type -> workflow.TraceSuspendRequest
+	5,  // 17: workflow.trace.Resume:input_type -> workflow.TraceResumeRequest
+	7,  // 18: workflow.trace.StreamTraces:input_type -> workflow.StreamTracesRequest
+	4,  // 19: workflow.trace.Suspend:output_type -> workflow.TraceSuspendResponse
+	6,  // 20: workflow.trace.Resume:output_type -> workflow.TraceResumeResponse
+	8,  // 21: workflow.trace.StreamTraces:output_type -> workflow.StreamTracesResponse
+	19, // [19:22] is the sub-list for method output_type
+	16, // [16:19] is the sub-list for method input_type
 	16, // [16:16] is the sub-list for extension type_name
 	16, // [16:16] is the sub-list for extension extendee
 	0,  // [0:16] is the sub-list for field type_name
@@ -1045,7 +1251,7 @@ func file_trace_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_trace_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*StreamTracesRequest); i {
+			switch v := v.(*TraceSuspendRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1057,7 +1263,7 @@ func file_trace_proto_init() {
 			}
 		}
 		file_trace_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*StreamTracesResponse); i {
+			switch v := v.(*TraceSuspendResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1069,7 +1275,7 @@ func file_trace_proto_init() {
 			}
 		}
 		file_trace_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Trace); i {
+			switch v := v.(*TraceResumeRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1081,7 +1287,7 @@ func file_trace_proto_init() {
 			}
 		}
 		file_trace_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*TraceMetadata); i {
+			switch v := v.(*TraceResumeResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1093,7 +1299,7 @@ func file_trace_proto_init() {
 			}
 		}
 		file_trace_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*TraceMetadataHTTP); i {
+			switch v := v.(*StreamTracesRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1105,7 +1311,7 @@ func file_trace_proto_init() {
 			}
 		}
 		file_trace_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*TraceMetadataCLI); i {
+			switch v := v.(*StreamTracesResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1117,7 +1323,7 @@ func file_trace_proto_init() {
 			}
 		}
 		file_trace_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*TraceResourceUtilisation); i {
+			switch v := v.(*Trace); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1129,7 +1335,7 @@ func file_trace_proto_init() {
 			}
 		}
 		file_trace_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*TraceFunctionCall); i {
+			switch v := v.(*TraceMetadata); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1141,7 +1347,7 @@ func file_trace_proto_init() {
 			}
 		}
 		file_trace_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*TraceDrupal); i {
+			switch v := v.(*TraceMetadataHTTP); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1153,6 +1359,54 @@ func file_trace_proto_init() {
 			}
 		}
 		file_trace_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*TraceMetadataCLI); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_trace_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*TraceResourceUtilisation); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_trace_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*TraceFunctionCall); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_trace_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*TraceDrupal); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_trace_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*TraceDrupalCacheEvent); i {
 			case 0:
 				return &v.state
@@ -1165,15 +1419,15 @@ func file_trace_proto_init() {
 			}
 		}
 	}
-	file_trace_proto_msgTypes[2].OneofWrappers = []interface{}{}
-	file_trace_proto_msgTypes[3].OneofWrappers = []interface{}{}
+	file_trace_proto_msgTypes[6].OneofWrappers = []interface{}{}
+	file_trace_proto_msgTypes[7].OneofWrappers = []interface{}{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_trace_proto_rawDesc,
 			NumEnums:      3,
-			NumMessages:   10,
+			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -9,9 +9,34 @@ import "google/protobuf/duration.proto";
 option go_package = "./pb";
 
 service trace {
-  // Stream Compass traces from a specific environment.
+  rpc Suspend (TraceSuspendRequest) returns (TraceSuspendResponse) {}
+  rpc Resume (TraceResumeRequest) returns (TraceResumeResponse) {}
   rpc StreamTraces (StreamTracesRequest) returns (stream StreamTracesResponse) {}
 }
+
+/**
+ * Request that tracing is suspended for an environment
+ */
+message TraceSuspendRequest {
+  string Environment = 1; // Name of the environment
+}
+
+/**
+ * Response if the tracing suspend was successful
+ */
+message TraceSuspendResponse {}
+
+/**
+ * Request that tracing be resumed
+ */
+message TraceResumeRequest {
+  string Environment = 1; // Name of the environment
+}
+
+/**
+ * Response if the tracing resume was successful
+ */
+message TraceResumeResponse {}
 
 /**
  * Input for StreamTraces.
