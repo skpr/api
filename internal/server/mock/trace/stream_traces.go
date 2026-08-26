@@ -20,29 +20,60 @@ func (s *Server) StreamTraces(_ *pb.StreamTracesRequest, server pb.Trace_StreamT
 		// ~6ms realistic function execution time
 		latency := 6 * time.Millisecond
 
-		// Function calls generator with Duration + timestamp
-		makeFunctionCalls := func(base time.Time) []*pb.TraceFunctionCall {
+		// Function calls generator, placed relative to the start of the request.
+		makeFunctionCalls := func() []*pb.TraceFunctionCall {
 			return []*pb.TraceFunctionCall{
 				{
-					Name:      "PDOStatement::execute",
-					StartTime: timestamppb.New(base),
-					Elapsed:   durationpb.New(latency),
+					Name:    "PDOStatement::execute",
+					Offset:  durationpb.New(0),
+					Elapsed: durationpb.New(latency),
+					Memory:  1048576,
 				},
 				{
-					Name:      "Drupal\\Core\\Database\\StatementPrefetchIterator::execute",
-					StartTime: timestamppb.New(base.Add(500 * time.Microsecond)),
-					Elapsed:   durationpb.New(latency),
+					Name:    "Drupal\\Core\\Database\\StatementPrefetchIterator::execute",
+					Offset:  durationpb.New(500 * time.Microsecond),
+					Elapsed: durationpb.New(latency),
+					Memory:  2097152,
 				},
 				{
-					Name:      "Drupal\\sqlite\\Driver\\Database\\sqlite\\Statement::execute",
-					StartTime: timestamppb.New(base.Add(1 * time.Millisecond)),
-					Elapsed:   durationpb.New(latency),
+					Name:    "Drupal\\sqlite\\Driver\\Database\\sqlite\\Statement::execute",
+					Offset:  durationpb.New(1 * time.Millisecond),
+					Elapsed: durationpb.New(latency),
+					Memory:  524288,
 				},
 				{
-					Name:      "Drupal\\Core\\Database\\Query\\Upsert::execute",
-					StartTime: timestamppb.New(base.Add(1500 * time.Microsecond)),
-					Elapsed:   durationpb.New(latency),
+					Name:    "Drupal\\Core\\Database\\Query\\Upsert::execute",
+					Offset:  durationpb.New(1500 * time.Microsecond),
+					Elapsed: durationpb.New(latency),
+					Memory:  786432,
 				},
+			}
+		}
+
+		makeDrupal := func() *pb.TraceDrupal {
+			return &pb.TraceDrupal{
+				CacheEvents: []*pb.TraceDrupalCacheEvent{
+					{
+						Origin:   pb.TraceDrupalCacheOrigin_TRACE_DRUPAL_CACHE_ORIGIN_RENDER_ARRAY,
+						Caller:   "Drupal\\Core\\Render\\Renderer::doRender",
+						MaxAge:   -1,
+						Tags:     []string{"node:1", "node_list"},
+						Contexts: []string{"url.path", "user.permissions"},
+						Offset:   durationpb.New(2 * time.Millisecond),
+						Calls:    12,
+					},
+					{
+						Origin:     pb.TraceDrupalCacheOrigin_TRACE_DRUPAL_CACHE_ORIGIN_OBJECT,
+						Caller:     "Drupal\\Core\\Cache\\CacheableMetadata::createFromObject",
+						ObjectType: "Drupal\\node\\Entity\\Node",
+						MaxAge:     3600,
+						Tags:       []string{"node:1"},
+						Contexts:   []string{"user.roles"},
+						Offset:     durationpb.New(4 * time.Millisecond),
+						Calls:      3,
+					},
+				},
+				CacheEventsDropped: 0,
 			}
 		}
 
@@ -56,12 +87,20 @@ func (s *Server) StreamTraces(_ *pb.StreamTracesRequest, server pb.Trace_StreamT
 			traces = append(traces, &pb.Trace{
 				Metadata: &pb.TraceMetadata{
 					RequestId: gofakeit.UUID(),
-					Method:    http.MethodGet,
-					Uri:       "/sites/default/files/styles/scale_crop_7_3_wide/public/veggie-pasta-bake-hero-umami.jpg.webp?itok=CYsHBUlX",
 					StartTime: timestamppb.New(start),
 					EndTime:   timestamppb.New(end),
+					Source:    pb.TraceSource_TRACE_SOURCE_HTTP,
+					Runtime:   pb.TraceRuntime_TRACE_RUNTIME_PHP,
+					Http: &pb.TraceMetadataHTTP{
+						Method: http.MethodGet,
+						Uri:    "/sites/default/files/styles/scale_crop_7_3_wide/public/veggie-pasta-bake-hero-umami.jpg.webp?itok=CYsHBUlX",
+					},
 				},
-				FunctionCalls: makeFunctionCalls(start),
+				FunctionCalls: makeFunctionCalls(),
+				ResourceUtilisation: &pb.TraceResourceUtilisation{
+					MaxMemory: 33554432,
+				},
+				Drupal: makeDrupal(),
 			})
 		}
 

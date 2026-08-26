@@ -27,31 +27,114 @@ message StreamTracesResponse {
   repeated Trace Traces = 1; // List of traces.
 }
 
+// The invocation mechanism which produced the trace.
+enum TraceSource {
+  TRACE_SOURCE_UNSPECIFIED = 0;
+  TRACE_SOURCE_HTTP = 1; // Trace was collected from a HTTP request.
+  TRACE_SOURCE_CLI = 2;  // Trace was collected from the command line interface.
+}
+
+// The language runtime which produced the trace.
+enum TraceRuntime {
+  TRACE_RUNTIME_UNSPECIFIED = 0;
+  TRACE_RUNTIME_PHP = 1;  // Trace was collected from a PHP process.
+  TRACE_RUNTIME_NODE = 2; // Trace was collected from a Node.js process.
+}
+
 /**
  * Trace data provided by Compass.
  */
 message Trace {
-  TraceMetadata metadata = 1;                    // Metadata about the trace.
-  repeated TraceFunctionCall function_calls = 2; // List of function calls in the trace.
+  TraceMetadata metadata = 1;                              // Metadata about the trace.
+  repeated TraceFunctionCall function_calls = 2;           // List of function calls in the trace.
+  TraceResourceUtilisation resource_utilisation = 3;       // Resources consumed by the request.
+  optional TraceDrupal drupal = 4;                         // Drupal specific data. Only populated for PHP traces which called into the Drupal APIs.
 }
 
 /**
  * Metadata which contains information about the trace.
  */
 message TraceMetadata {
-  string request_id = 1;                     // Request identifier for tracking.
-  string uri = 2;                            // URI of the request being traced.
-  string method = 3;                         // HTTP method of the request (e.g., GET, POST).
-  google.protobuf.Timestamp start_time = 4;  // Start time of the trace in unix format.
-  google.protobuf.Timestamp end_time = 5;    // End time of the trace in unix format.
+  // Request identifier for tracking.
+  //
+  // Compass sends "UNKNOWN" when the request carried no HTTP_X_REQUEST_ID
+  // header. That is a sentinel, not an identifier: two traces reading UNKNOWN
+  // are not the same request, so anything correlating on this must treat it as
+  // absent.
+  string request_id = 1;
+  google.protobuf.Timestamp start_time = 2;  // Start time of the trace.
+  google.protobuf.Timestamp end_time = 3;    // End time of the trace.
+  TraceSource source = 4;                    // How the traced request was invoked.
+  TraceRuntime runtime = 5;                  // Language runtime which produced the trace.
+  optional TraceMetadataHTTP http = 6;       // Request details. Only set when source is TRACE_SOURCE_HTTP.
+  optional TraceMetadataCLI cli = 7;         // Command details. Only set when source is TRACE_SOURCE_CLI.
+}
+
+/**
+ * Metadata for a trace which was invoked by a HTTP request.
+ */
+message TraceMetadataHTTP {
+  string method = 1; // HTTP method of the request (e.g., GET, POST).
+  string uri = 2;    // URI of the request being traced.
+}
+
+/**
+ * Metadata for a trace which was invoked from the command line.
+ */
+message TraceMetadataCLI {
+  string command = 1; // Command which was executed.
+}
+
+/**
+ * Resources consumed over the course of the traced request.
+ */
+message TraceResourceUtilisation {
+  int64 max_memory = 1; // Peak memory used by the request, in bytes.
 }
 
 /**
  * Function call data within a trace.
  */
 message TraceFunctionCall {
-  string name = 1;                           // Name of the function being traced.
-  google.protobuf.Timestamp start_time = 2;  // Start time of the function call in unix format.
-  google.protobuf.Duration elapsed = 3;      // Elapsed time for the function call in milliseconds.
+  string name = 1;                        // Name of the function being traced.
+  google.protobuf.Duration offset = 2;    // Offset from the start of the request at which the call began.
+  google.protobuf.Duration elapsed = 3;   // How long the call ran for.
+  int64 memory = 4;                       // Memory used by the call, in bytes.
 }
 
+// Which Drupal API produced a cache event.
+enum TraceDrupalCacheOrigin {
+  TRACE_DRUPAL_CACHE_ORIGIN_UNSPECIFIED = 0;
+  TRACE_DRUPAL_CACHE_ORIGIN_RENDER_ARRAY = 1; // Cacheability was collected from a render array.
+  TRACE_DRUPAL_CACHE_ORIGIN_OBJECT = 2;       // Cacheability was collected from an object.
+}
+
+/**
+ * Drupal specific data collected for a trace.
+ *
+ * Only populated for PHP traces where the application called into the Drupal
+ * APIs which Compass probes, so it is absent for Node traces, PHP CLI traces
+ * and non-Drupal PHP applications.
+ */
+message TraceDrupal {
+  repeated TraceDrupalCacheEvent cache_events = 1; // Cache events which occurred during this trace, aggregated by their contents.
+  int64 cache_events_dropped = 2;                  // How many distinct cache events were discarded because the trace reached its retention limit. Reported so that a truncated trace is not mistaken for a complete one.
+}
+
+/**
+ * Cacheability metadata that Drupal derived at a point in the request.
+ *
+ * Drupal derives cacheability far more often than a request has interesting
+ * function calls, so identical events are aggregated into a single entry with a
+ * call count rather than retained individually.
+ */
+message TraceDrupalCacheEvent {
+  TraceDrupalCacheOrigin origin = 1;   // Origin of the cacheability metadata.
+  string caller = 2;                   // Caller which asked Drupal for the cacheability metadata.
+  string object_type = 3;              // Type the metadata was derived from. Only set for TRACE_DRUPAL_CACHE_ORIGIN_OBJECT.
+  int64 max_age = 4;                   // Max age in seconds, where -1 means cacheable forever.
+  repeated string tags = 5;            // Tags which the cached item is invalidated by.
+  repeated string contexts = 6;        // Contexts which the cached item varies by.
+  google.protobuf.Duration offset = 7; // Offset from the start of the request at which the first of these events occurred.
+  int64 calls = 8;                     // How many identical events were aggregated into this one.
+}
