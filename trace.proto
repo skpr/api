@@ -74,6 +74,7 @@ message Trace {
   repeated TraceFunctionCall function_calls = 2;           // List of function calls in the trace.
   TraceResourceUtilisation resource_utilisation = 3;       // Resources consumed by the request.
   optional TraceDrupal drupal = 4;                         // Drupal specific data. Only populated for PHP traces which called into the Drupal APIs.
+  int64 function_calls_dropped = 5;                        // How many function events were not retained because the trace reached its configured limit. Reported so that a truncated trace is not mistaken for a complete one.
 }
 
 /**

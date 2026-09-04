@@ -105,7 +105,8 @@ func (s *Server) StreamTraces(req *pb.StreamTracesRequest, server pb.Trace_Strea
 						Uri:    "/sites/default/files/styles/scale_crop_7_3_wide/public/veggie-pasta-bake-hero-umami.jpg.webp?itok=CYsHBUlX",
 					},
 				},
-				FunctionCalls: makeFunctionCalls(),
+				FunctionCalls:        makeFunctionCalls(),
+				FunctionCallsDropped: 0,
 				ResourceUtilisation: &pb.TraceResourceUtilisation{
 					MaxMemory: 33554432,
 				},
