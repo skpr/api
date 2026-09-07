@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/skpr/api/pb"
@@ -42,10 +43,10 @@ func (s *Model) GetEnvironments() []*Environment {
 
 func (s *Model) CreateEnvironment(name string, size int, metrics bool) {
 	environment := &pb.Environment{
-		Name:       name,
-		Version:    "v0.0.1",
-		Phase:      "Deployed",
-		Production: name == "prod",
+		Name:    name,
+		Version: "v1.0.1",
+		Phase:   "Deployed",
+		Tier:    pb.Environment_TierNonProduction,
 		Ingress: &pb.Ingress{
 			Routes: []string{
 				fmt.Sprintf("%s.mock.local.skpr.dev", name),
@@ -95,6 +96,12 @@ func (s *Model) CreateEnvironment(name string, size int, metrics bool) {
 	}
 	if name == "prod" {
 		environment.Ingress.Routes = append(environment.Ingress.Routes, "example.com", "www.example.com")
+		environment.Tier = pb.Environment_TierProduction
+		environment.Version = "v1.0.0"
+	}
+	if strings.HasPrefix(name, "pr-") {
+		environment.Tier = pb.Environment_TierScratch
+		environment.Version = "v1.0.1-a3ef9c"
 	}
 
 	cron := make(map[string]*Cron)

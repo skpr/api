@@ -59,12 +59,13 @@ func main() {
 	o := Options{}
 
 	globalModel := model.NewModel()
-	globalModel.AddProject(model.NewProject("project1", "Project One", []string{"group1", "group3"}, "small"))
-	globalModel.AddProject(model.NewProject("project2", "Project Two", []string{}, "medium"))
-	globalModel.AddProject(model.NewProject("project3", "Project Three", []string{"group2", "group3"}, "large"))
+	globalModel.AddProject(model.NewProject("drupal", "Drupal", []string{"group1", "group3"}, "small"))
+	globalModel.AddProject(model.NewProject("php", "Php", []string{}, "medium"))
+	globalModel.AddProject(model.NewProject("basic", "Basic", []string{"group2", "group3"}, "large"))
 	globalModel.CreateEnvironment("dev", 1, true)
 	globalModel.CreateEnvironment("stg", 2, true)
 	globalModel.CreateEnvironment("prod", 4, false)
+	globalModel.CreateEnvironment("pr-123", 1, true)
 
 	cmd := &cobra.Command{
 		Use:     "apiserver-mock",
