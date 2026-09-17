@@ -11,6 +11,7 @@ option go_package = "./pb";
 service trace {
   rpc Suspend (TraceSuspendRequest) returns (TraceSuspendResponse) {}
   rpc Resume (TraceResumeRequest) returns (TraceResumeResponse) {}
+  rpc SetThreshold (TraceSetThresholdRequest) returns (TraceSetThresholdResponse) {}
   rpc StreamTraces (StreamTracesRequest) returns (stream StreamTracesResponse) {}
 }
 
@@ -37,6 +38,25 @@ message TraceResumeRequest {
  * Response if the tracing resume was successful
  */
 message TraceResumeResponse {}
+
+/**
+ * Request that the tracing threshold be set for an environment
+ */
+message TraceSetThresholdRequest {
+  string Environment = 1; // Name of the environment
+
+  // Minimum duration a function call has to run for before it is traced.
+  //
+  // Compass only fires a probe for calls above this, so it is the main control
+  // over how much a traced environment pays for tracing. A threshold of zero
+  // traces every call, which is expensive on a busy environment.
+  google.protobuf.Duration Threshold = 2;
+}
+
+/**
+ * Response if setting the tracing threshold was successful
+ */
+message TraceSetThresholdResponse {}
 
 /**
  * Input for StreamTraces.
@@ -70,11 +90,19 @@ enum TraceRuntime {
  * Trace data provided by Compass.
  */
 message Trace {
-  TraceMetadata metadata = 1;                              // Metadata about the trace.
-  repeated TraceFunctionCall function_calls = 2;           // List of function calls in the trace.
-  TraceResourceUtilisation resource_utilisation = 3;       // Resources consumed by the request.
-  optional TraceDrupal drupal = 4;                         // Drupal specific data. Only populated for PHP traces which called into the Drupal APIs.
-  int64 function_calls_dropped = 5;                        // How many function events were not retained because the trace reached its configured limit. Reported so that a truncated trace is not mistaken for a complete one.
+  TraceMetadata metadata = 1;                        // Metadata about the trace.
+  repeated TraceSpan spans = 2;                      // Function calls made by the request, aggregated into spans.
+  TraceResourceUtilisation resource_utilisation = 3; // Resources consumed by the request.
+  optional TraceDrupal drupal = 4;                   // Drupal specific data. Only populated for PHP traces which called into the Drupal APIs.
+
+  // How many function calls the request made, including any which no span
+  // represents. It is an exact count either way.
+  int64 calls = 5;
+
+  // How many of those calls no span represents, because the trace had already
+  // reached its span limit when they arrived. Reported so that a truncated
+  // trace is not mistaken for a complete one.
+  int64 calls_dropped = 6;
 }
 
 /**
@@ -119,13 +147,25 @@ message TraceResourceUtilisation {
 }
 
 /**
- * Function call data within a trace.
+ * The calls of one function during one slice of a request.
+ *
+ * A request can make more than a million function calls, and no reader looks at
+ * those one at a time: what a reader asks of a trace is where the time went,
+ * which is an aggregate. Compass collects calls into spans as their events
+ * arrive, which is what lets a trace of a million calls stay a few hundred
+ * kilobytes.
+ *
+ * A span is placed by how far into the request it started rather than by the
+ * instant it started at, because an absolute time says nothing on its own -
+ * every consumer immediately subtracts the request start to get back to this.
  */
-message TraceFunctionCall {
-  string name = 1;                        // Name of the function being traced.
-  google.protobuf.Duration offset = 2;    // Offset from the start of the request at which the call began.
-  google.protobuf.Duration elapsed = 3;   // How long the call ran for.
-  int64 memory = 4;                       // Memory used by the call, in bytes.
+message TraceSpan {
+  string name = 1;                      // Name of the function which was called.
+  google.protobuf.Duration offset = 2;  // Offset from the start of the request at which the earliest call in this span began.
+  google.protobuf.Duration elapsed = 3; // How long the longest single call in this span ran for.
+  google.protobuf.Duration total = 4;   // How long the calls in this span ran for altogether. Exceeds the request duration where a function called its way back into itself.
+  int64 calls = 5;                      // How many calls were aggregated into this span.
+  int64 memory = 6;                     // The highest memory reported by any call in this span, in bytes.
 }
 
 // Which Drupal API produced a cache event.

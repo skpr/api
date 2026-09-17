@@ -24,36 +24,50 @@ func (s *Server) StreamTraces(req *pb.StreamTracesRequest, server pb.Trace_Strea
 			return status.Errorf(codes.FailedPrecondition, "tracing is suspended for environment: %s", req.Environment)
 		}
 
+		threshold := s.GetThreshold(req.Environment)
+
 		now := time.Now()
 
 		// ~6ms realistic function execution time
 		latency := 6 * time.Millisecond
 
-		// Function calls generator, placed relative to the start of the request.
-		makeFunctionCalls := func() []*pb.TraceFunctionCall {
-			return []*pb.TraceFunctionCall{
+		// Spans generator, placed relative to the start of the request. Each span is
+		// the calls of one function during one slice of the request, so it carries
+		// how many there were, the longest of them, and what they cost altogether.
+		makeSpans := func() []*pb.TraceSpan {
+			return []*pb.TraceSpan{
 				{
 					Name:    "PDOStatement::execute",
 					Offset:  durationpb.New(0),
 					Elapsed: durationpb.New(latency),
+					Total:   durationpb.New(3 * latency),
+					Calls:   3,
 					Memory:  1048576,
 				},
 				{
 					Name:    "Drupal\\Core\\Database\\StatementPrefetchIterator::execute",
 					Offset:  durationpb.New(500 * time.Microsecond),
 					Elapsed: durationpb.New(latency),
+					Total:   durationpb.New(2 * latency),
+					Calls:   2,
 					Memory:  2097152,
 				},
 				{
 					Name:    "Drupal\\sqlite\\Driver\\Database\\sqlite\\Statement::execute",
 					Offset:  durationpb.New(1 * time.Millisecond),
 					Elapsed: durationpb.New(latency),
+					Total:   durationpb.New(latency),
+					Calls:   1,
 					Memory:  524288,
 				},
 				{
+					// Below the default threshold, so it only appears for an
+					// environment which has asked for a finer one.
 					Name:    "Drupal\\Core\\Database\\Query\\Upsert::execute",
 					Offset:  durationpb.New(1500 * time.Microsecond),
-					Elapsed: durationpb.New(latency),
+					Elapsed: durationpb.New(250 * time.Microsecond),
+					Total:   durationpb.New(500 * time.Microsecond),
+					Calls:   2,
 					Memory:  786432,
 				},
 			}
@@ -93,6 +107,8 @@ func (s *Server) StreamTraces(req *pb.StreamTracesRequest, server pb.Trace_Strea
 			start := now.Add(time.Duration(i*250) * time.Millisecond)
 			end := start.Add(50 * time.Millisecond)
 
+			spans, calls := aboveThreshold(makeSpans(), threshold)
+
 			traces = append(traces, &pb.Trace{
 				Metadata: &pb.TraceMetadata{
 					RequestId: gofakeit.UUID(),
@@ -105,8 +121,11 @@ func (s *Server) StreamTraces(req *pb.StreamTracesRequest, server pb.Trace_Strea
 						Uri:    "/sites/default/files/styles/scale_crop_7_3_wide/public/veggie-pasta-bake-hero-umami.jpg.webp?itok=CYsHBUlX",
 					},
 				},
-				FunctionCalls:        makeFunctionCalls(),
-				FunctionCallsDropped: 0,
+				Spans: spans,
+				// The call count is exact whether or not a span represents the calls,
+				// so it stays the same no matter where the threshold sits.
+				Calls:        calls,
+				CallsDropped: 0,
 				ResourceUtilisation: &pb.TraceResourceUtilisation{
 					MaxMemory: 33554432,
 				},
@@ -122,4 +141,28 @@ func (s *Server) StreamTraces(req *pb.StreamTracesRequest, server pb.Trace_Strea
 
 		time.Sleep(time.Second)
 	}
+}
+
+// aboveThreshold keeps the spans whose longest call ran for at least the
+// environment's threshold, which is what the extension's probe does, and returns
+// them along with the total number of calls the request made. The call count
+// covers every span, including those the threshold filtered out, because the
+// request made those calls either way.
+func aboveThreshold(spans []*pb.TraceSpan, threshold time.Duration) ([]*pb.TraceSpan, int64) {
+	var (
+		retained []*pb.TraceSpan
+		calls    int64
+	)
+
+	for _, span := range spans {
+		calls += span.Calls
+
+		if span.Elapsed.AsDuration() < threshold {
+			continue
+		}
+
+		retained = append(retained, span)
+	}
+
+	return retained, calls
 }

@@ -2,9 +2,14 @@ package trace
 
 import (
 	"sync"
+	"time"
 
 	"github.com/skpr/api/pb"
 )
+
+// DefaultThreshold is the tracing threshold an environment has until one is set
+// for it, matching the default which Compass ships with.
+const DefaultThreshold = time.Millisecond
 
 // Server implements the GRPC "trace" definition.
 type Server struct {
@@ -12,6 +17,7 @@ type Server struct {
 
 	lock      sync.Mutex
 	suspended map[string]bool
+	threshold map[string]time.Duration
 }
 
 // SetSuspended marks tracing as suspended, or resumed, for an environment.
@@ -32,4 +38,31 @@ func (s *Server) IsSuspended(environment string) bool {
 	defer s.lock.Unlock()
 
 	return s.suspended[environment]
+}
+
+// setThreshold records the minimum call duration which is traced for an environment.
+func (s *Server) setThreshold(environment string, threshold time.Duration) {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
+	if s.threshold == nil {
+		s.threshold = make(map[string]time.Duration)
+	}
+
+	s.threshold[environment] = threshold
+}
+
+// GetThreshold returns the minimum call duration which is traced for an
+// environment, falling back to the default for an environment which has not had
+// one set.
+func (s *Server) GetThreshold(environment string) time.Duration {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+
+	threshold, ok := s.threshold[environment]
+	if !ok {
+		return DefaultThreshold
+	}
+
+	return threshold
 }
