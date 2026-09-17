@@ -24,7 +24,7 @@ func (s *Server) StreamTraces(req *pb.StreamTracesRequest, server pb.Trace_Strea
 			return status.Errorf(codes.FailedPrecondition, "tracing is suspended for environment: %s", req.Environment)
 		}
 
-		threshold := s.GetThreshold(req.Environment)
+		threshold := s.getThreshold(req.Environment)
 
 		now := time.Now()
 

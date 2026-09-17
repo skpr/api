@@ -40,7 +40,7 @@ func TestSetThreshold(t *testing.T) {
 				t.Errorf("got code %s, want %s", got, c.wantCode)
 			}
 
-			if got := srv.GetThreshold("dev"); got != c.want {
+			if got := getThreshold(t, srv, "dev"); got != c.want {
 				t.Errorf("got threshold %s, want %s", got, c.want)
 			}
 		})
@@ -52,7 +52,7 @@ func TestSetThreshold(t *testing.T) {
 func TestGetThresholdDefaults(t *testing.T) {
 	srv := &Server{}
 
-	if got := srv.GetThreshold("dev"); got != DefaultThreshold {
+	if got := getThreshold(t, srv, "dev"); got != DefaultThreshold {
 		t.Errorf("got threshold %s, want %s", got, DefaultThreshold)
 	}
 }
@@ -69,8 +69,41 @@ func TestSetThresholdIsPerEnvironment(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
-	if got := srv.GetThreshold("prod"); got != DefaultThreshold {
+	if got := getThreshold(t, srv, "prod"); got != DefaultThreshold {
 		t.Errorf("got threshold %s for prod, want %s", got, DefaultThreshold)
+	}
+}
+
+// --- GetSuspended ---
+
+// Suspending and resuming are only useful if a client can find out which of the
+// two an environment is in, without opening a stream to see if it fails.
+func TestGetSuspended(t *testing.T) {
+	srv := &Server{}
+
+	if getSuspended(t, srv, "dev") {
+		t.Error("got suspended for an environment which was never suspended")
+	}
+
+	if _, err := srv.Suspend(context.TODO(), &pb.TraceSuspendRequest{Environment: "dev"}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if !getSuspended(t, srv, "dev") {
+		t.Error("got resumed after Suspend")
+	}
+
+	// Suspending one environment does not suspend the rest.
+	if getSuspended(t, srv, "prod") {
+		t.Error("got suspended for prod after suspending dev")
+	}
+
+	if _, err := srv.Resume(context.TODO(), &pb.TraceResumeRequest{Environment: "dev"}); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if getSuspended(t, srv, "dev") {
+		t.Error("got suspended after Resume")
 	}
 }
 
@@ -115,4 +148,28 @@ func TestAboveThreshold(t *testing.T) {
 			}
 		})
 	}
+}
+
+// --- helpers ---
+
+func getThreshold(t *testing.T, srv *Server, environment string) time.Duration {
+	t.Helper()
+
+	resp, err := srv.GetThreshold(context.TODO(), &pb.TraceGetThresholdRequest{Environment: environment})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	return resp.Threshold.AsDuration()
+}
+
+func getSuspended(t *testing.T, srv *Server, environment string) bool {
+	t.Helper()
+
+	resp, err := srv.GetSuspended(context.TODO(), &pb.TraceGetSuspendedRequest{Environment: environment})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	return resp.Suspended
 }
