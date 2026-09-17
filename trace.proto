@@ -11,7 +11,9 @@ option go_package = "./pb";
 service trace {
   rpc Suspend (TraceSuspendRequest) returns (TraceSuspendResponse) {}
   rpc Resume (TraceResumeRequest) returns (TraceResumeResponse) {}
+  rpc GetSuspended (TraceGetSuspendedRequest) returns (TraceGetSuspendedResponse) {}
   rpc SetThreshold (TraceSetThresholdRequest) returns (TraceSetThresholdResponse) {}
+  rpc GetThreshold (TraceGetThresholdRequest) returns (TraceGetThresholdResponse) {}
   rpc StreamTraces (StreamTracesRequest) returns (stream StreamTracesResponse) {}
 }
 
@@ -40,6 +42,20 @@ message TraceResumeRequest {
 message TraceResumeResponse {}
 
 /**
+ * Request whether tracing is currently suspended for an environment
+ */
+message TraceGetSuspendedRequest {
+  string Environment = 1; // Name of the environment
+}
+
+/**
+ * Whether tracing is currently suspended for an environment
+ */
+message TraceGetSuspendedResponse {
+  bool Suspended = 1; // If tracing is suspended for the environment
+}
+
+/**
  * Request that the tracing threshold be set for an environment
  */
 message TraceSetThresholdRequest {
@@ -57,6 +73,24 @@ message TraceSetThresholdRequest {
  * Response if setting the tracing threshold was successful
  */
 message TraceSetThresholdResponse {}
+
+/**
+ * Request the tracing threshold currently applied to an environment
+ */
+message TraceGetThresholdRequest {
+  string Environment = 1; // Name of the environment
+}
+
+/**
+ * The tracing threshold currently applied to an environment
+ */
+message TraceGetThresholdResponse {
+  // Minimum duration a function call has to run for before it is traced.
+  //
+  // An environment which has never had one set reports the default rather than
+  // zero, because zero is itself a meaningful threshold which traces every call.
+  google.protobuf.Duration Threshold = 1;
+}
 
 /**
  * Input for StreamTraces.

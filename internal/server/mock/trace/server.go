@@ -15,9 +15,9 @@ const DefaultThreshold = time.Millisecond
 type Server struct {
 	pb.UnimplementedTraceServer
 
-	lock      sync.Mutex
-	suspended map[string]bool
-	threshold map[string]time.Duration
+	lock       sync.Mutex
+	suspended  map[string]bool
+	thresholds map[string]time.Duration
 }
 
 // SetSuspended marks tracing as suspended, or resumed, for an environment.
@@ -45,21 +45,21 @@ func (s *Server) setThreshold(environment string, threshold time.Duration) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
-	if s.threshold == nil {
-		s.threshold = make(map[string]time.Duration)
+	if s.thresholds == nil {
+		s.thresholds = make(map[string]time.Duration)
 	}
 
-	s.threshold[environment] = threshold
+	s.thresholds[environment] = threshold
 }
 
-// GetThreshold returns the minimum call duration which is traced for an
+// getThreshold returns the minimum call duration which is traced for an
 // environment, falling back to the default for an environment which has not had
 // one set.
-func (s *Server) GetThreshold(environment string) time.Duration {
+func (s *Server) getThreshold(environment string) time.Duration {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
-	threshold, ok := s.threshold[environment]
+	threshold, ok := s.thresholds[environment]
 	if !ok {
 		return DefaultThreshold
 	}

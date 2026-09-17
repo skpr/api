@@ -24,7 +24,9 @@ const _ = grpc.SupportPackageIsVersion7
 type TraceClient interface {
 	Suspend(ctx context.Context, in *TraceSuspendRequest, opts ...grpc.CallOption) (*TraceSuspendResponse, error)
 	Resume(ctx context.Context, in *TraceResumeRequest, opts ...grpc.CallOption) (*TraceResumeResponse, error)
+	GetSuspended(ctx context.Context, in *TraceGetSuspendedRequest, opts ...grpc.CallOption) (*TraceGetSuspendedResponse, error)
 	SetThreshold(ctx context.Context, in *TraceSetThresholdRequest, opts ...grpc.CallOption) (*TraceSetThresholdResponse, error)
+	GetThreshold(ctx context.Context, in *TraceGetThresholdRequest, opts ...grpc.CallOption) (*TraceGetThresholdResponse, error)
 	StreamTraces(ctx context.Context, in *StreamTracesRequest, opts ...grpc.CallOption) (Trace_StreamTracesClient, error)
 }
 
@@ -54,9 +56,27 @@ func (c *traceClient) Resume(ctx context.Context, in *TraceResumeRequest, opts .
 	return out, nil
 }
 
+func (c *traceClient) GetSuspended(ctx context.Context, in *TraceGetSuspendedRequest, opts ...grpc.CallOption) (*TraceGetSuspendedResponse, error) {
+	out := new(TraceGetSuspendedResponse)
+	err := c.cc.Invoke(ctx, "/workflow.trace/GetSuspended", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *traceClient) SetThreshold(ctx context.Context, in *TraceSetThresholdRequest, opts ...grpc.CallOption) (*TraceSetThresholdResponse, error) {
 	out := new(TraceSetThresholdResponse)
 	err := c.cc.Invoke(ctx, "/workflow.trace/SetThreshold", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *traceClient) GetThreshold(ctx context.Context, in *TraceGetThresholdRequest, opts ...grpc.CallOption) (*TraceGetThresholdResponse, error) {
+	out := new(TraceGetThresholdResponse)
+	err := c.cc.Invoke(ctx, "/workflow.trace/GetThreshold", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +121,9 @@ func (x *traceStreamTracesClient) Recv() (*StreamTracesResponse, error) {
 type TraceServer interface {
 	Suspend(context.Context, *TraceSuspendRequest) (*TraceSuspendResponse, error)
 	Resume(context.Context, *TraceResumeRequest) (*TraceResumeResponse, error)
+	GetSuspended(context.Context, *TraceGetSuspendedRequest) (*TraceGetSuspendedResponse, error)
 	SetThreshold(context.Context, *TraceSetThresholdRequest) (*TraceSetThresholdResponse, error)
+	GetThreshold(context.Context, *TraceGetThresholdRequest) (*TraceGetThresholdResponse, error)
 	StreamTraces(*StreamTracesRequest, Trace_StreamTracesServer) error
 	mustEmbedUnimplementedTraceServer()
 }
@@ -116,8 +138,14 @@ func (UnimplementedTraceServer) Suspend(context.Context, *TraceSuspendRequest) (
 func (UnimplementedTraceServer) Resume(context.Context, *TraceResumeRequest) (*TraceResumeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Resume not implemented")
 }
+func (UnimplementedTraceServer) GetSuspended(context.Context, *TraceGetSuspendedRequest) (*TraceGetSuspendedResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetSuspended not implemented")
+}
 func (UnimplementedTraceServer) SetThreshold(context.Context, *TraceSetThresholdRequest) (*TraceSetThresholdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetThreshold not implemented")
+}
+func (UnimplementedTraceServer) GetThreshold(context.Context, *TraceGetThresholdRequest) (*TraceGetThresholdResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetThreshold not implemented")
 }
 func (UnimplementedTraceServer) StreamTraces(*StreamTracesRequest, Trace_StreamTracesServer) error {
 	return status.Errorf(codes.Unimplemented, "method StreamTraces not implemented")
@@ -171,6 +199,24 @@ func _Trace_Resume_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Trace_GetSuspended_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TraceGetSuspendedRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TraceServer).GetSuspended(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/workflow.trace/GetSuspended",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TraceServer).GetSuspended(ctx, req.(*TraceGetSuspendedRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Trace_SetThreshold_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(TraceSetThresholdRequest)
 	if err := dec(in); err != nil {
@@ -185,6 +231,24 @@ func _Trace_SetThreshold_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(TraceServer).SetThreshold(ctx, req.(*TraceSetThresholdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Trace_GetThreshold_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TraceGetThresholdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TraceServer).GetThreshold(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/workflow.trace/GetThreshold",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TraceServer).GetThreshold(ctx, req.(*TraceGetThresholdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -226,8 +290,16 @@ var Trace_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Trace_Resume_Handler,
 		},
 		{
+			MethodName: "GetSuspended",
+			Handler:    _Trace_GetSuspended_Handler,
+		},
+		{
 			MethodName: "SetThreshold",
 			Handler:    _Trace_SetThreshold_Handler,
+		},
+		{
+			MethodName: "GetThreshold",
+			Handler:    _Trace_GetThreshold_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
