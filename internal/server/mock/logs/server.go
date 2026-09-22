@@ -22,8 +22,9 @@ const (
 // Raw JSON payloads reused from the Tail mock, kept here so fixture events
 // look realistic without duplicating the strings across methods.
 const (
-	rawNginx = `{ "body_bytes_sent": "37", "http_forward": "10.0.39.194", "http_header": "-", "http_referrer": "-", "http_user_agent": "ELB-HealthChecker/2.0", "http_x_amzn_trace_id": "-", "remote_addr": "10.0.39.194", "remote_user": "-", "request": "GET /readyz HTTP/1.1", "request_id": "6a06b1bf387b54f5f88cd1cac8c75de1", "request_method": "GET", "request_time": "0.001", "request_uri": "/readyz", "request_uri_query": "-", "server_name": "", "status": "200", "timestamp": "2025-03-25T01:21:50+00:00", "upstream_addr": "127.0.0.1:9000", "upstream_cache_status": "-", "upstream_http_x_drupal_cache": "-", "upstream_http_x_drupal_dynamic_cache": "-", "upstream_response_length": "23", "upstream_response_time": "0.002", "upstream_status": "200" }`
-	rawFPM   = `{ "body_bytes_sent": "0", "client_ip": "-", "cpu": "0.00", "headers": { "Cache-Control": "no-cache, no-store, must-revalidate, max-age=0" }, "http_referrer": "", "http_user_agent": "kube-probe/1.31+", "memory": "2097152", "remote_addr": "127.0.0.1", "remote_user": "", "request_id": "eaff1b73b352356ea0a321a250c1d591", "request_time": "0.001", "request_uri": "/readyz", "skpr_component": "fpm", "status": "200", "timestamp": "2025-03-25T01:21:26+0000" }`
+	rawCloudfront = `FRA60-P12	1266	94.154.43.164	GET	faux.cloudfront.net	/	403	-	Mozilla/5.0%20(Windows%20NT%2010.0;%20Win64;%20x64)%20AppleWebKit/537.36%20(KHTML,%20like%20Gecko)%20Chrome/147.0.0.0%20Safari/537.36	-	-	Error	htuneoahutneoahuneoahuneoa	test.skpr.dev	https	234	0.002	-	TLSv1.3	TLS_AES_128_GCM_SHA256	Error	HTTP/1.1	-	-	60092	0.002	Error	text/html	919	-	-`
+	rawNginx      = `{ "body_bytes_sent": "37", "http_forward": "10.0.39.194", "http_header": "-", "http_referrer": "-", "http_user_agent": "ELB-HealthChecker/2.0", "http_x_amzn_trace_id": "-", "remote_addr": "10.0.39.194", "remote_user": "-", "request": "GET /readyz HTTP/1.1", "request_id": "6a06b1bf387b54f5f88cd1cac8c75de1", "request_method": "GET", "request_time": "0.001", "request_uri": "/readyz", "request_uri_query": "-", "server_name": "", "status": "200", "timestamp": "2025-03-25T01:21:50+00:00", "upstream_addr": "127.0.0.1:9000", "upstream_cache_status": "-", "upstream_http_x_drupal_cache": "-", "upstream_http_x_drupal_dynamic_cache": "-", "upstream_response_length": "23", "upstream_response_time": "0.002", "upstream_status": "200" }`
+	rawFPM        = `{ "body_bytes_sent": "0", "client_ip": "-", "cpu": "0.00", "headers": { "Cache-Control": "no-cache, no-store, must-revalidate, max-age=0" }, "http_referrer": "", "http_user_agent": "kube-probe/1.31+", "memory": "2097152", "remote_addr": "127.0.0.1", "remote_user": "", "request_id": "eaff1b73b352356ea0a321a250c1d591", "request_time": "0.001", "request_uri": "/readyz", "skpr_component": "fpm", "status": "200", "timestamp": "2025-03-25T01:21:26+0000" }`
 )
 
 // Server implements the GRPC "events" definition.
@@ -117,6 +118,16 @@ func (s *Server) Tail(req *pb.LogTailRequest, server pb.Logs_TailServer) error {
 func buildMockEvents() []*pb.LogEvent {
 	now := time.Now()
 	return []*pb.LogEvent{
+		{
+			Timestamp: timestamppb.New(now.Add(-20 * time.Second)),
+			Stream:    StreamCloudfront,
+			Message:   rawCloudfront,
+		},
+		{
+			Timestamp: timestamppb.New(now.Add(-1 * time.Minute)),
+			Stream:    StreamNginx,
+			Message:   rawNginx,
+		},
 		{
 			Timestamp: timestamppb.New(now.Add(-1 * time.Minute)),
 			Stream:    StreamNginx,
