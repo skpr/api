@@ -7,10 +7,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/skpr/api/pb"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
+
+	"github.com/skpr/api/pb"
 )
 
 // Server implements the GRPC "events" definition.

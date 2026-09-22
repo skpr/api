@@ -1,12 +1,13 @@
 [tools]
 go = "1.26"
 "go:github.com/daixiang0/gci" = "latest"
-"ubi:golangci/golangci-lint" = "2.10"
-"ubi:goreleaser/goreleaser" = "2.14"
+"github:golangci/golangci-lint" = "latest"
+"github:securego/gosec" = "latest"
+"github:goreleaser/goreleaser" = "latest"
 
 [env]
 CGO_ENABLED=0
-LGFLAGS="-extldflags '-static'"
+LDFLAGS="-extldflags '-static'"
 IMAGE="skpr/grpc-go:latest"
 PB_DIR="./pb"
 
@@ -32,7 +33,7 @@ docker run -w /data -v .:/data $IMAGE /bin/bash -c 'protoc --go_out=./pb --go_op
 
 [tasks."build"]
 description = "Build the application"
-run = "go build -o bin/apiserver-mock -ldflags=${CLI_LDFLAGS} github.com/skpr/api/cmd/apiserver-mock"
+run = "go build -o bin/apiserver-mock -ldflags=\"${LDFLAGS}\" github.com/skpr/api/cmd/apiserver-mock"
 depends = ["vendor"]
 
 [tasks.mock]
