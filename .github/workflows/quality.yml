@@ -1,4 +1,4 @@
-name: 📋 GolangCI Checks
+name: 📋 Lint
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
 
 jobs:
   lint:
-    name: 📋 GolangCI
+    name: 📋 Lint
     runs-on: ubuntu-latest
     steps:
       - name: ⬇️ Git clone the repository
