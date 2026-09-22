@@ -40,7 +40,7 @@ func (s *Model) GetEnvironments() []*Environment {
 	return response
 }
 
-func (s *Model) CreateEnvironment(name string, size int, metrics bool) {
+func (s *Model) CreateEnvironment(name string, size int32, metrics bool) {
 	environment := &pb.Environment{
 		Name:       name,
 		Version:    "v0.0.1",
@@ -62,9 +62,9 @@ func (s *Model) CreateEnvironment(name string, size int, metrics bool) {
 				Limit:   512 * int64(size) * 1024,
 			},
 			Replicas: &pb.EnvironmentResourcesReplicas{
-				Current: 1 * int32(size),
-				Min:     1 * int32(size),
-				Max:     5 * int32(size),
+				Current: 1 * size,
+				Min:     1 * size,
+				Max:     5 * size,
 			},
 		},
 		Cron: []*pb.Cron{
