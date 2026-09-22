@@ -7,9 +7,6 @@ issues:
 linters:
   enable:
     - gosec
-  disable:
-    # We check error as part of our PR process.
-    - errcheck
 
 formatters:
   enable:
