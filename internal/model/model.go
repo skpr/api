@@ -46,6 +46,7 @@ func (s *Model) CreateEnvironment(name string, size int32, metrics bool) {
 		Version:    "v0.0.1",
 		Phase:      "Deployed",
 		Production: name == "prod",
+		Suspended:  false,
 		Ingress: &pb.Ingress{
 			Routes: []string{
 				fmt.Sprintf("%s.mock.local.skpr.dev", name),
@@ -197,7 +198,6 @@ func (s *Model) CreateEnvironment(name string, size int32, metrics bool) {
 
 	s.Environments[name] = &Environment{
 		Environment: environment,
-		Suspended:   false,
 		Config:      config,
 		Cron:        cron,
 		Purge:       purge,
@@ -233,7 +233,6 @@ func (m *Model) GetRestore(id string) (*Restore, error) {
 
 type Environment struct {
 	Environment *pb.Environment
-	Suspended   bool
 	Config      map[string]*pb.Config
 	Cron        map[string]*Cron
 	Purge       []*Purge

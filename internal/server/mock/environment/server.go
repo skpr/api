@@ -54,7 +54,7 @@ func (c *Server) Suspend(ctx context.Context, req *pb.EnvironmentSuspendRequest)
 		return nil, err
 	}
 
-	environment.Suspended = true
+	environment.Environment.Suspended = true
 
 	resp := &pb.EnvironmentSuspendResponse{}
 	return resp, nil
@@ -66,7 +66,7 @@ func (c *Server) Resume(ctx context.Context, req *pb.EnvironmentResumeRequest) (
 		return nil, err
 	}
 
-	environment.Suspended = false
+	environment.Environment.Suspended = false
 
 	resp := &pb.EnvironmentResumeResponse{}
 	return resp, nil

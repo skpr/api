@@ -53,7 +53,7 @@ message Environment {
   string Version = 5; // Version associated with an environment
   string Size = 6; // Size of the environment
   Ingress Ingress = 7; // Ingress configuration for routing
-  Image Image = 8; // Image respository information
+  Image Image = 8; // Image repository information
   repeated Cron Cron = 9; // Cron configuration for an environment
   repeated MySQL MySQL = 10; // MySQL configuration for an environment
   SMTP SMTP = 11; // SMTP configuration for an environment
@@ -67,6 +67,7 @@ message Environment {
   repeated Daemon Daemon = 19; // Daemon configuration for an environment
   EnvironmentResources Resources = 20; // Resources utilised by this environment
   EnvironmentMetrics Metrics = 21; // Metrics configuration for this environment
+  bool Suspended = 22; // Environment is suspended
 }
 
 /**
