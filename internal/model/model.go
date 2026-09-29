@@ -46,6 +46,7 @@ func (s *Model) CreateEnvironment(name string, size int32, metrics bool) {
 		Version:    "v0.0.1",
 		Phase:      "Deployed",
 		Production: name == "prod",
+		Suspended:  false,
 		Ingress: &pb.Ingress{
 			Routes: []string{
 				fmt.Sprintf("%s.mock.local.skpr.dev", name),
