@@ -12,6 +12,8 @@ service environment {
   rpc Create (EnvironmentCreateRequest) returns (stream EnvironmentCreateResponse) {}
   rpc Update (EnvironmentUpdateRequest) returns (stream EnvironmentUpdateResponse) {}
   rpc Validate (EnvironmentValidateRequest) returns (EnvironmentValidateResponse) {}
+  rpc Suspend (EnvironmentSuspendRequest) returns (EnvironmentSuspendResponse) {}
+  rpc Resume (EnvironmentResumeRequest) returns (EnvironmentResumeResponse) {}
 }
 
 /**

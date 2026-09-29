@@ -28,6 +28,8 @@ type EnvironmentClient interface {
 	Create(ctx context.Context, in *EnvironmentCreateRequest, opts ...grpc.CallOption) (Environment_CreateClient, error)
 	Update(ctx context.Context, in *EnvironmentUpdateRequest, opts ...grpc.CallOption) (Environment_UpdateClient, error)
 	Validate(ctx context.Context, in *EnvironmentValidateRequest, opts ...grpc.CallOption) (*EnvironmentValidateResponse, error)
+	Suspend(ctx context.Context, in *EnvironmentSuspendRequest, opts ...grpc.CallOption) (*EnvironmentSuspendResponse, error)
+	Resume(ctx context.Context, in *EnvironmentResumeRequest, opts ...grpc.CallOption) (*EnvironmentResumeResponse, error)
 }
 
 type environmentClient struct {
@@ -138,6 +140,24 @@ func (c *environmentClient) Validate(ctx context.Context, in *EnvironmentValidat
 	return out, nil
 }
 
+func (c *environmentClient) Suspend(ctx context.Context, in *EnvironmentSuspendRequest, opts ...grpc.CallOption) (*EnvironmentSuspendResponse, error) {
+	out := new(EnvironmentSuspendResponse)
+	err := c.cc.Invoke(ctx, "/workflow.environment/Suspend", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *environmentClient) Resume(ctx context.Context, in *EnvironmentResumeRequest, opts ...grpc.CallOption) (*EnvironmentResumeResponse, error) {
+	out := new(EnvironmentResumeResponse)
+	err := c.cc.Invoke(ctx, "/workflow.environment/Resume", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // EnvironmentServer is the server API for Environment service.
 // All implementations must embed UnimplementedEnvironmentServer
 // for forward compatibility
@@ -148,6 +168,8 @@ type EnvironmentServer interface {
 	Create(*EnvironmentCreateRequest, Environment_CreateServer) error
 	Update(*EnvironmentUpdateRequest, Environment_UpdateServer) error
 	Validate(context.Context, *EnvironmentValidateRequest) (*EnvironmentValidateResponse, error)
+	Suspend(context.Context, *EnvironmentSuspendRequest) (*EnvironmentSuspendResponse, error)
+	Resume(context.Context, *EnvironmentResumeRequest) (*EnvironmentResumeResponse, error)
 	mustEmbedUnimplementedEnvironmentServer()
 }
 
@@ -172,6 +194,12 @@ func (UnimplementedEnvironmentServer) Update(*EnvironmentUpdateRequest, Environm
 }
 func (UnimplementedEnvironmentServer) Validate(context.Context, *EnvironmentValidateRequest) (*EnvironmentValidateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Validate not implemented")
+}
+func (UnimplementedEnvironmentServer) Suspend(context.Context, *EnvironmentSuspendRequest) (*EnvironmentSuspendResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Suspend not implemented")
+}
+func (UnimplementedEnvironmentServer) Resume(context.Context, *EnvironmentResumeRequest) (*EnvironmentResumeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Resume not implemented")
 }
 func (UnimplementedEnvironmentServer) mustEmbedUnimplementedEnvironmentServer() {}
 
@@ -300,6 +328,42 @@ func _Environment_Validate_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Environment_Suspend_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EnvironmentSuspendRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EnvironmentServer).Suspend(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/workflow.environment/Suspend",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EnvironmentServer).Suspend(ctx, req.(*EnvironmentSuspendRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Environment_Resume_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EnvironmentResumeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EnvironmentServer).Resume(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/workflow.environment/Resume",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EnvironmentServer).Resume(ctx, req.(*EnvironmentResumeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Environment_ServiceDesc is the grpc.ServiceDesc for Environment service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -322,6 +386,14 @@ var Environment_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Validate",
 			Handler:    _Environment_Validate_Handler,
+		},
+		{
+			MethodName: "Suspend",
+			Handler:    _Environment_Suspend_Handler,
+		},
+		{
+			MethodName: "Resume",
+			Handler:    _Environment_Resume_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
