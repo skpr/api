@@ -47,3 +47,27 @@ func (c *Server) Delete(ctx context.Context, req *pb.EnvironmentDeleteRequest) (
 	resp := &pb.EnvironmentDeleteResponse{}
 	return resp, nil
 }
+
+func (c *Server) Suspend(ctx context.Context, req *pb.EnvironmentSuspendRequest) (*pb.EnvironmentSuspendResponse, error) {
+	environment, err := c.Model.GetEnvironment(req.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	environment.Suspended = true
+
+	resp := &pb.EnvironmentSuspendResponse{}
+	return resp, nil
+}
+
+func (c *Server) Resume(ctx context.Context, req *pb.EnvironmentResumeRequest) (*pb.EnvironmentResumeResponse, error) {
+	environment, err := c.Model.GetEnvironment(req.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	environment.Suspended = false
+
+	resp := &pb.EnvironmentResumeResponse{}
+	return resp, nil
+}

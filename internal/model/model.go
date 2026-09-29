@@ -197,6 +197,7 @@ func (s *Model) CreateEnvironment(name string, size int32, metrics bool) {
 
 	s.Environments[name] = &Environment{
 		Environment: environment,
+		Suspended:   false,
 		Config:      config,
 		Cron:        cron,
 		Purge:       purge,
