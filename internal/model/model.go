@@ -232,6 +232,7 @@ func (m *Model) GetRestore(id string) (*Restore, error) {
 
 type Environment struct {
 	Environment *pb.Environment
+	Suspended   bool
 	Config      map[string]*pb.Config
 	Cron        map[string]*Cron
 	Purge       []*Purge

@@ -147,6 +147,30 @@ message EnvironmentGetResponse {
 }
 
 /**
+ * Request that environment is suspended
+ */
+message EnvironmentSuspendRequest {
+  string Name = 1; // Name of the environment
+}
+
+/**
+ * Response if the environment suspend was successful
+ */
+message EnvironmentSuspendResponse {}
+
+/**
+ * Request that environment be resumed
+ */
+message EnvironmentResumeRequest {
+  string Name = 1; // Name of the environment
+}
+
+/**
+ * Response if the environment resume was successful
+ */
+message EnvironmentResumeResponse {}
+
+/**
  * Request a list of environment
  */
 message EnvironmentListRequest {}
