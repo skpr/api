@@ -1,4 +1,5 @@
 version: 2
+
 updates:
   - package-ecosystem: "gomod"
     directory: "/"
@@ -8,3 +9,8 @@ updates:
       go-dependencies:
         patterns:
           - "*"
+      gomod-security-deps:
+        applies-to: security-updates
+        patterns: [ "*" ]
+    cooldown:
+      default-days: 2
