@@ -1,4 +1,5 @@
 version: 2
+
 updates:
   - package-ecosystem: "gomod"
     directory: "/"
@@ -8,11 +9,6 @@ updates:
       go-dependencies:
         patterns:
           - "*"
-        update-types: [ "minor", "patch" ]
-      go-major-dependencies:
-        patterns:
-          - "*"
-        update-types: [ "major" ]
       gomod-security-deps:
         applies-to: security-updates
         patterns: [ "*" ]
