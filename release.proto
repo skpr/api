@@ -10,6 +10,7 @@ service release {
   rpc Info (ReleaseInfoRequest) returns (ReleaseInfoResponse) {}
   rpc List (ReleaseListRequest) returns (ReleaseListResponse) {}
   rpc SignerInfo (ReleaseSignerInfoRequest) returns (ReleaseSignerInfoResponse) {}
+  rpc SbomList (ReleaseSbomListRequest) returns (ReleaseSbomListResponse) {}
 }
 
 /**
@@ -82,4 +83,28 @@ message ReleaseSignerInfoRequest {}
  */
 message ReleaseSignerInfoResponse {
   string Identifier = 1; // Identifier for the signer
+}
+
+/**
+ * List the software components in a release image
+ */
+message ReleaseSbomListRequest {
+  string Release = 1; // Name of the release
+  string Image = 2; // Name of the release image
+}
+
+/**
+ * Returns the software components in a release image
+ */
+message ReleaseSbomListResponse {
+  repeated ReleaseSbomComponent Items = 1; // Components in the image
+}
+
+/**
+ * A software component in a release image
+ */
+message ReleaseSbomComponent {
+  string Name = 1; // Name as the ecosystem spells it, e.g. drupal/core
+  string Version = 2; // Version of the component
+  string Ecosystem = 3; // Package ecosystem, e.g. composer, npm, deb
 }

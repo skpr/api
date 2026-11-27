@@ -26,6 +26,7 @@ type ReleaseClient interface {
 	Info(ctx context.Context, in *ReleaseInfoRequest, opts ...grpc.CallOption) (*ReleaseInfoResponse, error)
 	List(ctx context.Context, in *ReleaseListRequest, opts ...grpc.CallOption) (*ReleaseListResponse, error)
 	SignerInfo(ctx context.Context, in *ReleaseSignerInfoRequest, opts ...grpc.CallOption) (*ReleaseSignerInfoResponse, error)
+	SbomList(ctx context.Context, in *ReleaseSbomListRequest, opts ...grpc.CallOption) (*ReleaseSbomListResponse, error)
 }
 
 type releaseClient struct {
@@ -72,6 +73,15 @@ func (c *releaseClient) SignerInfo(ctx context.Context, in *ReleaseSignerInfoReq
 	return out, nil
 }
 
+func (c *releaseClient) SbomList(ctx context.Context, in *ReleaseSbomListRequest, opts ...grpc.CallOption) (*ReleaseSbomListResponse, error) {
+	out := new(ReleaseSbomListResponse)
+	err := c.cc.Invoke(ctx, "/workflow.release/SbomList", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ReleaseServer is the server API for Release service.
 // All implementations must embed UnimplementedReleaseServer
 // for forward compatibility
@@ -80,6 +90,7 @@ type ReleaseServer interface {
 	Info(context.Context, *ReleaseInfoRequest) (*ReleaseInfoResponse, error)
 	List(context.Context, *ReleaseListRequest) (*ReleaseListResponse, error)
 	SignerInfo(context.Context, *ReleaseSignerInfoRequest) (*ReleaseSignerInfoResponse, error)
+	SbomList(context.Context, *ReleaseSbomListRequest) (*ReleaseSbomListResponse, error)
 	mustEmbedUnimplementedReleaseServer()
 }
 
@@ -98,6 +109,9 @@ func (UnimplementedReleaseServer) List(context.Context, *ReleaseListRequest) (*R
 }
 func (UnimplementedReleaseServer) SignerInfo(context.Context, *ReleaseSignerInfoRequest) (*ReleaseSignerInfoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SignerInfo not implemented")
+}
+func (UnimplementedReleaseServer) SbomList(context.Context, *ReleaseSbomListRequest) (*ReleaseSbomListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SbomList not implemented")
 }
 func (UnimplementedReleaseServer) mustEmbedUnimplementedReleaseServer() {}
 
@@ -184,6 +198,24 @@ func _Release_SignerInfo_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Release_SbomList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReleaseSbomListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReleaseServer).SbomList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/workflow.release/SbomList",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReleaseServer).SbomList(ctx, req.(*ReleaseSbomListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Release_ServiceDesc is the grpc.ServiceDesc for Release service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -206,6 +238,10 @@ var Release_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SignerInfo",
 			Handler:    _Release_SignerInfo_Handler,
+		},
+		{
+			MethodName: "SbomList",
+			Handler:    _Release_SbomList_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
